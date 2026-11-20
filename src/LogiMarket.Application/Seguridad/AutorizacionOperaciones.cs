@@ -20,6 +20,7 @@ public enum Operacion
 public interface IAuditoriaAcceso
 {
     Task DenegadoAsync(Guid? usuarioId, Operacion operacion, CancellationToken ct);
+    Task GuardarPendientesAsync(CancellationToken ct);
 }
 
 public sealed class AutorizacionOperaciones(SesionLocal sesion, IAuditoriaAcceso auditoria)
@@ -33,6 +34,8 @@ public sealed class AutorizacionOperaciones(SesionLocal sesion, IAuditoriaAcceso
         await auditoria.DenegadoAsync(identidad?.UsuarioId, operacion, ct);
         throw new UnauthorizedAccessException("La sesión no tiene permiso para esta operación.");
     }
+
+    public Task GuardarDenegacionesPendientesAsync(CancellationToken ct) => auditoria.GuardarPendientesAsync(ct);
 
     public static bool Permite(Rol rol, Operacion operacion)
     {

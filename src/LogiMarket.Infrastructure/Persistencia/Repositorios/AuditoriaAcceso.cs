@@ -1,13 +1,17 @@
 using LogiMarket.Application.Seguridad;
 using LogiMarket.Infrastructure.Persistencia.Operaciones;
+using Microsoft.EntityFrameworkCore;
 
 namespace LogiMarket.Infrastructure.Persistencia.Repositorios;
 
-public sealed class AuditoriaAcceso(LogiMarketDbContext db, TimeProvider reloj) : IAuditoriaAcceso
+public sealed class AuditoriaAcceso(LogiMarketDbContext db, DbContextOptions<LogiMarketDbContext> opciones,
+    TimeProvider reloj) : IAuditoriaAcceso
 {
-    public async Task DenegadoAsync(Guid? usuarioId, Operacion operacion, CancellationToken ct)
+    private readonly List<AuditoriaRegistro> _pendientes = [];
+
+    public Task DenegadoAsync(Guid? usuarioId, Operacion operacion, CancellationToken ct)
     {
-        db.Auditorias.Add(new AuditoriaRegistro
+        _pendientes.Add(new AuditoriaRegistro
         {
             UsuarioId = usuarioId,
             Categoria = "SEGURIDAD",
@@ -16,6 +20,18 @@ public sealed class AuditoriaAcceso(LogiMarketDbContext db, TimeProvider reloj) 
             Correlacion = Guid.NewGuid().ToString("N"),
             FechaUtc = reloj.GetUtcNow().UtcDateTime
         });
-        await db.SaveChangesAsync(ct);
+
+        return db.Database.CurrentTransaction is null ? GuardarPendientesAsync(ct) : Task.CompletedTask;
+    }
+
+    public async Task GuardarPendientesAsync(CancellationToken ct)
+    {
+        if (_pendientes.Count == 0)
+            return;
+
+        await using var escritura = new LogiMarketDbContext(opciones);
+        escritura.Auditorias.AddRange(_pendientes);
+        await escritura.SaveChangesAsync(ct);
+        _pendientes.Clear();
     }
 }

@@ -30,6 +30,7 @@ public sealed class ConfirmacionPedidoFacade(AutorizacionOperaciones acceso, IUn
         }
         finally
         {
+            await acceso.GuardarDenegacionesPendientesAsync(CancellationToken.None);
             await trazas.GuardarAsync(CancellationToken.None);
         }
     }
