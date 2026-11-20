@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../LogiMarket.Application/LogiMarket.Application.csproj" />
+    <ProjectReference Include="../LogiMarket.Infrastructure/LogiMarket.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
