@@ -57,6 +57,8 @@ public static class RegistroPersistencia
         servicios.AddScoped<IPagosRegistrados, PagosRegistrados>();
         servicios.AddScoped<IColaEventos, ColaEventosSqlite>();
         servicios.AddScoped<ConfirmacionPedidoFacade>();
+        servicios.AddScoped<IDespachosRegistrados, DespachosRegistrados>();
+        servicios.AddScoped<DespacharPedidos>();
         return servicios;
     }
 }
