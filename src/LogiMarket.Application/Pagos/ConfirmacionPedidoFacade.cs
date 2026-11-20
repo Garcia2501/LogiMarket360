@@ -1,5 +1,4 @@
 using LogiMarket.Application.Clientes;
-using LogiMarket.Application.Entregas;
 using LogiMarket.Application.Eventos;
 using LogiMarket.Application.Inventario;
 using LogiMarket.Application.Pedidos;
@@ -13,7 +12,7 @@ namespace LogiMarket.Application.Pagos;
 // patron facade: coordina la confirmacion y delega las reglas en sus colaboradores
 public sealed class ConfirmacionPedidoFacade(AutorizacionOperaciones acceso, IUnidadDeTrabajo unidad,
     IRepositorioPedidos pedidos, IRepositorioClientes clientes, CadenaValidacionPedido cadena,
-    CalculadoraPedido calculadora, FamiliasEntrega familias, IResolutorPasarelas pasarelas, IPagosRegistrados pagos,
+    ValorarPedido valorar, IResolutorPasarelas pasarelas, IPagosRegistrados pagos,
     IRegistroInventario inventario, IColaEventos eventos, ITrazasPago trazas, TimeProvider reloj)
 {
     public async Task<PagoAplicado> ConfirmarAsync(Guid pedidoId, string clave, ProveedorPago proveedor,
@@ -52,8 +51,7 @@ public sealed class ConfirmacionPedidoFacade(AutorizacionOperaciones acceso, IUn
         var cliente = await clientes.BuscarPorIdAsync(pedido.ClienteId, ct);
         var productos = await cadena.RevisarAsync(pedido, cliente, paraConfirmar: true, ct);
         var unidades = CantidadesFisicas.DelPedido(pedido);
-        var valor = calculadora.Calcular(new(pedido.Subtotal, unidades.Values.Sum(), cliente!.Categoria),
-            familias.Obtener(pedido.Entrega).Tarifa.Valor);
+        var valor = valorar.Calcular(pedido, cliente!.Categoria, unidades.Values.Sum());
 
         var respuesta = await pasarelas.Obtener(proveedor).CobrarAsync(valor.Total, clave, ct);
         if (!respuesta.Aprobado || string.IsNullOrWhiteSpace(respuesta.Referencia))

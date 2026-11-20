@@ -1,6 +1,5 @@
 using LogiMarket.Application.Catalogo;
 using LogiMarket.Application.Clientes;
-using LogiMarket.Application.Entregas;
 using LogiMarket.Application.Persistencia;
 using LogiMarket.Application.Precios;
 using LogiMarket.Application.Seguridad;
@@ -15,7 +14,7 @@ public sealed record BorradorVisto(Guid Id, Guid ClienteId, EstadoPedido Estado,
 
 public sealed class AdministrarPedidos(IRepositorioPedidos pedidos, IRepositorioClientes clientes,
     AdministrarCatalogo catalogo, AutorizacionOperaciones acceso, IUnidadDeTrabajo unidad,
-    CadenaValidacionPedido cadena, CalculadoraPedido calculadora, FamiliasEntrega familias, TimeProvider reloj)
+    CadenaValidacionPedido cadena, ValorarPedido valorar, TimeProvider reloj)
 {
     public async Task<BorradorVisto> CrearAsync(Guid clienteId, ModalidadEntrega entrega,
         IReadOnlyList<LineaSolicitada> lineas, CancellationToken ct = default)
@@ -97,9 +96,7 @@ public sealed class AdministrarPedidos(IRepositorioPedidos pedidos, IRepositorio
 
     private BorradorVisto Proyectar(Pedido pedido, Domain.Clientes.CategoriaCliente categoria)
     {
-        var unidades = CantidadesFisicas.DelPedido(pedido).Values.Sum();
-        var valoracion = calculadora.Calcular(new(pedido.Subtotal, unidades, categoria),
-            familias.Obtener(pedido.Entrega).Tarifa.Valor);
+        var valoracion = valorar.Calcular(pedido, categoria);
         return new(pedido.Id, pedido.ClienteId, pedido.Estado, pedido.Entrega,
             pedido.Lineas.Select(l => new LineaVista(l.Id, l.Sku.Valor, l.Nombre, l.PrecioUnitario, l.Cantidad)).ToArray(),
             valoracion);

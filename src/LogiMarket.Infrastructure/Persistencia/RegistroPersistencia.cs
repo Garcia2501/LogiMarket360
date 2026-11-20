@@ -45,6 +45,7 @@ public static class RegistroPersistencia
         servicios.AddSingleton<IPoliticaDescuento, Vip10>();
         servicios.AddSingleton<IPoliticaDescuento, Mayorista15>();
         servicios.AddSingleton<CalculadoraPedido>();
+        servicios.AddSingleton<ValorarPedido>();
         servicios.AddSingleton<FabricaEntrega, FabricaEntregaEstandar>();
         servicios.AddSingleton<FabricaEntrega, FabricaEntregaExpres>();
         servicios.AddSingleton<FamiliasEntrega>();
