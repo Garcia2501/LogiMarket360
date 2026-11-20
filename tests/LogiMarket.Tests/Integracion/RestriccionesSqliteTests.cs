@@ -14,6 +14,7 @@ namespace LogiMarket.Tests.Integracion;
 public sealed class RestriccionesSqliteTests
 {
     private const int IndiceUnico = 2067;
+    private const int LlavePrimaria = 1555;
     private const int RestriccionCheck = 275;
     private const int LlaveForanea = 787;
     private const int Trigger = 1811;
@@ -87,15 +88,16 @@ public sealed class RestriccionesSqliteTests
         await using var db = basePrueba.Abrir();
         var producto = Producto();
         var kit = new KitCompuesto(new Sku("KIT_A"), "Kit", producto);
-        db.Kits.Add(kit);
+        var otroKit = new KitCompuesto(new Sku("KIT_B"), "Otro kit", producto);
+        db.Kits.AddRange(kit, otroKit);
         await db.SaveChangesAsync();
 
         var doble = await Assert.ThrowsAsync<SqliteException>(() =>
             db.Database.ExecuteSqlInterpolatedAsync($"""
                 INSERT INTO KitComponente (Id, KitId, ProductoId, KitHijoId, Cantidad)
-                VALUES ({Guid.NewGuid()}, {kit.Id}, {producto.Id}, {kit.Id}, 1)
+                VALUES ({Guid.NewGuid()}, {kit.Id}, {producto.Id}, {otroKit.Id}, 1)
                 """));
-        Assert.Contains(doble.SqliteExtendedErrorCode, new[] { RestriccionCheck, Trigger });
+        Assert.Equal(RestriccionCheck, doble.SqliteExtendedErrorCode);
         var huerfano = await Assert.ThrowsAsync<SqliteException>(() =>
             db.Database.ExecuteSqlInterpolatedAsync($"""
                 INSERT INTO KitComponente (Id, KitId, ProductoId, Cantidad)
@@ -137,6 +139,7 @@ public sealed class RestriccionesSqliteTests
         var pedidos = CrearPedidos(db);
         db.Pagos.Add(Pago(pedidos[0].Id, "cobro-1", "operacion-1"));
         await db.SaveChangesAsync();
+        db.ChangeTracker.Clear();
 
         db.Pagos.Add(Pago(
             repetido == "pedido" ? pedidos[0].Id : pedidos[1].Id,
@@ -173,7 +176,7 @@ public sealed class RestriccionesSqliteTests
         {
             EventoId = evento.Id, Suscriptor = "auditoria", FechaUtc = Ahora.UtcDateTime
         });
-        await AssertRestriccionAsync(IndiceUnico, db);
+        await AssertRestriccionAsync(LlavePrimaria, db);
     }
 
     private static async Task AssertRestriccionAsync(int codigo, LogiMarketDbContext db)
