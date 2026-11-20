@@ -30,6 +30,19 @@
 - **Cobertura**. P01, Composite en P18 y State en P31 del agregado. Quedan 35 casos oficiales sin ejecución completa. La guía aplica MAYORISTA según cantidad física. Las únicas categorías de cliente son NORMAL y VIP.
 - **Pendientes**. Sesión y autorización por operación, CRUD visible, promociones, flujos completos y procesador Outbox. Composite, instantáneas y State se adelantaron a esta fase para dejar la base de dominio y persistencia verificada.
 
+## Fase 2 Seguridad y núcleo transaccional · 2026-11-20
+
+- **Rama** `feature/nucleo-transaccional` desde `develop` sincronizada en `d6ab655`.
+- **Funcionalidad**. Acceso local y autorización, catálogo y clientes, borradores, valoración, cobro simulado en dos proveedores, despacho/entrega, devolución total y Outbox durable con avisos locales. Panel WinForms de acceso y recorrido básico.
+- **Commits feat**. `64206ca`, `7530805`, `9061811`, `d4b10c5`, `da70dbe`, `f4d5689`, `c0616d3`, `b0b820b`, `1437d7e`, `45cc43d`, `8883b19`, `8c59efa`, `10a8197`.
+- **Commits test**. `2bf896a`, `11ab3e6`, `7b7d128`, `2a75ed5`, `26df60e`, `e10a66b`, `1304790`.
+- **Defecto real y fix**. Al cerrar la sesión entre la primera autorización y el Proxy, la denegación se escribía en la transacción de pago que luego se revertía. `26df60e` reprodujo la ausencia del registro. `c4eb737` persistió esa auditoría en una unidad independiente después del rollback y pasó las 17 pruebas de seguridad y confirmación seleccionadas.
+- **Riesgo de diseño y refactor**. Cotización y cobro duplicaban la composición de tarifas, cantidades físicas y promociones. `dd57d52` centralizó esa valoración en `ValorarPedido`. Las 18 pruebas seleccionadas de ambos flujos mantuvieron sus resultados.
+- **Incidencia de prueba**. La primera prueba de rollback P20 no inyectaba el adaptador que genera una FK inválida. Se corrigió el fixture y se observó el fallo real de SQLite con reversión completa. Se registró en el commit de pruebas `7b7d128`.
+- **Verificación final**. Restauración y compilación Release con cero errores y advertencias. 87 pruebas aprobadas, 0 fallidas y 0 omitidas, con 60 de integración, 21 de dominio y 6 de arquitectura. TRX local `phase2-final.trx`. Migración `20261120214119_EsquemaInicial` aplicada desde una base inexistente. Dos arranques consecutivos en modo inicialización, el segundo sin volver a pasar claves. Comprobaciones SQLite de integridad y FK correctas.
+- **Patrones y requisitos**. La matriz registra 13 patrones integrados en esta fase, además de Composite y State existentes. La matriz de aceptación registra 23 casos aprobados, 6 parciales y 9 pendientes de ejecución. Quedan las pruebas visuales, vistas completas, reportes, comprobantes y los ocho patrones restantes.
+- **Riesgos pendientes**. Un fallo de almacenamiento de diagnósticos puede ocurrir después del commit del negocio; la confirmación puede consultarse o repetirse con la misma clave. El reproceso se inicia mediante una operación ADMIN. Probar visualmente la inducción y recuperación de fallos cuando se complete el panel de demostración.
+
 ## Plantilla para próximas fases
 
 Registrar fase y fecha, rama, cambio y flujo comprobable, commits y verificaciones de integración, requisitos cumplidos o pendientes, patrones con archivo y método, comandos y resultados, incidentes con esperado/obtenido, forma de reproducción, corrección y regresión, y siguientes pasos. Para riesgos reales, vincular evidencia de antes y después, efecto, pruebas y commit. Un estado pendiente conserva sus campos de evidencia vacíos hasta ejecutar.

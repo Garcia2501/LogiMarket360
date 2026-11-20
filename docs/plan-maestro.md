@@ -63,3 +63,7 @@ Revisar durante la construcción áreas propensas a riesgos: duplicación de fó
 | DIP | Cambiar proveedor/repositorio mediante puertos inyectados y verificar grafo de .csproj y DI. |
 
 Al cerrar cada fase actualizar [historial de desarrollo](historial-desarrollo.md) e informar rama, commits, estado del repositorio, pruebas, patrones y requisitos, fallos reales y próximos pasos. Guardar datos brutos de prueba, evidencia y fecha. Registrar solo cifras ejecutadas y resultados observados.
+
+## Alcance ejecutado en la fase 2
+
+El incremento solicitado de seguridad y núcleo transaccional incorporó operaciones de las fases 2, 3 y 4 del plan inicial: autenticación, pedidos, valoración, cobro, logística, devoluciones y Outbox. Permanecen en el plan los patrones y flujos pendientes indicados en las matrices, incluida la validación visual final.

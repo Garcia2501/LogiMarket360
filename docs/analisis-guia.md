@@ -134,3 +134,16 @@ La guía se desarrolla en diez actividades. Sus entregables y controles están t
 | RNF01, RNF02, RNF05, RNF07–RNF09 | Integridad y unicidad en esquema, grafo de cinco proyectos, hash, 49 pruebas aprobadas, migración y seed comprobados. Queda la validación integral. | P01, `ReferenciasTests` e historial. |
 
 Los demás requisitos conservan sus comprobaciones previstas. En el ejemplo de Carmen, MAYORISTA identifica la promoción por las diez unidades físicas. El dominio usa NORMAL y VIP como categorías de cliente.
+
+## Avance verificado en fase 2
+
+| Requisito | Resultado comprobado | Alcance por completar |
+| --- | --- | --- |
+| RF01 | Inicio/cierre local, cuatro roles, autorización por operación en Application y auditoría de denegaciones, incluso tras rollback. | Verificación visual de acceso y permisos. |
+| RF02–RF05 | Gestión y búsqueda de catálogo/clientes, edición de kits y borradores, expansion física e instantáneas. | Vistas completas y evidencia visual. |
+| RF07–RF09 | Estrategias excluyentes, familias de entrega, Builder, cadena, reglas de estado, confirmación y cancelación. | La verificación formal de P08 incluye el intento de cambiar precio desde el flujo final. |
+| RF10–RF12 | Despacho/entrega por rol, seguimiento, devolución por políticas y stock con movimientos trazables. | Vistas completas y comprobantes. |
+| RF15 y RF18 | Avisos simulados por canal, auditoría, métricas y recuperación de Outbox sin repetir el cobro al reiniciar el host. | Evidencia visual, modo de fallos desde la interfaz y recorrido final P10/P37. |
+| RNF01, RNF02, RNF05, RNF07–RNF09 | Build limpio, dependencias, 87 pruebas aprobadas, transacción e idempotencia bajo SQLite y migración desde archivo nuevo. | Sustentación y ejecución formal del conjunto completo P01–P38. |
+
+Los reportes, comprobantes, Prototype, Memento y el resto de patrones/vistas siguen planificados.

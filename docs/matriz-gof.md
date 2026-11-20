@@ -52,4 +52,19 @@ Anotar en el código real cerca del punto de colaboración con comentarios como 
 | Composite | `Catalogo/IElementoCatalogo.cs`, `ProductoSimple`, `KitCompuesto` y `KitComponente`. `Capturar` conserva el árbol, `Expandir` acumula SKU físicos y `PedidoDetalle` guarda la composición histórica. El seed construye los kits y el repositorio carga la composición desde SQLite. | P18, `CatalogoTests`, `InicializacionTests`, `RestriccionesSqliteTests` y `PersistenciaTests`. |
 | State | `Pedidos/Pedido.cs` delega acciones a `EstadoDelPedido`. El agregado registra cambios de estado y rechaza edición/cancelación indebidas. Los estados terminales comparten un comportamiento cerrado. | P31 del agregado, `PedidoTests` y persistencia del historial en `PersistenciaTests`. |
 
-Los otros 21 patrones mantienen sus verificaciones pendientes.
+El avance posterior se registra a continuación.
+
+## Patrones integrados en fase 2
+
+| Patrón | Colaborador en operación | Verificación |
+| --- | --- | --- |
+| Strategy y Abstract Factory | `CalculadoraPedido`, `ValorarPedido`, `FabricaEntrega`; cotización, cobro y despacho. | P12, P32 y cifras oficiales P02–P04. |
+| Builder y Chain of Responsibility | `PedidoBuilder`, `CadenaValidacionPedido`; borrador, validación y confirmación. | P13 y P23. |
+| Proxy, Decorator y Adapter | `PagoAutorizadoProxy`, `AuditoriaPagoDecorator`, `PasarelaLegadaAdapter`; pago autorizado y proveedor alterno. | P16, P19, P22; regresión de cierre de sesión antes de invocar. |
+| Facade | `ConfirmacionPedidoFacade`; coordina la transacción sin SQL ni cálculo de descuentos. | P02–P07, P20 y P36. |
+| Command | `InvocadorComandos`, `OperacionesPedido`, cuatro comandos; ejecución desde panel y pruebas. | P24 parcial, auditoría de éxito/rechazo verificada por integración. |
+| Template Method | `ProcesarDevolucion` y variantes por defecto o arrepentimiento. | P33, P35. |
+| Observer y Factory Method | `PublicadorEventos` y tres observadores; `CreadorEmail` o `CreadorSms` generan avisos locales. | P11 y P30; recuperación técnica de P37. |
+| Singleton | `MetricasSesion` compartida por DI con deduplicación por evento. | Identidad y recuento probados. P15 parcial hasta demostrar dos vistas. |
+
+Pendientes Prototype, Bridge, Flyweight, Interpreter, Iterator, Mediator, Memento y Visitor.

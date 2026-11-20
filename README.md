@@ -47,7 +47,17 @@ try {
 
 Las claves se suministran temporalmente al proceso y SQLite conserva sus hashes con sal. Si las cuatro cuentas ya existen, el arranque repetido conserva inventario, precios y composición sin volver a pedir claves. Para restablecer una demostración, apunta `LOGIMARKET360_DB` a otro archivo vacío y repite la inicialización.
 
-Usa `dotnet run --project src/LogiMarket.WinForms` para abrir la ventana base después de inicializar. El acceso y la autorización por operación se implementarán más adelante.
+Usa `dotnet run --project src/LogiMarket.WinForms` e inicia sesión con una cuenta ficticia configurada localmente.
+
+## Demostración del núcleo comercial
+
+1. Con VENTAS, registra a Ana como VIP, escribe `KIT_TELETRABAJO:1`, selecciona entrega estándar, crea el borrador y valídalo. Conserva el GUID que muestra el formulario.
+2. Confirma con cualquiera de las dos pasarelas simuladas. El resultado esperado es USD 59.00 sobre la base recién preparada. Para reintentar el mismo cobro conserva tanto el pedido como la clave de confirmación.
+3. Cierra sesión. Con BODEGA, pega el GUID y registra despacho y entrega. El seguimiento muestra la guía y el estado.
+4. Con ADMIN, devuelve el pedido por DEFECTO dentro de 30 días. El resultado esperado es USD 54.00, sin flete. Desde la misma pantalla puedes procesar eventos pendientes y elegir aviso EMAIL o SMS simulado.
+5. Reinicia contra el mismo archivo. El seguimiento recupera los datos persistidos. Las pruebas automatizadas también comprueban recuentos de stock, pago, auditoría y recuperación del procesador.
+
+El panel actual incluye acceso y recorrido básico de operaciones. Los servicios de Application tienen edición, búsqueda y gestión adicionales. Las vistas completas de catálogo, borradores, inventario, auditoría y reportes se incorporarán según el plan.
 
 ## Migración de esquema
 
