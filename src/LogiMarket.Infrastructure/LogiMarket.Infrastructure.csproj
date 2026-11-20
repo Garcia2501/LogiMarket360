@@ -3,4 +3,8 @@
     <ProjectReference Include="../LogiMarket.Application/LogiMarket.Application.csproj" />
     <ProjectReference Include="../LogiMarket.Domain/LogiMarket.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.34" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.34" PrivateAssets="all" />
+  </ItemGroup>
 </Project>
