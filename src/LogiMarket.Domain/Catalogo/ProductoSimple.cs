@@ -2,7 +2,7 @@ using LogiMarket.Domain.Inventario;
 
 namespace LogiMarket.Domain.Catalogo;
 
-public sealed class ProductoSimple
+public sealed class ProductoSimple : IElementoCatalogo
 {
     private ProductoSimple() { }
 
@@ -42,6 +42,11 @@ public sealed class ProductoSimple
         Descripcion = descripcion?.Trim();
         Version = Guid.NewGuid();
     }
+
+    public decimal CalcularPrecio() => Precio;
+
+    public ComponenteCatalogoSnapshot Capturar() =>
+        new(Sku, Nombre, Precio, PesoKg, 1, []);
 
     public void CambiarDisponibilidad(bool activo)
     {
