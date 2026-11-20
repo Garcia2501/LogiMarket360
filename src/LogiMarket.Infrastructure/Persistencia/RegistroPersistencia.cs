@@ -1,3 +1,4 @@
+using LogiMarket.Infrastructure.Persistencia.Eventos;
 using LogiMarket.Application.Devoluciones;
 using LogiMarket.Application.Eventos;
 using LogiMarket.Application.Pagos;
@@ -66,6 +67,17 @@ public static class RegistroPersistencia
         servicios.AddSingleton<ProcesarDevolucion, DevolucionPorArrepentimiento>();
         servicios.AddScoped<ContextoDevolucion>();
         servicios.AddScoped<AdministrarDevoluciones>();
+        servicios.AddScoped<IObservadorEvento, ObservadorAuditoria>();
+        servicios.AddScoped<IObservadorEvento, ObservadorAvisos>();
+        servicios.AddScoped<IObservadorEvento, ObservadorMetricas>();
+        servicios.AddScoped<IRegistroAvisosSimulados, RegistroAvisosSqlite>();
+        servicios.AddSingleton<CreadorAviso, CreadorEmail>();
+        servicios.AddSingleton<CreadorAviso, CreadorSms>();
+        servicios.AddSingleton<MetricasSesion>();
+        servicios.AddScoped<IEntregaDurable, EntregaDurableSqlite>();
+        servicios.AddScoped<PublicadorEventos>();
+        servicios.AddScoped<IProcesadorOutbox, ProcesadorOutboxSqlite>();
+        servicios.AddScoped<ReprocesarEventos>();
         return servicios;
     }
 }
