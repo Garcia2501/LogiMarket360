@@ -42,6 +42,8 @@ public static class RegistroPersistencia
         servicios.AddSingleton<FabricaEntrega, FabricaEntregaEstandar>();
         servicios.AddSingleton<FabricaEntrega, FabricaEntregaExpres>();
         servicios.AddSingleton<FamiliasEntrega>();
+        servicios.AddScoped<CadenaValidacionPedido>();
+        servicios.AddScoped<AdministrarPedidos>();
         return servicios;
     }
 }
