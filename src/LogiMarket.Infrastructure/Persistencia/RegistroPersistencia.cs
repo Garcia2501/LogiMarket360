@@ -26,6 +26,11 @@ public static class RegistroPersistencia
         servicios.AddScoped<IUnidadDeTrabajo>(s => s.GetRequiredService<UnidadDeTrabajoSqlite>());
         servicios.AddScoped<DatosIniciales>();
         servicios.AddSingleton<IHashClave, Pbkdf2HashClave>();
+        servicios.AddSingleton(TimeProvider.System);
+        servicios.AddSingleton<SesionLocal>();
+        servicios.AddScoped<AutenticacionLocal>();
+        servicios.AddScoped<AutorizacionOperaciones>();
+        servicios.AddScoped<IAuditoriaAcceso, AuditoriaAcceso>();
         return servicios;
     }
 }
