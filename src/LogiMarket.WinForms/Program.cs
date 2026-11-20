@@ -1,3 +1,4 @@
+using LogiMarket.Application.Seguridad;
 using LogiMarket.Infrastructure.Persistencia;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +12,14 @@ internal static class Program
         bool soloInicializar = args is ["--solo-inicializar"];
         try
         {
-            PrepararPersistenciaAsync().GetAwaiter().GetResult();
+            using var servicios = CrearHost();
+            PrepararPersistenciaAsync(servicios).GetAwaiter().GetResult();
+            if (!soloInicializar)
+            {
+                ApplicationConfiguration.Initialize();
+                System.Windows.Forms.Application.Run(new VentanaComercial(servicios, servicios.GetRequiredService<SesionLocal>()));
+            }
+            return 0;
         }
         catch (Exception error)
         {
@@ -22,16 +30,9 @@ internal static class Program
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             return 1;
         }
-
-        if (!soloInicializar)
-        {
-            ApplicationConfiguration.Initialize();
-            System.Windows.Forms.Application.Run(new Form { Text = "LogiMarket 360" });
-        }
-        return 0;
     }
 
-    private static async Task PrepararPersistenciaAsync()
+    private static ServiceProvider CrearHost()
     {
         var archivo = Environment.GetEnvironmentVariable("LOGIMARKET360_DB")
             ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -39,9 +40,12 @@ internal static class Program
         archivo = Path.GetFullPath(archivo);
         Directory.CreateDirectory(Path.GetDirectoryName(archivo)!);
 
-        await using var servicios = new ServiceCollection()
-            .AgregarPersistenciaLogiMarket(archivo)
-            .BuildServiceProvider();
+        return new ServiceCollection().AgregarPersistenciaLogiMarket(archivo)
+            .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+    }
+
+    private static async Task PrepararPersistenciaAsync(IServiceProvider servicios)
+    {
         await using var scope = servicios.CreateAsyncScope();
         await scope.ServiceProvider.GetRequiredService<DatosIniciales>().InicializarAsync(rol =>
             Environment.GetEnvironmentVariable($"LOGIMARKET360_DEMO_{rol}") ?? "");
