@@ -1,3 +1,5 @@
+using LogiMarket.Application.Entregas;
+using LogiMarket.Application.Precios;
 using LogiMarket.Application.Catalogo;
 using LogiMarket.Application.Clientes;
 using LogiMarket.Application.Inventario;
@@ -33,6 +35,13 @@ public static class RegistroPersistencia
         servicios.AddScoped<IAuditoriaAcceso, AuditoriaAcceso>();
         servicios.AddScoped<AdministrarCatalogo>();
         servicios.AddScoped<AdministrarClientes>();
+        servicios.AddSingleton<IPoliticaDescuento, SinDescuento>();
+        servicios.AddSingleton<IPoliticaDescuento, Vip10>();
+        servicios.AddSingleton<IPoliticaDescuento, Mayorista15>();
+        servicios.AddSingleton<CalculadoraPedido>();
+        servicios.AddSingleton<FabricaEntrega, FabricaEntregaEstandar>();
+        servicios.AddSingleton<FabricaEntrega, FabricaEntregaExpres>();
+        servicios.AddSingleton<FamiliasEntrega>();
         return servicios;
     }
 }
