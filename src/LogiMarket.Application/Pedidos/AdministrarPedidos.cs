@@ -32,6 +32,18 @@ public sealed class AdministrarPedidos(IRepositorioPedidos pedidos, IRepositorio
         }, ct);
     }
 
+    public async Task<BorradorVisto> ConsultarBorradorAsync(Guid id, CancellationToken ct = default)
+    {
+        await acceso.ExigirAsync(Operacion.Consultar, ct);
+        var pedido = await ObtenerAsync(id, ct);
+        if (pedido.Estado is not (EstadoPedido.BORRADOR or EstadoPedido.VALIDADO))
+            throw new RechazoPedidoException("ESTADO", "La cotización está disponible solo antes del pago.");
+
+        var cliente = await clientes.BuscarPorIdAsync(pedido.ClienteId, ct)
+            ?? throw new KeyNotFoundException("El cliente no existe.");
+        return Proyectar(pedido, cliente.Categoria);
+    }
+
     public Task AgregarLineaAsync(Guid pedidoId, LineaSolicitada linea, CancellationToken ct = default) =>
         EditarAsync(pedidoId, async (p, token) =>
             p.AgregarLinea(await catalogo.ObtenerElementoActivoAsync(linea.Sku, token), linea.Cantidad), ct);

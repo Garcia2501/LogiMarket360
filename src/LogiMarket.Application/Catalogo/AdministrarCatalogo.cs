@@ -93,6 +93,34 @@ public sealed class AdministrarCatalogo(IConsultaCatalogo consultas, IEscrituraC
         }, ct);
     }
 
+    public async Task<decimal> ActualizarKitAsync(string codigo, string nombre,
+        IReadOnlyList<ComponenteSolicitado> componentes, CancellationToken ct = default)
+    {
+        await acceso.ExigirAsync(Operacion.GestionarCatalogo, ct);
+        if (componentes.Count == 0)
+            throw new ArgumentException("El kit requiere al menos un componente.", nameof(componentes));
+        var cantidades = componentes.ToDictionary(c => new Sku(c.Sku), c => c.Cantidad);
+
+        return await unidad.EnTransaccionAsync(async token =>
+        {
+            var kit = await consultas.BuscarKitAsync(new Sku(codigo), token)
+                ?? throw new KeyNotFoundException("El kit no existe.");
+            kit.Renombrar(nombre);
+
+            var anteriores = kit.Componentes.Select(c => c.Elemento.Sku).ToHashSet();
+            foreach (var (sku, cantidad) in cantidades)
+            {
+                if (anteriores.Contains(sku))
+                    kit.CambiarCantidad(sku, cantidad);
+                else
+                    kit.AgregarComponente(await ObtenerElementoActivoAsync(sku.Valor, token), cantidad);
+            }
+            foreach (var sku in anteriores.Where(sku => !cantidades.ContainsKey(sku)))
+                kit.QuitarComponente(sku);
+            return kit.CalcularPrecio();
+        }, ct);
+    }
+
     internal async Task<IElementoCatalogo> ObtenerElementoActivoAsync(string codigo, CancellationToken ct)
     {
         var sku = new Sku(codigo);
