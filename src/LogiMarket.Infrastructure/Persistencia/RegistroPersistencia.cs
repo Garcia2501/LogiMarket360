@@ -1,3 +1,4 @@
+using LogiMarket.Application.Devoluciones;
 using LogiMarket.Application.Eventos;
 using LogiMarket.Application.Pagos;
 using LogiMarket.Infrastructure.Pagos;
@@ -59,6 +60,12 @@ public static class RegistroPersistencia
         servicios.AddScoped<ConfirmacionPedidoFacade>();
         servicios.AddScoped<IDespachosRegistrados, DespachosRegistrados>();
         servicios.AddScoped<DespacharPedidos>();
+        servicios.AddScoped<IDevolucionesRegistradas, DevolucionesRegistradas>();
+        servicios.AddSingleton<IReembolsoSimulado, ReembolsoSimulado>();
+        servicios.AddSingleton<ProcesarDevolucion, DevolucionPorDefecto>();
+        servicios.AddSingleton<ProcesarDevolucion, DevolucionPorArrepentimiento>();
+        servicios.AddScoped<ContextoDevolucion>();
+        servicios.AddScoped<AdministrarDevoluciones>();
         return servicios;
     }
 }
