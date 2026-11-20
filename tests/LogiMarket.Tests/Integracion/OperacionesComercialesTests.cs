@@ -75,6 +75,13 @@ public sealed class OperacionesComercialesTests
         Assert.Equal(67m, borrador.Valoracion.Subtotal);
         await catalogo.ActualizarAsync("C01", datos with { Precio = 100m });
         await pedidos.CambiarCantidadAsync(borrador.Id, borrador.Lineas[1].Id, 2);
+        await catalogo.ActualizarKitAsync("KIT_TELETRABAJO", "Versión actual", [new("P03", 2)]);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => catalogo.ActualizarKitAsync(
+            "KIT_TELETRABAJO", "Ciclo", [new("KIT_TELETRABAJO", 1)]));
+        var cotizado = await pedidos.ConsultarBorradorAsync(borrador.Id);
+        Assert.Equal(74m, cotizado.Valoracion.Subtotal);
+        Assert.Equal(5, cotizado.Valoracion.UnidadesFisicas);
+
         var actual = await scope.ServiceProvider.GetRequiredService<IRepositorioPedidos>().BuscarAsync(borrador.Id);
         Assert.Equal(74m, actual!.Subtotal);
         await catalogo.DesactivarAsync("C01");

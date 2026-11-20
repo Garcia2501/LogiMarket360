@@ -102,6 +102,9 @@ public sealed class LogisticaTests
         var duplicada = await Assert.ThrowsAsync<RechazoPedidoException>(() =>
             devoluciones.DevolverAsync(orden, MotivoDevolucion.DEFECTO, false));
         Assert.Equal("DEVUELTO", duplicada.Codigo);
+        var outbox = scope.ServiceProvider.GetRequiredService<ReprocesarEventos>();
+        Assert.Equal(new ResumenOutbox(3, 0), await outbox.EjecutarAsync(CanalAviso.SMS));
+        Assert.Equal(new ResumenOutbox(0, 0), await outbox.EjecutarAsync(CanalAviso.EMAIL));
 
         await using var db = entorno.AbrirBase();
         Assert.Equal(59m, (await db.Pagos.SingleAsync()).Importe);
@@ -109,6 +112,9 @@ public sealed class LogisticaTests
         Assert.Equal(3, await db.Movimientos.CountAsync(m => m.Cantidad > 0));
         Assert.Equal(new[] { 8, 5, 20, 4, 30 }, (await db.Productos.OrderBy(p => p.Sku).ToListAsync()).Select(p => p.Stock));
         Assert.Equal(1, await db.EventosOutbox.CountAsync(e => e.Tipo == EventoComercial.DevolucionAceptada));
+        Assert.Equal(new[] { EventoComercial.DespachoRegistrado, EventoComercial.DevolucionAceptada, EventoComercial.PedidoPagado },
+            await db.Auditorias.Where(a => a.Categoria == "AVISO_SMS").OrderBy(a => a.Accion).Select(a => a.Accion).ToArrayAsync());
+        Assert.Equal(9, await db.EntregasEvento.CountAsync());
     }
 
     private static async Task<Guid> PedidoEntregadoAsync(EntornoComercial entorno, string cliente, CategoriaCliente categoria,

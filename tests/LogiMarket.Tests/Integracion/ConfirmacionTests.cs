@@ -106,6 +106,26 @@ public sealed class ConfirmacionTests
         Assert.Equal(60m, (await db.PedidoDetalles.SingleAsync()).PrecioUnitario);
     }
 
+    [Fact]
+    public async Task ClaveIdempotenteNoSePuedeReutilizarEnOtroPedido()
+    {
+        await using var entorno = await CrearEntornoAsync();
+        var primero = await CrearPedidoAsync(entorno, "primero", CategoriaCliente.NORMAL,
+            ModalidadEntrega.ESTANDAR, [new("P01", 1)]);
+        var segundo = await CrearPedidoAsync(entorno, "segundo", CategoriaCliente.NORMAL,
+            ModalidadEntrega.ESTANDAR, [new("P01", 1)]);
+        await ConfirmarAsync(entorno, primero, "clave-reusada", ProveedorPago.LEGADO);
+
+        var error = await Assert.ThrowsAsync<RechazoPedidoException>(() =>
+            ConfirmarAsync(entorno, segundo, "clave-reusada", ProveedorPago.ALTERNO));
+        Assert.Equal("CLAVE", error.Codigo);
+        await using var db = entorno.AbrirBase();
+        Assert.Equal(segundo, (await db.Pedidos.SingleAsync(p => p.Estado == EstadoPedido.VALIDADO)).Id);
+        Assert.Single(await db.Pagos.ToListAsync());
+        Assert.Single(await db.EventosOutbox.ToListAsync());
+        Assert.Equal(1, await db.Auditorias.CountAsync(a => a.Categoria == "COBRO" && a.Accion == "PASARELA"));
+    }
+
     [Theory]
     [InlineData(Rol.CONSULTA)]
     [InlineData(Rol.BODEGA)]
