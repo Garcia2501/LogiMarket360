@@ -1,3 +1,6 @@
+using LogiMarket.Application.Eventos;
+using LogiMarket.Application.Pagos;
+using LogiMarket.Infrastructure.Pagos;
 using LogiMarket.Application.Entregas;
 using LogiMarket.Application.Precios;
 using LogiMarket.Application.Catalogo;
@@ -16,7 +19,8 @@ public static class RegistroPersistencia
 {
     public static IServiceCollection AgregarPersistenciaLogiMarket(this IServiceCollection servicios, string archivo)
     {
-        servicios.AddScoped(_ => new LogiMarketDbContext(ConexionSqlite.CrearOpciones(archivo)));
+        servicios.AddSingleton(ConexionSqlite.CrearOpciones(archivo));
+        servicios.AddScoped<LogiMarketDbContext>();
         servicios.AddScoped<RepositorioCatalogo>();
         servicios.AddScoped<IConsultaCatalogo>(s => s.GetRequiredService<RepositorioCatalogo>());
         servicios.AddScoped<IEscrituraCatalogo>(s => s.GetRequiredService<RepositorioCatalogo>());
@@ -44,6 +48,15 @@ public static class RegistroPersistencia
         servicios.AddSingleton<FamiliasEntrega>();
         servicios.AddScoped<CadenaValidacionPedido>();
         servicios.AddScoped<AdministrarPedidos>();
+        servicios.AddSingleton<EstadoSimulacionPago>();
+        servicios.AddScoped<PasarelaLegadaSimulada>();
+        servicios.AddScoped<PasarelaLegadaAdapter>();
+        servicios.AddScoped<PasarelaAlternaSimulada>();
+        servicios.AddScoped<IResolutorPasarelas, ResolutorPasarelas>();
+        servicios.AddScoped<ITrazasPago, TrazasPagoSqlite>();
+        servicios.AddScoped<IPagosRegistrados, PagosRegistrados>();
+        servicios.AddScoped<IColaEventos, ColaEventosSqlite>();
+        servicios.AddScoped<ConfirmacionPedidoFacade>();
         return servicios;
     }
 }
