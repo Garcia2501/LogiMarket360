@@ -1,0 +1,71 @@
+# .NET build and test output
+[Bb]in/
+[Oo]bj/
+artifacts/
+publish/
+[Tt]est[Rr]esults/
+coverage/
+*.coverage
+*.coveragexml
+*.trx
+*.binlog
+*.nupkg
+*.snupkg
+
+# Visual Studio and editor state
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosscache
+*.suo
+*.rsuser
+*.sln.docstates
+_ReSharper*/
+*.DotSettings.user
+
+# Local temporary files and diagnostics
+*.tmp
+*.temp
+*.bak
+*.log
+*.dmp
+*.swp
+*~
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local configuration, credentials and certificates
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.Local.json
+appsettings.Development.json
+secrets.json
+credentials*.json
+.local/
+*.pfx
+*.p12
+*.pem
+*.key
+*.snk
+*.pubxml.user
+
+# Local databases and sidecars
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.mdf
+*.ldf
+*.sdf
+
+# Academic source material and final packages
+*.docx
+*.docm
+APE04_*.zip
+APE04_*.pdf
