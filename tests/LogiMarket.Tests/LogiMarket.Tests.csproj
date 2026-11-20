@@ -13,4 +13,8 @@
     <ProjectReference Include="../../src/LogiMarket.Application/LogiMarket.Application.csproj" />
     <ProjectReference Include="../../src/LogiMarket.Infrastructure/LogiMarket.Infrastructure.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../../src/**/*.csproj;$(MSBuildProjectFullPath)"
+                      LogicalName="Arquitectura.%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>
