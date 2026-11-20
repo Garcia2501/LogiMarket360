@@ -12,11 +12,22 @@ internal sealed class EntornoComercial(Action<IServiceCollection>? configurar = 
 
     public async Task InicializarAsync()
     {
-        var registro = new ServiceCollection().AgregarPersistenciaLogiMarket(_base.Archivo);
-        configurar?.Invoke(registro);
-        _servicios = registro.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+        _servicios = ConstruirServicios();
         await using var scope = Abrir();
         await scope.ServiceProvider.GetRequiredService<DatosIniciales>().InicializarAsync(Clave);
+    }
+
+    public async Task ReiniciarAsync()
+    {
+        await _servicios.DisposeAsync();
+        _servicios = ConstruirServicios();
+    }
+
+    private ServiceProvider ConstruirServicios()
+    {
+        var registro = new ServiceCollection().AgregarPersistenciaLogiMarket(_base.Archivo);
+        configurar?.Invoke(registro);
+        return registro.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
     }
 
     public string Clave(Rol rol) => _base.ClavesDemo[rol];
