@@ -5,15 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LogiMarket.Tests.Integracion;
 
-internal sealed class EntornoComercial : IAsyncDisposable
+internal sealed class EntornoComercial(Action<IServiceCollection>? configurar = null) : IAsyncDisposable
 {
     private readonly BaseSqlite _base = new();
     private ServiceProvider _servicios = null!;
 
     public async Task InicializarAsync()
     {
-        _servicios = new ServiceCollection().AgregarPersistenciaLogiMarket(_base.Archivo)
-            .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+        var registro = new ServiceCollection().AgregarPersistenciaLogiMarket(_base.Archivo);
+        configurar?.Invoke(registro);
+        _servicios = registro.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
         await using var scope = Abrir();
         await scope.ServiceProvider.GetRequiredService<DatosIniciales>().InicializarAsync(Clave);
     }
