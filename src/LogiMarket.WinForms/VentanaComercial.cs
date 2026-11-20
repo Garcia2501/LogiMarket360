@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LogiMarket.WinForms;
 
-internal sealed class VentanaComercial : Form
+internal sealed partial class VentanaComercial : Form
 {
     private readonly IServiceProvider _servicios;
     private readonly SesionLocal _sesion;
@@ -37,11 +37,12 @@ internal sealed class VentanaComercial : Form
         _sesion = sesion;
         Text = "LogiMarket 360";
         AutoScaleMode = AutoScaleMode.Font;
-        MinimumSize = new Size(700, 390);
-        ClientSize = new Size(850, 430);
+        MinimumSize = new Size(830, 500);
+        ClientSize = new Size(960, 545);
         StartPosition = FormStartPosition.CenterScreen;
         Controls.Add(_contenido);
         FilasSesion();
+        FilasBorrador();
         FilasOperaciones();
         _contenido.Controls.Add(_mensaje);
         ActualizarSesion();
@@ -50,6 +51,7 @@ internal sealed class VentanaComercial : Form
     private void FilasSesion()
     {
         _idempotencia.Text = Guid.NewGuid().ToString("N");
+        _pedido.TextChanged += (_, _) => _idempotencia.Text = Guid.NewGuid().ToString("N");
         _entrar.Click += async (_, _) => await EjecutarAsync(async sp =>
         {
             var permitido = await sp.GetRequiredService<AutenticacionLocal>().IniciarAsync(_usuario.Text, _clave.Text);
@@ -62,6 +64,7 @@ internal sealed class VentanaComercial : Form
             _usuario.Clear();
             _clave.Clear();
             _pedido.Clear();
+            LimpiarBorrador();
             _idempotencia.Text = Guid.NewGuid().ToString("N");
             _mensaje.Text = "Sesión cerrada.";
             ActualizarSesion();
