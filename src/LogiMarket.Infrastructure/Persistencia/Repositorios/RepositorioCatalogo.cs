@@ -6,6 +6,9 @@ namespace LogiMarket.Infrastructure.Persistencia.Repositorios;
 
 public sealed class RepositorioCatalogo(LogiMarketDbContext db) : IConsultaCatalogo, IEscrituraCatalogo
 {
+    public async Task<IReadOnlyList<ProductoSimple>> ListarProductosAsync(CancellationToken ct) =>
+        await db.Productos.AsNoTracking().OrderBy(p => p.Sku).ToListAsync(ct);
+
     public Task<ProductoSimple?> BuscarProductoAsync(Sku sku, CancellationToken cancellationToken = default) =>
         db.Productos.SingleOrDefaultAsync(producto => producto.Sku == sku, cancellationToken);
 

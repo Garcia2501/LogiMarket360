@@ -31,6 +31,8 @@ public static class RegistroPersistencia
         servicios.AddScoped<AutenticacionLocal>();
         servicios.AddScoped<AutorizacionOperaciones>();
         servicios.AddScoped<IAuditoriaAcceso, AuditoriaAcceso>();
+        servicios.AddScoped<AdministrarCatalogo>();
+        servicios.AddScoped<AdministrarClientes>();
         return servicios;
     }
 }

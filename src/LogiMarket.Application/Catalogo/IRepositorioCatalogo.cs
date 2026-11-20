@@ -4,6 +4,7 @@ namespace LogiMarket.Application.Catalogo;
 
 public interface IConsultaCatalogo
 {
+    Task<IReadOnlyList<ProductoSimple>> ListarProductosAsync(CancellationToken ct);
     Task<ProductoSimple?> BuscarProductoAsync(Sku sku, CancellationToken cancellationToken = default);
     Task<KitCompuesto?> BuscarKitAsync(Sku sku, CancellationToken cancellationToken = default);
 }
