@@ -1,6 +1,6 @@
 # Matriz de los 23 patrones GoF
 
-Los nombres de clases, ubicaciones y métodos son previstos. Estado común: **pendiente de implementación y verificación**. Después de integrar cada patrón registrar ruta y método reales, commit, recorrido, resultado de prueba y evidencia del colaborador. Los ejemplos de evidencia son instrucciones de captura.
+Las filas describen el diseño previsto. La sección final registra las implementaciones y comprobaciones realizadas. Después de integrar cada patrón registrar ruta y método reales, commit, recorrido, resultado de prueba y evidencia del colaborador. Los ejemplos de evidencia son instrucciones de captura.
 
 D = Domain; A = Application; I = Infrastructure; W = WinForms. Las rutas propuestas son relativas al proyecto indicado.
 
@@ -43,3 +43,13 @@ D = Domain; A = Application; I = Infrastructure; W = WinForms. Las rutas propues
 | Visitor · p. 8 | Obtener desglose físico y peso sin añadir cada reporte a productos/kits. | D/Catalogo/Visitantes, `Aceptar` en ProductoSimple/KitCompuesto y visitantes DesgloseSku/PesoLogistico. | P34, A34. Tres SKU y 1.00 kg en visita anidada. | Se agregan reportes sin modificar cálculos del catálogo. Cambiar los tipos visitables afecta visitantes. |
 
 Anotar en el código real cerca del punto de colaboración con comentarios como `// patron strategy: selecciona la politica de descuento`. Los identificadores C# mantienen sus convenciones.
+
+
+## Patrones verificados en fase 1
+
+| Patrón | Colaboración real y archivos | Evidencia |
+| --- | --- | --- |
+| Composite | `Catalogo/IElementoCatalogo.cs`, `ProductoSimple`, `KitCompuesto` y `KitComponente`. `Capturar` conserva el árbol, `Expandir` acumula SKU físicos y `PedidoDetalle` guarda la composición histórica. El seed construye los kits y el repositorio carga la composición desde SQLite. | P18, `CatalogoTests`, `InicializacionTests`, `RestriccionesSqliteTests` y `PersistenciaTests`. |
+| State | `Pedidos/Pedido.cs` delega acciones a `EstadoDelPedido`. El agregado registra cambios de estado y rechaza edición/cancelación indebidas. Los estados terminales comparten un comportamiento cerrado. | P31 del agregado, `PedidoTests` y persistencia del historial en `PersistenciaTests`. |
+
+Los otros 21 patrones mantienen sus verificaciones pendientes.

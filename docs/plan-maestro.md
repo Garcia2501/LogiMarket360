@@ -5,15 +5,15 @@ El proyecto es individual, presencial y nuevo. La guía indica ocho horas presen
 | Fase | Incrementos de trabajo | Actividad de la guía | Salida verificable |
 | --- | --- | --- | --- |
 | 0. Análisis y base | Revisar 20 páginas y 12 wireframes; levantar RF/RNF, 23 patrones, P01–P38, diagramas preliminares y cinco proyectos; acordar supuestos, calendario e identidad académica. | 1–2 | Documentación trazable y compilación de la estructura. |
-| 1. Plataforma y datos | Composición DI, autorización y sesión, catálogo físico e inventario, clientes, EF Core 8/SQLite, restricciones, migraciones, seed y fixtures. Validar inserciones, hash, privilegios y persistencia. | 2–3 | P01, protección transversal y preparación de P10/P38. |
-| 2. Cotización y borradores | Kits, Iterator/Visitor, estado inicial, Builder, Prototype, estrategias, familias de entrega, snapshots, Memento y Chain. Incorporar edición, cancelación y vista temprana. | 3–6 | P12–P14, P18, P23, P27, P29, P31–P32 y P34. |
+| 1. Plataforma y datos | Composición DI, usuarios, clientes, catálogo e inventario, pedidos, Composite, State, EF Core 8/SQLite, restricciones, migración, seed y fixtures. | 2–3 | P01, P18 y P31 en dominio. Base para P10, P36 y P38. |
+| 2. Cotización y borradores | Sesión y autorización por operación, Iterator/Visitor, Builder, Prototype, estrategias, familias de entrega, Memento y Chain sobre el dominio ya creado. Incorporar edición, cancelación y vista temprana. | 3–6 | P12–P14, P23, P27, P29, P32 y P34. |
 | 3. Confirmación y Outbox | Command, Facade, Adapter, Proxy, Decorator; transacción, idempotencia, control de sobreventa, historial; Observer/Factory Method, métricas y reintento seguro. Integrar UI de cobro. | 4–6 | P02–P08, P11, P15–P16, P19–P20, P22, P24, P30, P36–P37. |
 | 4. Operaciones posteriores | Despacho/entrega y guía, devoluciones con Template Method, reintegro/reembolso, comprobantes Bridge, operaciones auditadas. | 4–6 | P09, P12, P17, P31, P33 y P35. |
 | 5. Consulta e integración visual | Completar doce áreas y Mediator, accesibilidad y navegación, Flyweight, reportes Interpreter, seguimiento, acciones demo aisladas y pruebas de interacción. | 5–6 | P10, P21, P25–P26, P28 y comprobaciones visuales de las fases previas. |
 | 6. Verificación y refactorización | Revisar SOLID y diez o más riesgos reales registrados durante toda la construcción. Reejecutar P01–P38, suite automática, compilación desde código limpio, DB vacía, reinicio, fallos y recuperación. | 7–9 | P38, al menos 25 aprobadas, matriz completa con evidencia, trazas y comparación Flyweight. |
 | 7. Entrega y defensa | Empaquetar fuentes limpias, completar README, PDF en orden oficial, conclusiones por objetivo, recomendaciones y referencias IEEE. Ensayar demo y verificar autoría y artefactos. | 9–10 | ZIP y PDF con nomenclatura oficial, defensa reproducible y cobertura 23/23 demostrada. |
 
-La cobertura indicada es prevista. P31, P38 y otros casos transversales se ejecutan formalmente cuando sus dependencias estén completas. Las pruebas y la evidencia se incorporan en cada fase, incluso si se reejecutan en el cierre.
+La cobertura indicada es prevista. P31 se verificó en el agregado y se revisará de nuevo con las operaciones completas. P38 y otros casos transversales se ejecutan cuando sus dependencias estén completas. Las pruebas y la evidencia se incorporan en cada fase, incluso si se reejecutan en el cierre.
 
 ## Paso inicial de implementación
 

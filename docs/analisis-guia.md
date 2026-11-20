@@ -119,3 +119,18 @@ En la carpeta de proyecto se preparará la instalación desde código limpio y u
 2. **APE04_Informe_APELLIDOS_NOMBRES.pdf**. Orden obligatorio: portada institucional, resumen ejecutivo, problema/requisitos, dominio y datos, arquitectura/dependencias, Clean Code/SOLID, creacionales, estructurales, comportamentales, desarrollo visual/flujo, pruebas/resultados, riesgos/limitaciones, conclusiones por objetivo, recomendaciones por conclusión y limitación verificable, referencias IEEE y anexos. Las recomendaciones separarán mejoras futuras de obligaciones. Anexos complementan la entrega y defensa.
 
 La guía se desarrolla en diez actividades. Sus entregables y controles están trazados en el [plan maestro](plan-maestro.md).
+
+
+## Avance verificado en fase 1
+
+| Requisito | Resultado de fase | Evidencia |
+| --- | --- | --- |
+| RF01 | Cuatro roles y usuarios ficticios con hash. Quedan inicio/cierre de sesión y autorización por caso de uso. | P01, `InicializacionTests`. |
+| RF02 | Producto con invariantes, SKU único e índices. Quedan CRUD, permisos y filtros de interfaz. | `CatalogoTests`, `RestriccionesSqliteTests`. |
+| RF03 | Kits anidados, cantidades y detección de ciclos en dominio y SQLite. Queda la edición en WinForms. | P18. |
+| RF04 | Cliente con categoría, disponibilidad y repositorio. Queda gestión desde Application y WinForms. | `PedidoTests`, `PersistenciaTests`. |
+| RF05 y RF08 | Pedido, líneas, instantáneas, transiciones e historial. Pendientes Builder, Chain, comandos y flujos por rol. | P31, `PedidoTests`, `PersistenciaTests`. |
+| RF07, RF09–RF12, RF15 y RF18 | Subtotal histórico, almacenamiento de registros operativos, transacción, concurrencia y reapertura de SQLite. Quedan las políticas y flujos completos y el procesamiento Outbox. | `PersistenciaTests`, `RestriccionesSqliteTests`. |
+| RNF01, RNF02, RNF05, RNF07–RNF09 | Integridad y unicidad en esquema, grafo de cinco proyectos, hash, 49 pruebas aprobadas, migración y seed comprobados. Queda la validación integral. | P01, `ReferenciasTests` e historial. |
+
+Los demás requisitos conservan sus comprobaciones previstas. En el ejemplo de Carmen, MAYORISTA identifica la promoción por las diez unidades físicas. El dominio usa NORMAL y VIP como categorías de cliente.

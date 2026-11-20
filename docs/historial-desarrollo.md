@@ -21,6 +21,15 @@
 - Verificación desde la carpeta original: SDK .NET 8.0.428, cinco proyectos compilados, 0 errores y 0 advertencias. La ejecución restringida inicial no resolvió referencias de proyecto fuera del espacio escribible. La repetición con acceso a la carpeta original completó el build sin cambiar los proyectos.
 - El Word original permanece local. Se revisan los archivos versionados antes de publicar. Los flujos, patrones GoF y pruebas de negocio quedan pendientes para los incrementos desde develop.
 
+## Fase 1 Dominio y persistencia · 2026-11-20
+
+- **Rama** `feature/dominio-persistencia` desde `develop` sincronizada en `9e5f254`.
+- **Commits**. `1fb1375` entidades, `316238f` Composite, `fa89932` pedidos y State, `1931f18` puertos, `5a8828a` mapeo SQLite, `3c2f9b2` registros operativos, `dd756fb` migración, `64273eb` repositorios y transacción, `dc3592f` seed y hash, `e85eeae` pruebas de dominio, `47ac83b` pruebas de seed, `03990a7` restricciones, `9e62a5d` arquitectura y persistencia, `cb8cada` corrección de pruebas SQLite y `7bb3b00` arranque. Esta entrada se incorpora con el commit de documentación de fase.
+- **Verificación**. Restauración correcta, compilación con 0 errores y advertencias, y 49 pruebas aprobadas, 0 fallidas y 0 omitidas (`phase1-final.trx` local). `20261120214119_EsquemaInicial` aplicada por EF Core 8.0.34 en una base nueva y desde el arranque de WinForms. La repetición del arranque sin claves produjo 5 productos, 2 kits, 4 enlaces y 4 usuarios. Ambas bases verificaron integridad y FK.
+- **Incidencias**. Primera suite completa: 47 aprobadas y 2 fallidas (`phase1-first-full.trx`). La prueba de pago duplicado reutilizaba el rastreo de la relación uno a uno, por lo que EF interceptaba el segundo pago antes de SQLite. Se despejó el rastreo antes del segundo INSERT. La prueba de Outbox esperaba 2067 y SQLite devolvió 1555 por la PK compuesta. Ambas comprobaciones pasaron al reejecutar. PowerShell también separó `-m:1` al reenviarlo desde una función del script de verificación. La llamada directa a dotnet resolvió el error.
+- **Cobertura**. P01, Composite en P18 y State en P31 del agregado. Quedan 35 casos oficiales sin ejecución completa. La guía aplica MAYORISTA según cantidad física. Las únicas categorías de cliente son NORMAL y VIP.
+- **Pendientes**. Sesión y autorización por operación, CRUD visible, promociones, flujos completos y procesador Outbox. Composite, instantáneas y State se adelantaron a esta fase para dejar la base de dominio y persistencia verificada.
+
 ## Plantilla para próximas fases
 
 Registrar fase y fecha, rama, cambio y flujo comprobable, commits y verificaciones de integración, requisitos cumplidos o pendientes, patrones con archivo y método, comandos y resultados, incidentes con esperado/obtenido, forma de reproducción, corrección y regresión, y siguientes pasos. Para riesgos reales, vincular evidencia de antes y después, efecto, pruebas y commit. Un estado pendiente conserva sus campos de evidencia vacíos hasta ejecutar.
