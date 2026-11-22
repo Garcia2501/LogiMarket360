@@ -16,7 +16,8 @@ public enum CambioComercial
     EstadoPedido,
     VentaConfirmada,
     DevolucionAceptada,
-    EventosProcesados
+    EventosProcesados,
+    CatalogoEditado
 }
 
 public sealed record ErrorActualizacion(AreaComercial Area, string Mensaje);
@@ -59,6 +60,7 @@ public sealed class FormularioPrincipalMediator
         CambioComercial.Inicio or CambioComercial.VentaConfirmada or CambioComercial.DevolucionAceptada =>
             [AreaComercial.Catalogo, AreaComercial.Carrito, AreaComercial.Pedidos, AreaComercial.Inventario, AreaComercial.Metricas],
         CambioComercial.BorradorEditado or CambioComercial.EstadoPedido => [AreaComercial.Carrito, AreaComercial.Pedidos],
+        CambioComercial.CatalogoEditado => [AreaComercial.Catalogo, AreaComercial.Inventario, AreaComercial.Metricas],
         CambioComercial.EventosProcesados => [AreaComercial.Metricas],
         _ => throw new ArgumentOutOfRangeException(nameof(cambio))
     };

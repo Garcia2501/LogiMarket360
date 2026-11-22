@@ -138,6 +138,12 @@ public sealed class AdministrarCatalogo(IConsultaCatalogo consultas, IEscrituraC
         return filas.AsReadOnly();
     }
 
+    public async Task<ComponenteCatalogoSnapshot> ConsultarEstructuraAsync(string codigo, CancellationToken ct = default)
+    {
+        await acceso.ExigirAsync(Operacion.Consultar, ct);
+        return (await ObtenerElementoActivoAsync(codigo, ct)).Capturar();
+    }
+
     public async Task<DesgloseLogistico> ConsultarLogisticaAsync(string codigo, int cantidad, CancellationToken ct = default)
     {
         await acceso.ExigirAsync(Operacion.Consultar, ct);
