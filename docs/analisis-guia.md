@@ -147,3 +147,16 @@ Los demás requisitos conservan sus comprobaciones previstas. En el ejemplo de C
 | RNF01, RNF02, RNF05, RNF07–RNF09 | Build limpio, dependencias, 87 pruebas aprobadas, transacción e idempotencia bajo SQLite y migración desde archivo nuevo. | Sustentación y ejecución formal del conjunto completo P01–P38. |
 
 Los reportes, comprobantes, Prototype, Memento y el resto de patrones/vistas siguen planificados.
+
+## Avance verificado en fase 3
+
+| Requisito | Resultado de fase | Evidencia |
+| --- | --- | --- |
+| RF03, RF12 | Consulta real de existencias por componente, desglose por SKU y peso con kits anidados. | P27 y P34. |
+| RF05, RF07, RF08 | Borrador clonado con instantáneas e identidades nuevas. La edición usa un historial de hasta cinco estados y queda bloqueada después de validar. | P14 y P29. |
+| RF13 | Listado por estado, total cobrado y cliente. AST con precedencia, paréntesis y errores localizados. | P25 y P26. |
+| RF14 | Venta y devolución con vista previa visible y exportación TXT. | P17 y dos comprobantes de demostración. |
+| RF16 | Proyección con metadatos compartidos y coordinación de catálogo, carrito, pedidos, inventario y métricas tras el cobro. | P21 y P28 en el panel actual. |
+| RNF02, RNF07–RNF09 | 108 pruebas, compilación Release sin errores o advertencias, grafo de referencias y esquema SQLite verificados. | TRX, migración y prueba visual aislada. |
+
+Quedan las pantallas completas, la revisión visual de los casos parciales y el cierre documental de la entrega.

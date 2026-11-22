@@ -43,6 +43,14 @@
 - **Patrones y requisitos**. La matriz registra 13 patrones integrados en esta fase, además de Composite y State existentes. La matriz de aceptación registra 23 casos aprobados, 6 parciales y 9 pendientes de ejecución. Quedan las pruebas visuales, vistas completas, reportes, comprobantes y los ocho patrones restantes.
 - **Riesgos pendientes**. Un fallo de almacenamiento de diagnósticos puede ocurrir después del commit del negocio; la confirmación puede consultarse o repetirse con la misma clave. El reproceso se inicia mediante una operación ADMIN. Probar visualmente la inducción y recuperación de fallos cuando se complete el panel de demostración.
 
+## Fase 3 Patrones GoF restantes · 2026-11-22
+
+- **Rama y auditoría inicial.** `feature/patrones-gof-restantes` desde `develop` sincronizada en `71693d2`. Se releyeron las definiciones y la aceptación de la guía Word original de 20 páginas. La matriz de patrones vigente en el repositorio se llama `matriz-gof.md`. Código y matriz confirmaron los ocho pendientes. Singleton y Command tenían evidencia visual parcial al inicio.
+- **Incrementos feat.** `37639e8` Iterator y Visitor, `28055d0` Prototype y Memento, `bb18c36` Interpreter, `00ddf7c` Bridge, `508c8e6` Flyweight y `02fe769` Mediator y conexiones WinForms. Cada incremento incluye sus pruebas, ejecutadas antes del commit. El commit de cierre actualiza matrices, diseño y evidencia técnica.
+- **Verificación de cierre.** 108 casos aprobados, 0 fallidos, 0 omitidos. Release con 0 errores y 0 advertencias. Se aplicó `20261120214119_EsquemaInicial` a una base nueva y EF Core no detectó divergencia del modelo. El recorrido WinForms aislado mostró ambas vistas previas y guardó los dos TXT. Tras cobro se vieron stock 7/4/19, estado PAGADO, carrito cerrado y métrica de un pedido cobrado. Se consultó la auditoría SQLite de los comandos emitidos.
+- **Defectos y riesgos.** No se reprodujo un defecto de producto que requiriera un commit fix. La evaluación en memoria del filtro es una decisión de escala académica. El historial es local al proceso y coteja la versión para no deshacer ediciones ajenas. La mediación informa fallos de refresco por separado del resultado comercial.
+- **Cobertura.** 23 patrones integrados con pruebas técnicas. Singleton conserva pendiente P15 a nivel visual. 33 casos de aceptación verificados y 5 parciales. Quedan las vistas finales que exige la guía y el cierre de P08, P10, P15, P37 y P38.
+
 ## Plantilla para próximas fases
 
 Registrar fase y fecha, rama, cambio y flujo comprobable, commits y verificaciones de integración, requisitos cumplidos o pendientes, patrones con archivo y método, comandos y resultados, incidentes con esperado/obtenido, forma de reproducción, corrección y regresión, y siguientes pasos. Para riesgos reales, vincular evidencia de antes y después, efecto, pruebas y commit. Un estado pendiente conserva sus campos de evidencia vacíos hasta ejecutar.

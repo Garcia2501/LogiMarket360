@@ -69,3 +69,12 @@ dotnet ef database update --project src/LogiMarket.Infrastructure --startup-proj
 ```
 
 Si la herramienta global ya está instalada en otra versión, usa una instalación de EF Core 8.0.34 en un directorio de herramientas separado. La migración prepara el esquema. El arranque ejecuta también el seed.
+
+## Patrones y consultas de fase 3
+
+- En el panel, selecciona un borrador y usa **Clonar**, **Cambiar cantidad**, **Deshacer** o **Rehacer**. El historial conserva hasta cinco estados en la sesión de aplicación y queda bloqueado al salir de BORRADOR.
+- En **Catálogo**, elige un SKU para consultar peso, desglose y existencias. **Medir 1.000 renglones** repite los metadatos del catálogo bajo dos estrategias y muestra los recuentos y bytes asignados.
+- En **Pedidos y comprobantes**, filtra con `ESTADO = PAGADO AND TOTAL >= 50`. `AND` tiene prioridad sobre `OR`. Usa paréntesis para agrupar y comillas para nombres con espacios, por ejemplo `CLIENTE = "Ana QA"`. `TOTAL` representa el monto efectivamente cobrado.
+- Usa el GUID del pedido o selecciónalo con doble clic en la cuadrícula. Selecciona venta o devolución y elige **Vista previa** o **Guardar TXT**. Los comprobantes son internos.
+
+Consulta el [registro técnico de fase 3](docs/evidencia-fase-3.md) para reproducir las comprobaciones.
