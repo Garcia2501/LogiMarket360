@@ -1,6 +1,7 @@
 using LogiMarket.Application.Documentos;
 using LogiMarket.Infrastructure.Documentos;
 using LogiMarket.Application.Reportes;
+using LogiMarket.Application.Escritorio;
 using LogiMarket.Application.Comandos;
 using LogiMarket.Infrastructure.Persistencia.Eventos;
 using LogiMarket.Application.Devoluciones;
@@ -93,6 +94,8 @@ public static class RegistroPersistencia
         servicios.AddScoped<EmitirComprobantes>();
         servicios.AddSingleton<IFabricaArchivoTxt, FabricaArchivoTxt>();
         servicios.AddScoped<ConsultarCatalogoVisual>();
+        servicios.AddScoped<ILecturaEscritorio, LecturaEscritorio>();
+        servicios.AddScoped<ConsultarEscritorio>();
         return servicios;
     }
 }

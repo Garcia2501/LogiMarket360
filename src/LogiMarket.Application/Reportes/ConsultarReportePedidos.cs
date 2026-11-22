@@ -3,7 +3,9 @@ using LogiMarket.Domain.Pedidos;
 
 namespace LogiMarket.Application.Reportes;
 
-public sealed record PedidoReportado(Guid Id, EstadoPedido Estado, string Cliente, decimal? TotalCobrado);
+public sealed record PedidoReportado(Guid Id, EstadoPedido Estado, string Cliente, decimal? TotalCobrado,
+    DateTime FechaCreacionUtc = default, DateTime? FechaPagoUtc = null, DateTime? FechaDevolucionUtc = null,
+    decimal? ImporteReembolso = null, ModalidadEntrega Entrega = ModalidadEntrega.ESTANDAR);
 
 public interface ILecturaReportePedidos
 {

@@ -14,7 +14,9 @@ public enum Operacion
     Despachar,
     Entregar,
     Devolver,
-    ReprocesarEventos
+    ReprocesarEventos,
+    ConsultarAuditoria,
+    ConfigurarDemostracion
 }
 
 public interface IAuditoriaAcceso
