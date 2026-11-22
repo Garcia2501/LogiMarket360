@@ -1,6 +1,6 @@
 # LogiMarket 360
 
-Proyecto académico de la APE 04. La fase 1 establece el dominio, SQLite con EF Core 8 y el arranque con datos iniciales.
+Proyecto académico de la APE 04. Aplicación Windows Forms con SQLite, EF Core 8, el catálogo oficial y operaciones comerciales simuladas.
 
 ## Documentación
 
@@ -17,8 +17,8 @@ Requiere Windows y SDK .NET 8. Para Visual Studio 2022, instala la carga de escr
 
 ```powershell
 dotnet restore LogiMarket360.sln
-dotnet build LogiMarket360.sln --no-restore
-dotnet test LogiMarket360.sln --no-build --logger 'trx;LogFileName=fase-1.trx'
+dotnet build LogiMarket360.sln -c Release --no-restore
+dotnet test LogiMarket360.sln -c Release --no-build --logger 'trx;LogFileName=logimarket360.trx'
 ```
 
 Las pruebas xUnit usan archivos SQLite temporales aislados. P01 verifica la migración, los cinco productos, dos kits y cuatro roles, así como el seed repetido.
@@ -51,13 +51,22 @@ Usa `dotnet run --project src/LogiMarket.WinForms` e inicia sesión con una cuen
 
 ## Demostración del núcleo comercial
 
-1. Con VENTAS, registra a Ana como VIP, escribe `KIT_TELETRABAJO:1`, selecciona entrega estándar, crea el borrador y valídalo. Conserva el GUID que muestra el formulario.
-2. Confirma con cualquiera de las dos pasarelas simuladas. El resultado esperado es USD 59.00 sobre la base recién preparada. Para reintentar el mismo cobro conserva tanto el pedido como la clave de confirmación.
-3. Cierra sesión. Con BODEGA, pega el GUID y registra despacho y entrega. El seguimiento muestra la guía y el estado.
-4. Con ADMIN, devuelve el pedido por DEFECTO dentro de 30 días. El resultado esperado es USD 54.00, sin flete. Desde la misma pantalla puedes procesar eventos pendientes y elegir aviso EMAIL o SMS simulado.
-5. Reinicia contra el mismo archivo. El seguimiento recupera los datos persistidos. Las pruebas automatizadas también comprueban recuentos de stock, pago, auditoría y recuperación del procesador.
+Para una base de demostración con los controles de fallo habilitados, agrega `--demo` al comando de inicialización y de arranque:
 
-El panel actual incluye acceso y recorrido básico de operaciones. Los servicios de Application tienen edición, búsqueda y gestión adicionales. Las vistas completas de catálogo, borradores, inventario, auditoría y reportes se incorporarán según el plan.
+```powershell
+dotnet run --project src/LogiMarket.WinForms -- --demo
+```
+
+El modo de demostración usa `%LOCALAPPDATA%\LogiMarket360\Demostracion\logimarket360-demo.db`. Para inicializar sus cuentas, usa el mismo procedimiento de claves anterior con `--demo --solo-inicializar`. El modo de demostración ignora la ruta operativa configurada en `LOGIMARKET360_DB`.
+
+1. Con VENTAS, registra a Ana como VIP en **Clientes**. En **Carrito y borradores**, selecciona a Ana, KIT_TELETRABAJO y entrega estándar. Crea y valida el borrador.
+2. En **Confirmación y cobro**, elige el pedido y una pasarela simulada. Sobre una base oficial nueva, verifica subtotal USD 60.00, descuento USD 6.00, envío USD 5.00 y total USD 59.00.
+3. Con BODEGA, selecciona el pedido en **Despacho y entrega**, emite la guía y confirma la entrega.
+4. Con ADMIN, valida en **Devoluciones** el motivo DEFECTO. El reembolso previsto es USD 54.00. Revisa el importe antes de confirmar.
+5. Abre **Auditoría y demostración** para consultar el estado de Outbox. En modo de demostración puedes inducir el fallo del notificador y reprocesar avisos locales por EMAIL o SMS simulado. **Panel general** muestra los indicadores del negocio.
+6. En **Reportes y comprobantes**, filtra por período y expresión. Selecciona el pedido y un tipo de comprobante para verlo o guardarlo en TXT.
+
+Consulta el [recorrido de las 12 vistas](docs/interfaz-winforms.md) y las comprobaciones registradas.
 
 ## Migración de esquema
 
@@ -70,11 +79,11 @@ dotnet ef database update --project src/LogiMarket.Infrastructure --startup-proj
 
 Si la herramienta global ya está instalada en otra versión, usa una instalación de EF Core 8.0.34 en un directorio de herramientas separado. La migración prepara el esquema. El arranque ejecuta también el seed.
 
-## Patrones y consultas de fase 3
+## Patrones y consultas en WinForms
 
-- En el panel, selecciona un borrador y usa **Clonar**, **Cambiar cantidad**, **Deshacer** o **Rehacer**. El historial conserva hasta cinco estados en la sesión de aplicación y queda bloqueado al salir de BORRADOR.
-- En **Catálogo**, elige un SKU para consultar peso, desglose y existencias. **Medir 1.000 renglones** repite los metadatos del catálogo bajo dos estrategias y muestra los recuentos y bytes asignados.
-- En **Pedidos y comprobantes**, filtra con `ESTADO = PAGADO AND TOTAL >= 50`. `AND` tiene prioridad sobre `OR`. Usa paréntesis para agrupar y comillas para nombres con espacios, por ejemplo `CLIENTE = "Ana QA"`. `TOTAL` representa el monto efectivamente cobrado.
-- Usa el GUID del pedido o selecciónalo con doble clic en la cuadrícula. Selecciona venta o devolución y elige **Vista previa** o **Guardar TXT**. Los comprobantes son internos.
+- En **Carrito y borradores**, selecciona un borrador y usa **Clonar borrador**, **Cambiar cantidad**, **Deshacer** o **Rehacer**. El historial conserva hasta cinco estados en la sesión de aplicación y queda bloqueado al salir de BORRADOR.
+- En **Catálogo**, elige un SKU para consultar peso, desglose y existencias. **Medir 1.000 filas** repite los metadatos del catálogo bajo dos estrategias y muestra los recuentos y bytes asignados.
+- En **Reportes y comprobantes**, filtra con `ESTADO = PAGADO AND TOTAL >= 50`. `AND` tiene prioridad sobre `OR`. Usa paréntesis para agrupar y comillas para nombres con espacios, por ejemplo `CLIENTE = "Ana QA"`. `TOTAL` representa el monto efectivamente cobrado.
+- Selecciona el pedido en la cuadrícula. Selecciona venta o devolución y elige **Vista previa** o **Guardar TXT**. Los comprobantes son internos.
 
 Consulta el [registro técnico de fase 3](docs/evidencia-fase-3.md) para reproducir las comprobaciones.

@@ -160,3 +160,14 @@ Los reportes, comprobantes, Prototype, Memento y el resto de patrones/vistas sig
 | RNF02, RNF07–RNF09 | 108 pruebas, compilación Release sin errores o advertencias, grafo de referencias y esquema SQLite verificados. | TRX, migración y prueba visual aislada. |
 
 Quedan las pantallas completas, la revisión visual de los casos parciales y el cierre documental de la entrega.
+
+
+## Avance verificado en fase 4
+
+| Requisitos | Resultado comprobado |
+| --- | --- |
+| RF01 y RNF05 | Se observó cierre de sesión y vuelta al acceso en WinForms. La suite verifica inicio y permisos en Application y verifica que el modo de simulación quede restringido a ADMIN. El inicio con entrada de credenciales y la revisión visual por los demás roles quedan para la comprobación manual. |
+| RF02–RF08 | Se sirvieron datos reales en catálogo, clientes, carrito, pedidos e historial. Se guardó un cambio de precio y se comprobó la conservación de la instantánea; la copia de un borrador permitió cambiar, deshacer y rehacer una cantidad. La suite verifica las reglas originales de descuentos, familias de entrega y estados. |
+| RF09–RF12 | Desde WinForms se confirmó la venta de Ana, se recuperaron existencias 7/4/19 después de reiniciar y se registraron guía y entrega. La vista de devoluciones calculó USD 54.00 sin flete. La confirmación de la devolución y sus efectos están cubiertos por pruebas de integración; falta repetir esa acción desde la nueva vista. |
+| RF13–RF18 | Se ejecutaron filtro de pedidos, vista previa y exportación TXT de venta, medición Flyweight, inducción y recuperación de fallo Outbox y lectura de la métrica compartida. Las vistas se conectan con el Mediator y las consultas y operaciones de Application. |
+| RNF01, RNF02, RNF06–RNF09 | Release limpio, 114 pruebas, migración y referencias verificadas. Se comprobó la ventana en tamaño normal y maximizado. El alcance visual y los artefactos están en [interfaz WinForms](interfaz-winforms.md). |

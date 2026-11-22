@@ -85,3 +85,14 @@ Estos ocho patrones se integraron en la fase 3. Sus comprobaciones se detallan a
 ## Estado acumulado
 
 Los 23 patrones tienen colaboradores funcionales y prueba técnica. Command completó en esta fase la comprobación visual del botón de confirmación junto con la prueba de invocación y auditoría existente. Singleton aún requiere la verificación de métricas desde dos vistas distintas de P15. La revisión de P38 y las demás comprobaciones parciales siguen en la matriz de aceptación.
+
+
+## Integración visual de fase 4
+
+| Patrón | Operación observada |
+| --- | --- |
+| Mediator y Singleton | `VentanaComercial` comunica cambios a través de `FormularioPrincipalMediator`. Tras reprocesar Outbox, **Panel general** y **Auditoría y demostración** mostraron una venta para la misma sesión. `MetricasSesionTests` verificó escritura concurrente deduplicada. P15 completo. |
+| Prototype y Memento | **Carrito y borradores** clonó un pedido con identificador nuevo. En la copia, la cantidad cambió de 1 a 2, volvió a 1 con Deshacer y a 2 con Rehacer. |
+| Bridge e Interpreter | La expresión `ESTADO = PAGADO AND TOTAL >= 50` dejó solo a Ana. Se abrió su vista previa y se comprobó el TXT guardado con el total de USD 59.00. |
+| Flyweight, Composite, Iterator y Visitor | **Catálogo y kits** mostró la composición física y el peso de 1.00 kg de KIT_TELETRABAJO. La medición en Windows registró 1.000 filas, 5/1.000 objetos compartidos/independientes y 56.752/104.024 bytes asignados, respectivamente. |
+| Observer y Factory Method | Se forzó el fallo del aviso simulado y se recuperó el evento pendiente tras reabrir WinForms. El reintento no volvió a cobrar ni repitió los movimientos de inventario. P37 completo. |

@@ -51,6 +51,15 @@
 - **Defectos y riesgos.** No se reprodujo un defecto de producto que requiriera un commit fix. La evaluación en memoria del filtro es una decisión de escala académica. El historial es local al proceso y coteja la versión para no deshacer ediciones ajenas. La mediación informa fallos de refresco por separado del resultado comercial.
 - **Cobertura.** 23 patrones integrados con pruebas técnicas. Singleton conserva pendiente P15 a nivel visual. 33 casos de aceptación verificados y 5 parciales. Quedan las vistas finales que exige la guía y el cierre de P08, P10, P15, P37 y P38.
 
+## Fase 4 Interfaz Windows Forms · 2026-11-22
+
+- Rama `feature/interfaz-winforms` desde `develop` sincronizada en `4668f63`.
+- Incrementos `feat`. `0bcfdbf` consultas, `8714125` simulación aislada y políticas, `daf809e` navegación, `7758741` catálogo/clientes/inventario, `b62758c` carrito/pedidos/cobro y `2fcd396` logística/reportes/auditoría.
+- Pruebas `cde276d` de composición y dependencias, y `63cbe25` de concurrencia Singleton.
+- Correcciones reproducidas en Windows. `b326672` corrigió importes visibles como USD N2; `fc3e82c` amplió dos rótulos del menú que se cortaban; `f0838bf` amplió las tarjetas de métricas y ajustó el estilo de encabezado. Tras reconstruir se observaron importes correctos, títulos completos y los valores de las tarjetas.
+- Compilación Release desde artefactos nuevos con cero errores y advertencias. 114 pruebas aprobadas, ninguna fallida ni omitida. Migración `20261120214119_EsquemaInicial` aplicada a un archivo nuevo y modelo sincronizado.
+- Cumplimiento. Se cerraron P08, P10, P15, P37 y P38. El historial de los 23 patrones permanece en la matriz GoF. La [evidencia visual](interfaz-winforms.md) registra comprobaciones pendientes y cómo reproducir las ejecutadas.
+
 ## Plantilla para próximas fases
 
 Registrar fase y fecha, rama, cambio y flujo comprobable, commits y verificaciones de integración, requisitos cumplidos o pendientes, patrones con archivo y método, comandos y resultados, incidentes con esperado/obtenido, forma de reproducción, corrección y regresión, y siguientes pasos. Para riesgos reales, vincular evidencia de antes y después, efecto, pruebas y commit. Un estado pendiente conserva sus campos de evidencia vacíos hasta ejecutar.

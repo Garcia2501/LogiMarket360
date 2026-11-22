@@ -163,3 +163,10 @@ El Proxy también se invoca y prueba directamente desde Application sin UI. Si l
 - **Pedidos y comprobantes.** Infrastructure obtiene una proyección tipada mediante EF Core. Application aplica el AST sobre estados, cliente y montos persistidos, por lo que la sintaxis no llega a SQL. Esta evaluación en memoria es adecuada para la base académica. La paginación o evaluación compatible con SQLite se reconsiderará si aumenta el volumen. Bridge compone una abstracción de venta o devolución con una salida elegida en el panel. El texto excluye cualquier validez tributaria.
 - **Mediación.** `FormularioPrincipalMediator` despacha a cinco puertos de vista registrados. WinForms traduce la operación terminada a un cambio, abre ámbitos de lectura por vista y presenta los resultados. Una actualización fallida no cancela las demás ni revierte la venta. El panel inicializa un coordinador por ventana y deja los contratos disponibles para separar vistas más adelante.
 - **Modelo.** Las funciones nuevas usan las tablas existentes. `HasPendingModelChanges` y la CLI de EF verificaron que la migración inicial sigue representando el esquema.
+
+
+## Interfaz comercial de fase 4
+
+`VentanaComercial` es la ventana principal y monta las doce vistas nativas. Cada vista obtiene servicios mediante un ámbito de DI para la consulta u operación. `ConsultarEscritorio` aplica permisos y compone las proyecciones; `LecturaEscritorio` recupera los datos de SQLite. Las escrituras siguen entrando por los casos de uso existentes. El pedido activo se conserva por identificador al navegar entre carrito, pedido y seguimiento. El Mediator refresca las áreas correspondientes y los errores de refresco se comunican independientemente del resultado del comando.
+
+Las tarjetas de sesión consultan `MetricasSesion`, que acumula eventos observados por el proceso. Las cifras de ventas e inventario persistidas se consultan en SQLite. La alerta visual de stock bajo se muestra con tres unidades o menos. Los controles para inducir fallos solo están disponibles al iniciar con `--demo` y usar ADMIN. La simulación escribe en un archivo dedicado e ignora la ruta de la base operativa.
