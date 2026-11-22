@@ -1,3 +1,4 @@
+using LogiMarket.Application.Escritorio;
 using System.Security.Cryptography;
 using System.Text;
 using LogiMarket.Application.Pagos;
@@ -10,13 +11,13 @@ public sealed class EstadoSimulacionPago
     public bool RechazarCobro { get; set; }
 }
 
-public sealed class PasarelaLegadaSimulada(EstadoSimulacionPago simulacion)
+public sealed class PasarelaLegadaSimulada(EstadoSimulacionPago simulacion, EstadoDemostracion demo)
 {
     public string? CobrarCentavos(long centavos, string clave)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(centavos);
         ArgumentException.ThrowIfNullOrWhiteSpace(clave);
-        return simulacion.RechazarCobro ? null : ReferenciaSimulada.Crear("LEG", clave);
+        return (simulacion.RechazarCobro || demo.Habilitado && demo.Ajustes.RechazarCobro) ? null : ReferenciaSimulada.Crear("LEG", clave);
     }
 }
 
@@ -31,14 +32,14 @@ public sealed class PasarelaLegadaAdapter(PasarelaLegadaSimulada legado) : IPasa
     }
 }
 
-public sealed class PasarelaAlternaSimulada(EstadoSimulacionPago simulacion) : IPasarelaPago
+public sealed class PasarelaAlternaSimulada(EstadoSimulacionPago simulacion, EstadoDemostracion demo) : IPasarelaPago
 {
     public Task<RespuestaPasarela> CobrarAsync(decimal importe, string clave, CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();
         ReferenciaSimulada.Centavos(importe);
         ArgumentException.ThrowIfNullOrWhiteSpace(clave);
-        return Task.FromResult(ReferenciaSimulada.Respuesta(simulacion.RechazarCobro
+        return Task.FromResult(ReferenciaSimulada.Respuesta((simulacion.RechazarCobro || demo.Habilitado && demo.Ajustes.RechazarCobro)
             ? null : ReferenciaSimulada.Crear("ALT", clave)));
     }
 }

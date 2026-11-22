@@ -1,3 +1,4 @@
+using LogiMarket.Application.Escritorio;
 using LogiMarket.Application.Eventos;
 using LogiMarket.Infrastructure.Persistencia.Operaciones;
 
@@ -19,11 +20,16 @@ public sealed class ObservadorAuditoria(LogiMarketDbContext db) : IObservadorEve
     }
 }
 
-public sealed class RegistroAvisosSqlite(LogiMarketDbContext db) : IRegistroAvisosSimulados
+public sealed class RegistroAvisosSqlite(LogiMarketDbContext db, EstadoDemostracion? demo = null) : IRegistroAvisosSimulados
 {
-    public void Registrar(AvisoSimulado aviso) => db.Auditorias.Add(new AuditoriaRegistro
+    public void Registrar(AvisoSimulado aviso)
     {
-        Categoria = $"AVISO_{aviso.Canal}", Accion = aviso.Evento, Resultado = aviso.Mensaje,
-        Correlacion = aviso.EventoId.ToString("N"), FechaUtc = aviso.FechaUtc
-    });
+        if (demo is { Habilitado: true } && demo.Ajustes.FallarAvisos)
+            throw new IOException("Fallo de aviso activado en la base de demostración.");
+        db.Auditorias.Add(new AuditoriaRegistro
+        {
+            Categoria = $"AVISO_{aviso.Canal}", Accion = aviso.Evento, Resultado = aviso.Mensaje,
+            Correlacion = aviso.EventoId.ToString("N"), FechaUtc = aviso.FechaUtc
+        });
+    }
 }

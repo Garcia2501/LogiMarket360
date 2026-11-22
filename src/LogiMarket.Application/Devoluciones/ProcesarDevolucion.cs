@@ -18,8 +18,8 @@ public abstract class ProcesarDevolucion
     protected abstract int DiasPermitidos { get; }
     protected abstract void Inspeccionar(bool productoSinUso);
 
-    internal async Task<DevolucionAplicada> EjecutarAsync(ContextoDevolucion contexto, Guid id,
-        bool productoSinUso, CancellationToken ct)
+    internal async Task<(Pedido Pedido, PagoAplicado Pago, DateTime FechaEntregaUtc, DateTimeOffset Ahora)> RevisarAsync(
+        ContextoDevolucion contexto, Guid id, bool productoSinUso, CancellationToken ct)
     {
         var pedido = await contexto.Pedidos.BuscarAsync(id, ct) ?? throw new KeyNotFoundException("El pedido no existe.");
         if (pedido.Estado != EstadoPedido.ENTREGADO)
@@ -38,6 +38,13 @@ public abstract class ProcesarDevolucion
 
         var pago = await contexto.Pagos.BuscarPorPedidoAsync(id, ct)
             ?? throw new RechazoPedidoException("PAGO", "El pedido no tiene un pago aprobado.");
+        return (pedido, pago, fechaEntrega, ahora);
+    }
+
+    internal async Task<DevolucionAplicada> EjecutarAsync(ContextoDevolucion contexto, Guid id,
+        bool productoSinUso, CancellationToken ct)
+    {
+        var (pedido, pago, _, ahora) = await RevisarAsync(contexto, id, productoSinUso, ct);
         var importe = pago.Importe - pago.Tarifa;
         var referencia = contexto.Reembolso.Reembolsar(pago, importe);
         var devolucion = new DevolucionAplicada(id, Motivo, productoSinUso, true, referencia, importe, ahora.UtcDateTime);
@@ -83,6 +90,16 @@ public sealed class AdministrarDevoluciones(IEnumerable<ProcesarDevolucion> poli
 {
     private readonly IReadOnlyDictionary<MotivoDevolucion, ProcesarDevolucion> _politicas =
         politicas.ToDictionary(p => p.Motivo);
+
+    public async Task<(decimal Importe, DateTime FechaEntregaUtc)> PrevisualizarAsync(Guid id, MotivoDevolucion motivo,
+        bool productoSinUso, CancellationToken ct = default)
+    {
+        await acceso.ExigirAsync(Operacion.Devolver, ct);
+        if (!_politicas.TryGetValue(motivo, out var politica))
+            throw new ArgumentOutOfRangeException(nameof(motivo));
+        var (_, pago, fecha, _) = await politica.RevisarAsync(contexto, id, productoSinUso, ct);
+        return (pago.Importe - pago.Tarifa, fecha);
+    }
 
     public async Task<DevolucionAplicada> DevolverAsync(Guid id, MotivoDevolucion motivo, bool productoSinUso,
         CancellationToken ct = default)

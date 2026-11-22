@@ -19,12 +19,13 @@ using LogiMarket.Application.Seguridad;
 using LogiMarket.Infrastructure.Persistencia.Repositorios;
 using LogiMarket.Infrastructure.Seguridad;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace LogiMarket.Infrastructure.Persistencia;
 
 public static class RegistroPersistencia
 {
-    public static IServiceCollection AgregarPersistenciaLogiMarket(this IServiceCollection servicios, string archivo)
+    public static IServiceCollection AgregarPersistenciaLogiMarket(this IServiceCollection servicios, string archivo, bool demostracion = false)
     {
         servicios.AddSingleton(ConexionSqlite.CrearOpciones(archivo));
         servicios.AddScoped<LogiMarketDbContext>();
@@ -96,6 +97,8 @@ public static class RegistroPersistencia
         servicios.AddScoped<ConsultarCatalogoVisual>();
         servicios.AddScoped<ILecturaEscritorio, LecturaEscritorio>();
         servicios.AddScoped<ConsultarEscritorio>();
+        servicios.TryAddSingleton(new EstadoDemostracion(demostracion));
+        servicios.AddScoped<ControlDemostracion>();
         return servicios;
     }
 }

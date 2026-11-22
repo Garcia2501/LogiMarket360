@@ -68,6 +68,13 @@ public sealed class AdministrarPedidos(IRepositorioPedidos pedidos, IRepositorio
         EditarAsync(pedidoId, async (p, token) =>
             p.AgregarLinea(await catalogo.ObtenerElementoActivoAsync(linea.Sku, token), linea.Cantidad), ct);
 
+    public Task ReemplazarLineaAsync(Guid pedidoId, Guid lineaId, LineaSolicitada linea, CancellationToken ct = default) =>
+        EditarAsync(pedidoId, async (p, token) =>
+        {
+            p.AgregarLinea(await catalogo.ObtenerElementoActivoAsync(linea.Sku, token), linea.Cantidad);
+            p.QuitarLinea(lineaId);
+        }, ct);
+
     public Task CambiarCantidadAsync(Guid pedidoId, Guid lineaId, int cantidad, CancellationToken ct = default) =>
         EditarAsync(pedidoId, (p, _) =>
         {

@@ -9,10 +9,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
-        bool soloInicializar = args is ["--solo-inicializar"];
+        bool soloInicializar = args.Contains("--solo-inicializar", StringComparer.Ordinal);
+        bool demo = args.Contains("--demo", StringComparer.Ordinal);
         try
         {
-            using var servicios = CrearHost();
+            using var servicios = CrearHost(demo);
             PrepararPersistenciaAsync(servicios).GetAwaiter().GetResult();
             if (!soloInicializar)
             {
@@ -32,15 +33,18 @@ internal static class Program
         }
     }
 
-    private static ServiceProvider CrearHost()
+    private static ServiceProvider CrearHost(bool demo)
     {
-        var archivo = Environment.GetEnvironmentVariable("LOGIMARKET360_DB")
-            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "LogiMarket360", "logimarket360.db");
-        archivo = Path.GetFullPath(archivo);
+        var baseLocal = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LogiMarket360");
+        var operativa = Path.GetFullPath(Environment.GetEnvironmentVariable("LOGIMARKET360_DB")
+            ?? Path.Combine(baseLocal, "logimarket360.db"));
+        var demostracion = Path.Combine(baseLocal, "Demostracion", "logimarket360-demo.db");
+        if (string.Equals(operativa, demostracion, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("La ruta de demostración está reservada para el modo --demo.");
+        var archivo = demo ? demostracion : operativa;
         Directory.CreateDirectory(Path.GetDirectoryName(archivo)!);
 
-        return new ServiceCollection().AgregarPersistenciaLogiMarket(archivo)
+        return new ServiceCollection().AgregarPersistenciaLogiMarket(archivo, demo)
             .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
     }
 
