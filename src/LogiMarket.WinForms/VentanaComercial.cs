@@ -1,9 +1,5 @@
+using LogiMarket.Application.Escritorio;
 using LogiMarket.Application.Navegacion;
-using LogiMarket.Application.Comandos;
-using LogiMarket.Application.Devoluciones;
-using LogiMarket.Application.Entregas;
-using LogiMarket.Application.Eventos;
-using LogiMarket.Application.Pagos;
 using LogiMarket.Application.Seguridad;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,168 +7,304 @@ namespace LogiMarket.WinForms;
 
 internal sealed partial class VentanaComercial : Form
 {
+    private enum Seccion { Panel, Catalogo, Clientes, Carrito, Pedidos, Cobro, Despacho, Devoluciones, Inventario, Reportes, Auditoria }
     private readonly IServiceProvider _servicios;
     private readonly SesionLocal _sesion;
-    private readonly TextBox _usuario = new() { Width = 180, AccessibleName = "Usuario" };
-    private readonly TextBox _clave = new() { Width = 180, UseSystemPasswordChar = true, AccessibleName = "Contraseña" };
-    private readonly TextBox _pedido = new() { Width = 278, AccessibleName = "Identificador del pedido" };
-    private readonly TextBox _idempotencia = new() { Width = 278, AccessibleName = "Clave de confirmación" };
-    private readonly ComboBox _proveedor = Seleccion<ProveedorPago>("Proveedor simulado");
-    private readonly ComboBox _motivo = Seleccion<MotivoDevolucion>("Motivo de devolución");
-    private readonly ComboBox _canal = Seleccion<CanalAviso>("Canal simulado");
-    private readonly CheckBox _sinUso = new() { Text = "Producto sin uso", AutoSize = true };
-    private readonly Label _estado = new() { AutoSize = true, AccessibleName = "Estado de sesión" };
-    private readonly Label _mensaje = new() { AutoSize = true, MaximumSize = new Size(680, 0), AccessibleName = "Resultado" };
-    private readonly List<(Button Boton, Operacion Permiso)> _operaciones = [];
-    private readonly Button _entrar = new() { Text = "Iniciar sesión", AutoSize = true };
-    private readonly Button _salir = new() { Text = "Cerrar sesión", AutoSize = true };
-    private readonly FlowLayoutPanel _contenido = new()
+    private readonly FormularioPrincipalMediator _mediador = new();
+    private readonly Dictionary<Seccion, (string Nombre, Func<Pantalla> Crear, Operacion Permiso)> _definiciones = [];
+    private readonly Dictionary<Seccion, Pantalla> _pantallas = [];
+    private readonly Dictionary<Seccion, Button> _enlaces = [];
+    private readonly Panel _centro = new() { Dock = DockStyle.Fill, BackColor = Tema.Fondo };
+    private readonly FlowLayoutPanel _navegacion = new()
     {
-        Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, AutoScroll = true,
-        Padding = new Padding(16)
+        Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false,
+        AutoScroll = true, BackColor = Tema.Barra, Padding = new Padding(12, 15, 12, 10)
     };
+    private readonly Label _rol = Tema.TextoPlano();
+    private readonly Button _salir = Tema.Boton("Cerrar sesión");
+    private readonly ErrorProvider _errores;
+    private Seccion? _paginaActiva;
+    private Guid? _pedidoActivo;
+    private bool _ocupado;
 
     public VentanaComercial(IServiceProvider servicios, SesionLocal sesion)
     {
         _servicios = servicios;
         _sesion = sesion;
+        _errores = new ErrorProvider(this) { BlinkStyle = ErrorBlinkStyle.NeverBlink };
         Text = "LogiMarket 360";
-        AutoScaleMode = AutoScaleMode.Font;
-        MinimumSize = new Size(830, 500);
-        ClientSize = new Size(960, 545);
+        Font = new Font("Segoe UI", 10f);
+        ForeColor = Tema.Texto;
+        BackColor = Tema.Fondo;
+        AutoScaleMode = AutoScaleMode.Dpi;
+        MinimumSize = new Size(900, 630);
+        ClientSize = new Size(1210, 790);
         StartPosition = FormStartPosition.CenterScreen;
-        Controls.Add(_contenido);
-        FilasSesion();
-        FilasBorrador();
-        FilasOperaciones();
-        _contenido.Controls.Add(_mensaje);
-        ConfigurarConsultas();
-        ActualizarSesion();
-    }
 
-    private void FilasSesion()
-    {
-        _idempotencia.Text = Guid.NewGuid().ToString("N");
-        _pedido.TextChanged += (_, _) => _idempotencia.Text = Guid.NewGuid().ToString("N");
-        _entrar.Click += async (_, _) => await EjecutarAsync(async sp =>
+        var distribucion = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 2 };
+        distribucion.ColumnStyles.Add(new(SizeType.Absolute, 217));
+        distribucion.ColumnStyles.Add(new(SizeType.Percent, 100));
+        distribucion.RowStyles.Add(new(SizeType.Absolute, 68));
+        distribucion.RowStyles.Add(new(SizeType.Percent, 100));
+        var cabecera = Cabecera();
+        distribucion.Controls.Add(cabecera, 0, 0);
+        distribucion.SetColumnSpan(cabecera, 2);
+        distribucion.Controls.Add(_navegacion, 0, 1);
+        distribucion.Controls.Add(_centro, 1, 1);
+        Controls.Add(distribucion);
+        _salir.Click += (_, _) => CerrarSesion();
+        RegistrarPantallas();
+
+        _mediador.Conectar(AreaComercial.Catalogo, (_, _) => ActualizarCacheAsync(Seccion.Catalogo));
+        _mediador.Conectar(AreaComercial.Carrito, (_, _) => ActualizarCacheAsync(Seccion.Carrito));
+        _mediador.Conectar(AreaComercial.Pedidos, async (_, _) =>
         {
-            var permitido = await sp.GetRequiredService<AutenticacionLocal>().IniciarAsync(_usuario.Text, _clave.Text);
-            _clave.Clear();
-            return permitido ? await RefrescarAsync(CambioComercial.Inicio, null, "Sesión iniciada.") : "Usuario o contraseña incorrectos.";
+            await ActualizarCacheAsync(Seccion.Pedidos);
+            if (_paginaActiva is Seccion.Cobro or Seccion.Despacho or Seccion.Devoluciones or Seccion.Reportes)
+                await ActualizarCacheAsync(_paginaActiva.Value);
         });
-        _salir.Click += (_, _) =>
+        _mediador.Conectar(AreaComercial.Inventario, (_, _) => ActualizarCacheAsync(Seccion.Inventario));
+        _mediador.Conectar(AreaComercial.Metricas, async (_, _) =>
+        {
+            await ActualizarCacheAsync(Seccion.Panel);
+            await ActualizarCacheAsync(Seccion.Auditoria);
+        });
+
+        Shown += async (_, _) =>
+        {
+            if (_sesion.Actual is null)
+                MostrarAcceso();
+            else
+            {
+                MostrarMenu();
+                await NavegarAsync(Seccion.Panel);
+            }
+        };
+        FormClosing += (_, e) => e.Cancel = _ocupado;
+        FormClosed += (_, _) =>
         {
             _sesion.Cerrar();
-            _usuario.Clear();
-            _clave.Clear();
-            _pedido.Clear();
-            LimpiarBorrador();
-            LimpiarConsultas();
-            _idempotencia.Text = Guid.NewGuid().ToString("N");
-            _mensaje.Text = "Sesión cerrada.";
-            ActualizarSesion();
+            foreach (var pantalla in _pantallas.Values)
+                pantalla.Dispose();
+            _errores.Dispose();
         };
-        _contenido.Controls.Add(Fila(
-            new Label { Text = "Usuario", AutoSize = true }, _usuario,
-            new Label { Text = "Contraseña", AutoSize = true }, _clave, _entrar, _salir));
-        _contenido.Controls.Add(_estado);
     }
 
-    private void FilasOperaciones()
+    private Control Cabecera()
     {
-        _contenido.Controls.Add(Fila(new Label { Text = "Pedido (GUID)", AutoSize = true }, _pedido,
-            Boton("Seguimiento", Operacion.Consultar, async sp =>
-            {
-                var pedido = await sp.GetRequiredService<DespacharPedidos>().ConsultarAsync(IdPedido());
-                return await RefrescarAsync(CambioComercial.EstadoPedido, pedido.Id,
-                    pedido.Despacho is { } despacho ? $"{pedido.Estado} · {despacho.Guia}" : pedido.Estado.ToString());
-            })));
-        _contenido.Controls.Add(Fila(new Label { Text = "Clave de confirmación", AutoSize = true }, _idempotencia,
-            _proveedor, Boton("Confirmar cobro", Operacion.Cobrar, async sp =>
-            {
-                var pago = await sp.GetRequiredService<OperacionesPedido>().ConfirmarAsync(
-                    new(IdPedido(), _idempotencia.Text, (ProveedorPago)_proveedor.SelectedItem!));
-                return await RefrescarAsync(CambioComercial.VentaConfirmada, pago.PedidoId, $"Pago USD {pago.Importe:F2} · {pago.Referencia}");
-            })));
-        _contenido.Controls.Add(Fila(
-            Boton("Cancelar pedido", Operacion.CancelarPedido, async sp =>
-            {
-                await sp.GetRequiredService<OperacionesPedido>().CancelarAsync(new(IdPedido()));
-                return await RefrescarAsync(CambioComercial.EstadoPedido, IdPedido(), "Pedido cancelado.");
-            }),
-            Boton("Despachar", Operacion.Despachar, async sp =>
-            {
-                var despacho = await sp.GetRequiredService<OperacionesPedido>().DespacharAsync(new(IdPedido()));
-                return await RefrescarAsync(CambioComercial.EstadoPedido, despacho.PedidoId, $"Guía {despacho.Guia} · {despacho.PlazoDias} día(s)");
-            }),
-            Boton("Registrar entrega", Operacion.Entregar, async sp =>
-            {
-                await sp.GetRequiredService<DespacharPedidos>().EntregarAsync(IdPedido());
-                return await RefrescarAsync(CambioComercial.EstadoPedido, IdPedido(), "Entrega registrada.");
-            })));
-        _contenido.Controls.Add(Fila(_motivo, _sinUso, Boton("Devolver pedido", Operacion.Devolver, async sp =>
-        {
-            var resultado = await sp.GetRequiredService<OperacionesPedido>().DevolverAsync(
-                new(IdPedido(), (MotivoDevolucion)_motivo.SelectedItem!, _sinUso.Checked));
-            return await RefrescarAsync(CambioComercial.DevolucionAceptada, resultado.PedidoId,
-                $"Reembolso simulado USD {resultado.Importe:F2} · {resultado.ReferenciaReembolso}");
-        })));
-        _contenido.Controls.Add(Fila(_canal, Boton("Procesar Outbox", Operacion.ReprocesarEventos, async sp =>
-        {
-            var resultado = await sp.GetRequiredService<ReprocesarEventos>().EjecutarAsync((CanalAviso)_canal.SelectedItem!);
-            return await RefrescarAsync(CambioComercial.EventosProcesados, null,
-                $"Eventos procesados: {resultado.Procesados}. Pendientes por fallo: {resultado.Fallidos}.");
-        })));
+        var tabla = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1,
+            BackColor = Tema.Papel, Padding = new Padding(15, 14, 18, 11), Margin = new Padding(0) };
+        tabla.ColumnStyles.Add(new(SizeType.Percent, 100));
+        tabla.ColumnStyles.Add(new(SizeType.AutoSize));
+        tabla.ColumnStyles.Add(new(SizeType.AutoSize));
+        tabla.Controls.Add(new Label { Text = "LogiMarket 360", AutoSize = true, ForeColor = Tema.Texto,
+            Anchor = AnchorStyles.Left, Font = new Font("Segoe UI", 16, FontStyle.Bold) }, 0, 0);
+        _rol.Anchor = AnchorStyles.Right;
+        _rol.Margin = new Padding(4, 0, 15, 0);
+        tabla.Controls.Add(_rol, 1, 0);
+        tabla.Controls.Add(_salir, 2, 0);
+        return tabla;
     }
 
-    private Button Boton(string texto, Operacion permiso, Func<IServiceProvider, Task<string>> accion)
+    private void RegistrarPantallas()
     {
-        var boton = new Button { Text = texto, AutoSize = true };
-        boton.Click += async (_, _) => await EjecutarAsync(accion);
-        _operaciones.Add((boton, permiso));
+        Registrar(Seccion.Panel, "Panel general", ConstruirPanel);
+        RegistrarCatalogo();
+        RegistrarPedidos();
+        RegistrarSeguimiento();
+    }
+
+    partial void RegistrarCatalogo();
+    partial void RegistrarPedidos();
+    partial void RegistrarSeguimiento();
+
+    private void Registrar(Seccion pagina, string nombre, Func<Pantalla> crear, Operacion permiso = Operacion.Consultar) =>
+        _definiciones.Add(pagina, (nombre, crear, permiso));
+
+    private void MostrarAcceso()
+    {
+        _navegacion.Visible = false;
+        _salir.Visible = false;
+        _rol.Text = EsDemo ? "Base de demostración · sin sesión" : "Sin sesión";
+        var tarjeta = Tema.Pilas();
+        tarjeta.Padding = new Padding(28);
+        tarjeta.BackColor = Tema.Papel;
+        tarjeta.Width = 397;
+        tarjeta.Height = 301;
+        tarjeta.Dock = DockStyle.None;
+        var usuario = Tema.TextoCampo("Usuario", 304);
+        var clave = Tema.TextoCampo("Contraseña", 304);
+        clave.UseSystemPasswordChar = true;
+        var ingresar = Tema.Boton("Ingresar", true);
+        var mensaje = Tema.TextoPlano();
+        mensaje.ForeColor = Tema.Riesgo;
+        Tema.Fila(tarjeta, new Label { Text = "Acceso al sistema", Font = new Font("Segoe UI", 18, FontStyle.Bold),
+            AutoSize = true, ForeColor = Tema.Texto, Margin = new Padding(0, 0, 0, 10) });
+        Tema.Fila(tarjeta, Tema.Campo("Usuario", usuario));
+        Tema.Fila(tarjeta, Tema.Campo("Contraseña", clave));
+        Tema.Fila(tarjeta, Tema.Acciones(ingresar));
+        Tema.Fila(tarjeta, mensaje);
+        ingresar.Click += async (_, _) =>
+        {
+            if (_ocupado || !Requerido(usuario) || !Requerido(clave))
+                return;
+            _ocupado = true;
+            tarjeta.Enabled = false;
+            bool iniciada = false;
+            try
+            {
+                await using var scope = _servicios.CreateAsyncScope();
+                iniciada = await scope.ServiceProvider.GetRequiredService<AutenticacionLocal>().IniciarAsync(usuario.Text, clave.Text);
+                if (!iniciada)
+                    mensaje.Text = "Usuario o contraseña incorrectos.";
+            }
+            catch (Exception e) { mensaje.Text = e.Message; }
+            finally
+            {
+                clave.Clear();
+                tarjeta.Enabled = true;
+                _ocupado = false;
+            }
+            if (iniciada)
+            {
+                _centro.Controls.Remove(tarjeta);
+                tarjeta.Dispose();
+                MostrarMenu();
+                await NavegarAsync(Seccion.Panel);
+            }
+        };
+        void Centrar(object? sender, EventArgs e) =>
+            tarjeta.Location = new Point(Math.Max(10, (_centro.ClientSize.Width - tarjeta.Width) / 2),
+                Math.Max(15, (_centro.ClientSize.Height - tarjeta.Height) / 2));
+        tarjeta.Resize += Centrar;
+        _centro.Resize += Centrar;
+        tarjeta.Disposed += (_, _) => _centro.Resize -= Centrar;
+        _centro.Controls.Add(tarjeta);
+        Centrar(null, EventArgs.Empty);
+        AcceptButton = ingresar;
+        usuario.Select();
+    }
+
+    private void MostrarMenu()
+    {
+        AcceptButton = null;
+        _navegacion.Visible = _salir.Visible = true;
+        var identidad = _sesion.Actual!;
+        _rol.Text = $"{identidad.Nombre} · {identidad.Rol}" + (EsDemo ? " · Demostración" : "");
+        foreach (var (seccion, configuracion) in _definiciones.OrderBy(d => d.Key))
+        {
+            if (!Tiene(configuracion.Permiso))
+                continue;
+            var enlace = Tema.Boton(configuracion.Nombre);
+            enlace.AutoSize = false;
+            enlace.Width = 188;
+            enlace.Height = 37;
+            enlace.TextAlign = ContentAlignment.MiddleLeft;
+            enlace.Click += async (_, _) => await NavegarAsync(seccion);
+            _enlaces.Add(seccion, enlace);
+            _navegacion.Controls.Add(enlace);
+        }
+    }
+
+    private async Task NavegarAsync(Seccion seccion)
+    {
+        if (_ocupado)
+            return;
+        var definicion = _definiciones[seccion];
+        if (!Tiene(definicion.Permiso))
+            return;
+        if (!_pantallas.TryGetValue(seccion, out var pagina))
+            _pantallas.Add(seccion, pagina = definicion.Crear());
+        _paginaActiva = seccion;
+        _centro.Controls.Clear();
+        _centro.Controls.Add(pagina.Contenedor);
+        foreach (var (key, boton) in _enlaces)
+            boton.BackColor = key == seccion ? Tema.Suave : Tema.Papel;
+
+        if (pagina.Cargar is { } cargar)
+            await EjecutarAsync(pagina, async sp => { await cargar(sp); return null; });
+    }
+
+    private void CerrarSesion()
+    {
+        if (_ocupado)
+            return;
+        _sesion.Cerrar();
+        _pedidoActivo = null;
+        _paginaActiva = null;
+        _centro.Controls.Clear();
+        foreach (var vista in _pantallas.Values)
+            vista.Dispose();
+        _pantallas.Clear();
+        foreach (var enlace in _enlaces.Values)
+            enlace.Dispose();
+        _enlaces.Clear();
+        MostrarAcceso();
+    }
+
+    private bool EsDemo => _servicios.GetRequiredService<EstadoDemostracion>().Habilitado;
+    private bool Tiene(Operacion op) => _sesion.Actual is { } s && AutorizacionOperaciones.Permite(s.Rol, op);
+    private void Elegir(Guid pedido) => _pedidoActivo = pedido;
+    private Guid PedidoActual() => _pedidoActivo ?? throw new InvalidOperationException("Selecciona un pedido primero.");
+
+    private Button Accion(Pantalla pantalla, string titulo, Func<IServiceProvider, Task<string?>> accion,
+        Operacion permiso = Operacion.Consultar, bool principal = false)
+    {
+        var boton = Tema.Boton(titulo, principal);
+        boton.Enabled = Tiene(permiso);
+        boton.Click += async (_, _) => await EjecutarAsync(pantalla, accion);
         return boton;
     }
 
-    private async Task EjecutarAsync(Func<IServiceProvider, Task<string>> accion)
+    private async Task EjecutarAsync(Pantalla pantalla, Func<IServiceProvider, Task<string?>> accion)
     {
-        _contenido.Enabled = false;
+        if (_ocupado)
+            return;
+        _ocupado = true;
+        UseWaitCursor = true;
+        _salir.Enabled = false;
         try
         {
             await using var scope = _servicios.CreateAsyncScope();
-            _mensaje.Text = await accion(scope.ServiceProvider);
+            var mensaje = await accion(scope.ServiceProvider);
+            if (mensaje is not null)
+                pantalla.Avisar(mensaje);
         }
-        catch (Exception error)
+        catch (Exception e)
         {
-            _mensaje.Text = error.Message;
+            pantalla.Avisar(e.Message, error: true);
         }
         finally
         {
-            _contenido.Enabled = true;
-            ActualizarSesion();
+            UseWaitCursor = false;
+            _ocupado = false;
+            _salir.Enabled = true;
         }
     }
 
-    private void ActualizarSesion()
+    private async Task ActualizarCacheAsync(Seccion seccion)
     {
-        var identidad = _sesion.Actual;
-        _estado.Text = identidad is null ? "Sin sesión" : $"{identidad.Nombre} · {identidad.Rol}";
-        _entrar.Enabled = _usuario.Enabled = _clave.Enabled = identidad is null;
-        _salir.Enabled = identidad is not null;
-        AcceptButton = identidad is null ? _entrar : null;
-        foreach (var (boton, permiso) in _operaciones)
-            boton.Enabled = identidad is not null && AutorizacionOperaciones.Permite(identidad.Rol, permiso);
+        if (!_pantallas.TryGetValue(seccion, out var pantalla) || pantalla.Cargar is not { } cargar)
+            return;
+        await using var scope = _servicios.CreateAsyncScope();
+        await cargar(scope.ServiceProvider);
     }
 
-    private Guid IdPedido() => Guid.TryParse(_pedido.Text, out var id)
-        ? id : throw new ArgumentException("Indica un identificador de pedido válido.");
-
-    private static ComboBox Seleccion<T>(string nombre) where T : struct, Enum =>
-        new() { DropDownStyle = ComboBoxStyle.DropDownList, DataSource = Enum.GetValues<T>(), AccessibleName = nombre };
-
-    private static FlowLayoutPanel Fila(params Control[] controles)
+    private async Task<string> NotificarAsync(CambioComercial cambio, string exito)
     {
-        var panel = new FlowLayoutPanel { AutoSize = true, WrapContents = false };
-        panel.Controls.AddRange(controles);
-        return panel;
+        var errores = await _mediador.NotificarAsync(cambio, _pedidoActivo);
+        return errores.Count == 0 ? exito : $"{exito} Actualización pendiente en {string.Join(", ", errores.Select(x => x.Area))}.";
     }
+
+    private bool Requerido(TextBox campo)
+    {
+        var valido = !string.IsNullOrWhiteSpace(campo.Text);
+        _errores.SetError(campo, valido ? "" : "Completa este campo.");
+        if (!valido)
+            campo.Focus();
+        return valido;
+    }
+
+    private bool Confirmar(string mensaje) => MessageBox.Show(this, mensaje, "Confirmar operación",
+        MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes;
 }
