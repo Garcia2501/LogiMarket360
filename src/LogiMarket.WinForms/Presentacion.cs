@@ -125,7 +125,7 @@ internal sealed class Tarjeta
 
     public FlowLayoutPanel Contenedor { get; } = new()
     {
-        Width = 164, Height = 80, BackColor = Tema.Papel, FlowDirection = FlowDirection.TopDown,
+        Width = 164, Height = 92, BackColor = Tema.Papel, FlowDirection = FlowDirection.TopDown,
         WrapContents = false, Padding = new Padding(12, 7, 8, 7), Margin = new Padding(0, 0, 9, 9)
     };
 
@@ -144,7 +144,7 @@ internal sealed class Cuadricula<T>(string nombre, Func<T, object> identidad) wh
         BackgroundColor = Tema.Papel, BorderStyle = BorderStyle.FixedSingle, GridColor = Tema.Borde,
         CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal, EnableHeadersVisualStyles = false,
         ColumnHeadersHeight = 35, ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
-        ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle { BackColor = Tema.Barra, ForeColor = Tema.Texto },
+        ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle { BackColor = Tema.Barra, ForeColor = Tema.Texto, SelectionForeColor = Color.White },
         DefaultCellStyle = new DataGridViewCellStyle { ForeColor = Tema.Texto, BackColor = Tema.Papel,
             SelectionBackColor = Tema.Acento, SelectionForeColor = Color.White },
         AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle { BackColor = Color.FromArgb(247, 250, 252) },
