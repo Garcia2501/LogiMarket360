@@ -1,3 +1,4 @@
+using LogiMarket.Application.Reportes;
 using LogiMarket.Application.Comandos;
 using LogiMarket.Infrastructure.Persistencia.Eventos;
 using LogiMarket.Application.Devoluciones;
@@ -84,6 +85,8 @@ public static class RegistroPersistencia
         servicios.AddScoped<IRegistroComandos, RegistroComandosSqlite>();
         servicios.AddScoped<InvocadorComandos>();
         servicios.AddScoped<OperacionesPedido>();
+        servicios.AddScoped<ILecturaReportePedidos, LecturaReportePedidos>();
+        servicios.AddScoped<ConsultarReportePedidos>();
         return servicios;
     }
 }
