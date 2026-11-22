@@ -21,6 +21,13 @@ public sealed class PedidoDetalleComponente
         EsProducto = nodo.Componentes.Count == 0;
     }
 
+    internal PedidoDetalleComponente CopiarPara(Guid detalleId) => new()
+    {
+        Id = Guid.NewGuid(), PedidoDetalleId = detalleId, Ruta = Ruta, Sku = Sku, Nombre = Nombre,
+        CantidadEnPadre = CantidadEnPadre, CantidadPorUnidad = CantidadPorUnidad, PrecioUnitario = PrecioUnitario,
+        PesoKg = PesoKg, EsProducto = EsProducto
+    };
+
     public Guid Id { get; private set; }
     public Guid PedidoDetalleId { get; private set; }
     public string Ruta { get; private set; } = null!;

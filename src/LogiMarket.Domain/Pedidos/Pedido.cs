@@ -3,7 +3,7 @@ using LogiMarket.Domain.Clientes;
 
 namespace LogiMarket.Domain.Pedidos;
 
-public sealed class Pedido
+public sealed partial class Pedido
 {
     private readonly List<PedidoDetalle> _lineas = [];
     private readonly List<HistorialPedido> _historial = [];

@@ -14,7 +14,7 @@ public sealed record BorradorVisto(Guid Id, Guid ClienteId, EstadoPedido Estado,
 
 public sealed class AdministrarPedidos(IRepositorioPedidos pedidos, IRepositorioClientes clientes,
     AdministrarCatalogo catalogo, AutorizacionOperaciones acceso, IUnidadDeTrabajo unidad,
-    CadenaValidacionPedido cadena, ValorarPedido valorar, TimeProvider reloj)
+    CadenaValidacionPedido cadena, ValorarPedido valorar, TimeProvider reloj, HistorialBorrador historial)
 {
     public async Task<BorradorVisto> CrearAsync(Guid clienteId, ModalidadEntrega entrega,
         IReadOnlyList<LineaSolicitada> lineas, CancellationToken ct = default)
@@ -43,6 +43,26 @@ public sealed class AdministrarPedidos(IRepositorioPedidos pedidos, IRepositorio
             ?? throw new KeyNotFoundException("El cliente no existe.");
         return Proyectar(pedido, cliente.Categoria);
     }
+
+    public async Task<BorradorVisto> ClonarBorradorAsync(Guid id, CancellationToken ct = default)
+    {
+        var actor = await acceso.ExigirAsync(Operacion.EditarPedido, ct);
+        return await unidad.EnTransaccionAsync(async token =>
+        {
+            var plantilla = await ObtenerAsync(id, token);
+            var cliente = await clientes.BuscarPorIdAsync(plantilla.ClienteId, token)
+                ?? throw new KeyNotFoundException("El cliente no existe.");
+            var copia = plantilla.ClonarComoBorrador(cliente, actor.UsuarioId, reloj.GetUtcNow());
+            pedidos.Agregar(copia);
+            return Proyectar(copia, cliente.Categoria);
+        }, ct);
+    }
+
+    public Task<BorradorVisto> DeshacerAsync(Guid id, CancellationToken ct = default) =>
+        NavegarHistorialAsync(id, -1, ct);
+
+    public Task<BorradorVisto> RehacerAsync(Guid id, CancellationToken ct = default) =>
+        NavegarHistorialAsync(id, 1, ct);
 
     public Task AgregarLineaAsync(Guid pedidoId, LineaSolicitada linea, CancellationToken ct = default) =>
         EditarAsync(pedidoId, async (p, token) =>
@@ -80,6 +100,7 @@ public sealed class AdministrarPedidos(IRepositorioPedidos pedidos, IRepositorio
             pedido.Validar(actor.UsuarioId, reloj.GetUtcNow());
             return true;
         }, ct);
+        historial.Cerrar(id);
     }
 
     public async Task CancelarAsync(Guid id, CancellationToken ct = default)
@@ -91,16 +112,38 @@ public sealed class AdministrarPedidos(IRepositorioPedidos pedidos, IRepositorio
             pedido.Cancelar(actor.UsuarioId, reloj.GetUtcNow());
             return true;
         }, ct);
+        historial.Cerrar(id);
     }
 
     private async Task EditarAsync(Guid id, Func<Pedido, CancellationToken, Task> editar, CancellationToken ct)
     {
-        await acceso.ExigirAsync(Operacion.EditarPedido, ct);
-        await unidad.EnTransaccionAsync(async token =>
+        var actor = await acceso.ExigirAsync(Operacion.EditarPedido, ct);
+        var cambio = await unidad.EnTransaccionAsync(async token =>
         {
-            await editar(await ObtenerAsync(id, token), token);
-            return true;
+            var pedido = await ObtenerAsync(id, token);
+            var version = pedido.Version;
+            var anterior = pedido.CapturarBorrador();
+            await editar(pedido, token);
+            return (VersionAnterior: version, Anterior: anterior, Nueva: pedido.Version, Siguiente: pedido.CapturarBorrador());
         }, ct);
+        historial.Registrar(id, actor.UsuarioId, cambio.VersionAnterior, cambio.Anterior, cambio.Nueva, cambio.Siguiente);
+    }
+
+    private async Task<BorradorVisto> NavegarHistorialAsync(Guid id, int direccion, CancellationToken ct)
+    {
+        var actor = await acceso.ExigirAsync(Operacion.EditarPedido, ct);
+        var cambio = await unidad.EnTransaccionAsync(async token =>
+        {
+            var pedido = await ObtenerAsync(id, token);
+            var cliente = await clientes.BuscarPorIdAsync(pedido.ClienteId, token)
+                ?? throw new KeyNotFoundException("El cliente no existe.");
+            var version = pedido.Version;
+            var destino = historial.Obtener(id, actor.UsuarioId, version, direccion);
+            pedido.RestaurarBorrador(destino.Estado);
+            return (Anterior: version, Nueva: pedido.Version, destino.Indice, Vista: Proyectar(pedido, cliente.Categoria));
+        }, ct);
+        historial.Confirmar(id, actor.UsuarioId, cambio.Anterior, cambio.Nueva, cambio.Indice);
+        return cambio.Vista;
     }
 
     private async Task<Pedido> ObtenerAsync(Guid id, CancellationToken ct) =>

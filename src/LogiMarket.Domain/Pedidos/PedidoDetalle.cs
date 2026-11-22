@@ -30,6 +30,17 @@ public sealed class PedidoDetalle
     public decimal Subtotal => PrecioUnitario * Cantidad;
     public IReadOnlyList<PedidoDetalleComponente> Componentes => _componentes.AsReadOnly();
 
+    internal PedidoDetalle CopiarPara(Guid pedidoId)
+    {
+        var copia = new PedidoDetalle
+        {
+            Id = Guid.NewGuid(), PedidoId = pedidoId, Sku = Sku, Nombre = Nombre,
+            PrecioUnitario = PrecioUnitario, Cantidad = Cantidad
+        };
+        copia._componentes.AddRange(_componentes.Select(c => c.CopiarPara(copia.Id)));
+        return copia;
+    }
+
     internal void CambiarCantidad(int cantidad)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(cantidad);
