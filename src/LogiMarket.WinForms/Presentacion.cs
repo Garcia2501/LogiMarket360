@@ -144,7 +144,7 @@ internal sealed class Cuadricula<T>(string nombre, Func<T, object> identidad) wh
         BackgroundColor = Tema.Papel, BorderStyle = BorderStyle.FixedSingle, GridColor = Tema.Borde,
         CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal, EnableHeadersVisualStyles = false,
         ColumnHeadersHeight = 35, ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
-        ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle { BackColor = Tema.Barra, ForeColor = Tema.Texto, SelectionForeColor = Color.White },
+        ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle { BackColor = Tema.Barra, ForeColor = Tema.Texto, SelectionBackColor = Tema.Suave, SelectionForeColor = Tema.Texto },
         DefaultCellStyle = new DataGridViewCellStyle { ForeColor = Tema.Texto, BackColor = Tema.Papel,
             SelectionBackColor = Tema.Acento, SelectionForeColor = Color.White },
         AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle { BackColor = Color.FromArgb(247, 250, 252) },

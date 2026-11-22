@@ -56,7 +56,7 @@
 - Rama `feature/interfaz-winforms` desde `develop` sincronizada en `4668f63`.
 - Incrementos `feat`. `0bcfdbf` consultas, `8714125` simulación aislada y políticas, `daf809e` navegación, `7758741` catálogo/clientes/inventario, `b62758c` carrito/pedidos/cobro y `2fcd396` logística/reportes/auditoría.
 - Pruebas `cde276d` de composición y dependencias, y `63cbe25` de concurrencia Singleton.
-- Correcciones reproducidas en Windows. `b326672` corrigió importes visibles como USD N2; `fc3e82c` amplió dos rótulos del menú que se cortaban; `f0838bf` amplió las tarjetas de métricas y ajustó el estilo de encabezado. Tras reconstruir se observaron importes correctos, títulos completos y los valores de las tarjetas.
+- Correcciones reproducidas en Windows. `b326672` corrigió importes visibles como USD N2; `fc3e82c` amplió dos rótulos del menú que se cortaban; `f0838bf` amplió las tarjetas de métricas y ajustó el estilo de encabezado. Tras reconstruir se observaron importes correctos, títulos completos y los valores de las tarjetas. La comprobación del foco mostró que WinForms conserva el texto oscuro en el encabezado seleccionado; se eligió un fondo claro para mantener su contraste.
 - Compilación Release desde artefactos nuevos con cero errores y advertencias. 114 pruebas aprobadas, ninguna fallida ni omitida. Migración `20261120214119_EsquemaInicial` aplicada a un archivo nuevo y modelo sincronizado.
 - Cumplimiento. Se cerraron P08, P10, P15, P37 y P38. El historial de los 23 patrones permanece en la matriz GoF. La [evidencia visual](interfaz-winforms.md) registra comprobaciones pendientes y cómo reproducir las ejecutadas.
 
