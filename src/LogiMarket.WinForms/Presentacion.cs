@@ -79,7 +79,7 @@ internal static class Tema
         tabla.Controls.Add(control, 0, fila);
     }
 
-    public static string Usd(decimal valor) => valor.ToString("'USD 'N2", CultureInfo.GetCultureInfo("en-US"));
+    public static string Usd(decimal valor) => "USD " + valor.ToString("N2", CultureInfo.GetCultureInfo("en-US"));
     public static string Fecha(DateTime utc) => utc.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
 }
 
