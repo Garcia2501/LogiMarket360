@@ -1,3 +1,4 @@
+using LogiMarket.Application.Navegacion;
 using LogiMarket.Application.Comandos;
 using LogiMarket.Application.Devoluciones;
 using LogiMarket.Application.Entregas;
@@ -45,6 +46,7 @@ internal sealed partial class VentanaComercial : Form
         FilasBorrador();
         FilasOperaciones();
         _contenido.Controls.Add(_mensaje);
+        ConfigurarConsultas();
         ActualizarSesion();
     }
 
@@ -56,7 +58,7 @@ internal sealed partial class VentanaComercial : Form
         {
             var permitido = await sp.GetRequiredService<AutenticacionLocal>().IniciarAsync(_usuario.Text, _clave.Text);
             _clave.Clear();
-            return permitido ? "Sesión iniciada." : "Usuario o contraseña incorrectos.";
+            return permitido ? await RefrescarAsync(CambioComercial.Inicio, null, "Sesión iniciada.") : "Usuario o contraseña incorrectos.";
         });
         _salir.Click += (_, _) =>
         {
@@ -65,6 +67,7 @@ internal sealed partial class VentanaComercial : Form
             _clave.Clear();
             _pedido.Clear();
             LimpiarBorrador();
+            LimpiarConsultas();
             _idempotencia.Text = Guid.NewGuid().ToString("N");
             _mensaje.Text = "Sesión cerrada.";
             ActualizarSesion();
@@ -81,41 +84,44 @@ internal sealed partial class VentanaComercial : Form
             Boton("Seguimiento", Operacion.Consultar, async sp =>
             {
                 var pedido = await sp.GetRequiredService<DespacharPedidos>().ConsultarAsync(IdPedido());
-                return pedido.Despacho is { } despacho ? $"{pedido.Estado} · {despacho.Guia}" : pedido.Estado.ToString();
+                return await RefrescarAsync(CambioComercial.EstadoPedido, pedido.Id,
+                    pedido.Despacho is { } despacho ? $"{pedido.Estado} · {despacho.Guia}" : pedido.Estado.ToString());
             })));
         _contenido.Controls.Add(Fila(new Label { Text = "Clave de confirmación", AutoSize = true }, _idempotencia,
             _proveedor, Boton("Confirmar cobro", Operacion.Cobrar, async sp =>
             {
                 var pago = await sp.GetRequiredService<OperacionesPedido>().ConfirmarAsync(
                     new(IdPedido(), _idempotencia.Text, (ProveedorPago)_proveedor.SelectedItem!));
-                return $"Pago USD {pago.Importe:F2} · {pago.Referencia}";
+                return await RefrescarAsync(CambioComercial.VentaConfirmada, pago.PedidoId, $"Pago USD {pago.Importe:F2} · {pago.Referencia}");
             })));
         _contenido.Controls.Add(Fila(
             Boton("Cancelar pedido", Operacion.CancelarPedido, async sp =>
             {
                 await sp.GetRequiredService<OperacionesPedido>().CancelarAsync(new(IdPedido()));
-                return "Pedido cancelado.";
+                return await RefrescarAsync(CambioComercial.EstadoPedido, IdPedido(), "Pedido cancelado.");
             }),
             Boton("Despachar", Operacion.Despachar, async sp =>
             {
                 var despacho = await sp.GetRequiredService<OperacionesPedido>().DespacharAsync(new(IdPedido()));
-                return $"Guía {despacho.Guia} · {despacho.PlazoDias} día(s)";
+                return await RefrescarAsync(CambioComercial.EstadoPedido, despacho.PedidoId, $"Guía {despacho.Guia} · {despacho.PlazoDias} día(s)");
             }),
             Boton("Registrar entrega", Operacion.Entregar, async sp =>
             {
                 await sp.GetRequiredService<DespacharPedidos>().EntregarAsync(IdPedido());
-                return "Entrega registrada.";
+                return await RefrescarAsync(CambioComercial.EstadoPedido, IdPedido(), "Entrega registrada.");
             })));
         _contenido.Controls.Add(Fila(_motivo, _sinUso, Boton("Devolver pedido", Operacion.Devolver, async sp =>
         {
             var resultado = await sp.GetRequiredService<OperacionesPedido>().DevolverAsync(
                 new(IdPedido(), (MotivoDevolucion)_motivo.SelectedItem!, _sinUso.Checked));
-            return $"Reembolso simulado USD {resultado.Importe:F2} · {resultado.ReferenciaReembolso}";
+            return await RefrescarAsync(CambioComercial.DevolucionAceptada, resultado.PedidoId,
+                $"Reembolso simulado USD {resultado.Importe:F2} · {resultado.ReferenciaReembolso}");
         })));
         _contenido.Controls.Add(Fila(_canal, Boton("Procesar Outbox", Operacion.ReprocesarEventos, async sp =>
         {
             var resultado = await sp.GetRequiredService<ReprocesarEventos>().EjecutarAsync((CanalAviso)_canal.SelectedItem!);
-            return $"Eventos procesados: {resultado.Procesados}. Pendientes por fallo: {resultado.Fallidos}.";
+            return await RefrescarAsync(CambioComercial.EventosProcesados, null,
+                $"Eventos procesados: {resultado.Procesados}. Pendientes por fallo: {resultado.Fallidos}.");
         })));
     }
 

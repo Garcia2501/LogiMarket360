@@ -1,3 +1,4 @@
+using LogiMarket.Application.Navegacion;
 using System.Globalization;
 using LogiMarket.Application.Clientes;
 using LogiMarket.Application.Pedidos;
@@ -15,6 +16,13 @@ internal sealed partial class VentanaComercial
     private readonly ComboBox _categoriaCliente = Seleccion<CategoriaCliente>("Categoría del cliente");
     private readonly ComboBox _entrega = Seleccion<ModalidadEntrega>("Modalidad de entrega");
     private readonly TextBox _lineas = new() { Width = 280, AccessibleName = "SKU y cantidades" };
+    private readonly ComboBox _renglonesBorrador = new()
+    {
+        Width = 150, DropDownStyle = ComboBoxStyle.DropDownList, AccessibleName = "Línea del borrador",
+        DisplayMember = nameof(LineaVista.Sku)
+    };
+    private readonly NumericUpDown _nuevaCantidad = new() { Minimum = 1, Maximum = int.MaxValue, Value = 1,
+        Width = 66, AccessibleName = "Nueva cantidad" };
     private Guid? _clienteId;
 
     private void FilasBorrador()
@@ -49,13 +57,43 @@ internal sealed partial class VentanaComercial
                 var pedido = await sp.GetRequiredService<AdministrarPedidos>().CrearAsync(clienteId,
                     (ModalidadEntrega)_entrega.SelectedItem!, LeerLineas());
                 _pedido.Text = pedido.Id.ToString("D");
-                return $"Borrador creado. Subtotal USD {pedido.Valoracion.Subtotal:F2}, descuento USD {pedido.Valoracion.Descuento:F2}, " +
-                    $"envío USD {pedido.Valoracion.Tarifa:F2}, total USD {pedido.Valoracion.Total:F2}.";
+                return await RefrescarAsync(CambioComercial.BorradorEditado, pedido.Id,
+                    $"Borrador creado. Subtotal USD {pedido.Valoracion.Subtotal:F2}, descuento USD {pedido.Valoracion.Descuento:F2}, " +
+                    $"envío USD {pedido.Valoracion.Tarifa:F2}, total USD {pedido.Valoracion.Total:F2}.");
             }),
             Boton("Validar pedido", Operacion.ValidarPedido, async sp =>
             {
                 await sp.GetRequiredService<AdministrarPedidos>().ValidarAsync(IdPedido());
-                return "Pedido validado.";
+                return await RefrescarAsync(CambioComercial.EstadoPedido, IdPedido(), "Pedido validado.");
+            })));
+        EdicionBorrador();
+    }
+
+    private void EdicionBorrador()
+    {
+        _contenido.Controls.Add(Fila(_renglonesBorrador, _nuevaCantidad,
+            Boton("Cambiar cantidad", Operacion.EditarPedido, async sp =>
+            {
+                var linea = _renglonesBorrador.SelectedItem as LineaVista
+                    ?? throw new InvalidOperationException("Consulta primero un borrador y elige una línea.");
+                await sp.GetRequiredService<AdministrarPedidos>().CambiarCantidadAsync(IdPedido(), linea.Id, (int)_nuevaCantidad.Value);
+                return await RefrescarAsync(CambioComercial.BorradorEditado, IdPedido(), "Cantidad editada.");
+            }),
+            Boton("Clonar", Operacion.EditarPedido, async sp =>
+            {
+                var copia = await sp.GetRequiredService<AdministrarPedidos>().ClonarBorradorAsync(IdPedido());
+                _pedido.Text = copia.Id.ToString("D");
+                return await RefrescarAsync(CambioComercial.BorradorEditado, copia.Id, "Copiado como borrador independiente.");
+            }),
+            Boton("Deshacer", Operacion.EditarPedido, async sp =>
+            {
+                await sp.GetRequiredService<AdministrarPedidos>().DeshacerAsync(IdPedido());
+                return await RefrescarAsync(CambioComercial.BorradorEditado, IdPedido(), "Cambio deshecho.");
+            }),
+            Boton("Rehacer", Operacion.EditarPedido, async sp =>
+            {
+                await sp.GetRequiredService<AdministrarPedidos>().RehacerAsync(IdPedido());
+                return await RefrescarAsync(CambioComercial.BorradorEditado, IdPedido(), "Cambio rehecho.");
             })));
     }
 

@@ -1,0 +1,84 @@
+using LogiMarket.Application.Catalogo;
+using LogiMarket.Application.Eventos;
+using LogiMarket.Application.Navegacion;
+using LogiMarket.Application.Pagos;
+using LogiMarket.Application.Pedidos;
+using LogiMarket.Application.Reportes;
+using LogiMarket.Domain.Clientes;
+using LogiMarket.Domain.Pedidos;
+using LogiMarket.Domain.Seguridad;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+using static LogiMarket.Tests.Integracion.ConfirmacionTests;
+
+namespace LogiMarket.Tests.Integracion;
+
+public sealed class MediadorComercialTests
+{
+    [Fact]
+    public async Task ConfirmacionRefrescaCincoColaboradoresSobreElEstadoConfirmado()
+    {
+        await using var entorno = await CrearEntornoAsync();
+        var id = await CrearPedidoAsync(entorno, "mediator", CategoriaCliente.NORMAL, ModalidadEntrega.ESTANDAR,
+            [new("KIT_TELETRABAJO", 1)]);
+        await ConfirmarAsync(entorno, id, "mediator", ProveedorPago.LEGADO);
+        await using var scope = entorno.Abrir();
+        var sp = scope.ServiceProvider;
+        var mediador = new FormularioPrincipalMediator();
+        var refrescadas = new List<AreaComercial>();
+
+        mediador.Conectar(AreaComercial.Catalogo, async (_, ct) =>
+        {
+            var filas = await sp.GetRequiredService<ConsultarCatalogoVisual>().ListarAsync(ct);
+            Assert.Equal(7, Assert.Single(filas, p => p.Sku == "P01").Stock);
+            refrescadas.Add(AreaComercial.Catalogo);
+        });
+        mediador.Conectar(AreaComercial.Carrito, async (pedido, ct) =>
+        {
+            Assert.Equal(id, pedido);
+            var error = await Assert.ThrowsAsync<RechazoPedidoException>(() =>
+                sp.GetRequiredService<AdministrarPedidos>().ConsultarBorradorAsync(pedido!.Value, ct));
+            Assert.Equal("ESTADO", error.Codigo);
+            refrescadas.Add(AreaComercial.Carrito);
+        });
+        mediador.Conectar(AreaComercial.Pedidos, async (_, ct) =>
+        {
+            var fila = Assert.Single(await sp.GetRequiredService<ConsultarReportePedidos>().EjecutarAsync(null, ct));
+            Assert.Equal((id, EstadoPedido.PAGADO, 65m), (fila.Id, fila.Estado, fila.TotalCobrado));
+            refrescadas.Add(AreaComercial.Pedidos);
+        });
+        mediador.Conectar(AreaComercial.Inventario, async (_, ct) =>
+        {
+            var filas = await sp.GetRequiredService<AdministrarCatalogo>().ConsultarExistenciasAsync("KIT_TELETRABAJO", 1, ct);
+            Assert.Equal(new[] { 7, 4, 19 }, filas.Select(f => f.Disponibles));
+            refrescadas.Add(AreaComercial.Inventario);
+        });
+        mediador.Conectar(AreaComercial.Metricas, async (_, ct) =>
+        {
+            var filas = await sp.GetRequiredService<ConsultarReportePedidos>().EjecutarAsync(null, ct);
+            Assert.Single(filas, p => p.TotalCobrado is not null);
+            Assert.Equal(0, sp.GetRequiredService<MetricasSesion>().Contar(EventoComercial.PedidoPagado));
+            refrescadas.Add(AreaComercial.Metricas);
+        });
+
+        Assert.Empty(await mediador.NotificarAsync(CambioComercial.VentaConfirmada, id));
+        Assert.Equal(Enum.GetValues<AreaComercial>(), refrescadas);
+    }
+
+    [Fact]
+    public async Task ErrorDeUnaVistaNoImpideRefrescarLasOtras()
+    {
+        var mediador = new FormularioPrincipalMediator();
+        bool recibio = false;
+        mediador.Conectar(AreaComercial.Catalogo, (_, _) => throw new InvalidOperationException("Consulta fallida."));
+        mediador.Conectar(AreaComercial.Metricas, (_, _) =>
+        {
+            recibio = true;
+            return Task.CompletedTask;
+        });
+
+        var error = Assert.Single(await mediador.NotificarAsync(CambioComercial.VentaConfirmada));
+        Assert.Equal(AreaComercial.Catalogo, error.Area);
+        Assert.True(recibio);
+    }
+}
