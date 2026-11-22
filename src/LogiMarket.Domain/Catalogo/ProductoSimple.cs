@@ -43,6 +43,13 @@ public sealed class ProductoSimple : IElementoCatalogo
         Version = Guid.NewGuid();
     }
 
+    public void Aceptar(IVisitanteCatalogo visitante, int cantidad = 1)
+    {
+        ArgumentNullException.ThrowIfNull(visitante);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(cantidad);
+        visitante.Visitar(this, cantidad);
+    }
+
     public decimal CalcularPrecio() => Precio;
 
     public ComponenteCatalogoSnapshot Capturar() =>

@@ -27,22 +27,9 @@ public sealed class ComponenteCatalogoSnapshot
 
     public IReadOnlyDictionary<Sku, int> Expandir(int cantidad = 1)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(cantidad);
-        var unidades = new Dictionary<Sku, int>();
-        Acumular(cantidad, unidades);
+        var unidades = IteradorComponentesFisicos.Recorrer(this, cantidad)
+            .GroupBy(c => c.Sku)
+            .ToDictionary(g => g.Key, g => g.Sum(c => c.Cantidad));
         return new ReadOnlyDictionary<Sku, int>(unidades);
-    }
-
-    private void Acumular(int multiplicador, Dictionary<Sku, int> unidades)
-    {
-        int total = checked(multiplicador * Cantidad);
-        if (Componentes.Count == 0)
-        {
-            unidades[Sku] = checked(unidades.GetValueOrDefault(Sku) + total);
-            return;
-        }
-
-        foreach (var componente in Componentes)
-            componente.Acumular(total, unidades);
     }
 }

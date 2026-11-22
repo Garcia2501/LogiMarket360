@@ -8,4 +8,5 @@ public interface IElementoCatalogo
     string Nombre { get; }
     decimal CalcularPrecio();
     ComponenteCatalogoSnapshot Capturar();
+    void Aceptar(IVisitanteCatalogo visitante, int cantidad = 1);
 }

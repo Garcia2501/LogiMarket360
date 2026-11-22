@@ -69,6 +69,13 @@ public sealed class KitCompuesto : IElementoCatalogo
         Version = Guid.NewGuid();
     }
 
+    public void Aceptar(IVisitanteCatalogo visitante, int cantidad = 1)
+    {
+        ArgumentNullException.ThrowIfNull(visitante);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(cantidad);
+        visitante.Visitar(this, cantidad);
+    }
+
     public decimal CalcularPrecio() => Capturar().PrecioUnitario;
 
     public IReadOnlyDictionary<Sku, int> Expandir(int cantidad = 1) => Capturar().Expandir(cantidad);

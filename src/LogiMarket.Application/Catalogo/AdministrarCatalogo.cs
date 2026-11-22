@@ -9,6 +9,9 @@ namespace LogiMarket.Application.Catalogo;
 public sealed record DatosProducto(string Nombre, decimal Precio, decimal PesoKg, string? Categoria, string? Descripcion);
 public sealed record ProductoVisto(string Sku, string Nombre, decimal Precio, decimal PesoKg, int Stock, bool Activo,
     string? Categoria, string? Descripcion);
+public sealed record ExistenciaComponente(string Sku, int Requeridas, int Disponibles);
+public sealed record DesgloseLogistico(decimal PesoKg, IReadOnlyList<ComponenteSolicitado> Componentes);
+
 public sealed record ComponenteSolicitado(string Sku, int Cantidad);
 
 public sealed class AdministrarCatalogo(IConsultaCatalogo consultas, IEscrituraCatalogo escritura,
@@ -119,6 +122,32 @@ public sealed class AdministrarCatalogo(IConsultaCatalogo consultas, IEscrituraC
                 kit.QuitarComponente(sku);
             return kit.CalcularPrecio();
         }, ct);
+    }
+
+    public async Task<IReadOnlyList<ExistenciaComponente>> ConsultarExistenciasAsync(string codigo, int cantidad,
+        CancellationToken ct = default)
+    {
+        await acceso.ExigirAsync(Operacion.Consultar, ct);
+        var elemento = await ObtenerElementoActivoAsync(codigo, ct);
+        var filas = new List<ExistenciaComponente>();
+        foreach (var grupo in IteradorComponentesFisicos.Recorrer(elemento, cantidad).GroupBy(c => c.Sku))
+        {
+            var producto = await consultas.BuscarProductoAsync(grupo.Key, ct);
+            filas.Add(new(grupo.Key.Valor, grupo.Sum(c => c.Cantidad), producto is { Activo: true } ? producto.Stock : 0));
+        }
+        return filas.AsReadOnly();
+    }
+
+    public async Task<DesgloseLogistico> ConsultarLogisticaAsync(string codigo, int cantidad, CancellationToken ct = default)
+    {
+        await acceso.ExigirAsync(Operacion.Consultar, ct);
+        var elemento = await ObtenerElementoActivoAsync(codigo, ct);
+        var desglose = new VisitanteDesgloseSku();
+        var peso = new VisitantePesoLogistico();
+        elemento.Aceptar(desglose, cantidad);
+        elemento.Aceptar(peso, cantidad);
+        return new(peso.PesoKg, desglose.Cantidades.OrderBy(c => c.Key.Valor, StringComparer.Ordinal)
+            .Select(c => new ComponenteSolicitado(c.Key.Valor, c.Value)).ToArray());
     }
 
     internal async Task<IElementoCatalogo> ObtenerElementoActivoAsync(string codigo, CancellationToken ct)
