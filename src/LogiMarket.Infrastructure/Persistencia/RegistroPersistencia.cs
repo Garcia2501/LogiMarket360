@@ -92,6 +92,7 @@ public static class RegistroPersistencia
         servicios.AddScoped<IConsultaDevolucion, ConsultaDevolucion>();
         servicios.AddScoped<EmitirComprobantes>();
         servicios.AddSingleton<IFabricaArchivoTxt, FabricaArchivoTxt>();
+        servicios.AddScoped<ConsultarCatalogoVisual>();
         return servicios;
     }
 }
