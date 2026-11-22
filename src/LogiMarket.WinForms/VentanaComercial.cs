@@ -42,7 +42,7 @@ internal sealed partial class VentanaComercial : Form
         StartPosition = FormStartPosition.CenterScreen;
 
         var distribucion = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 2 };
-        distribucion.ColumnStyles.Add(new(SizeType.Absolute, 217));
+        distribucion.ColumnStyles.Add(new(SizeType.Absolute, 251));
         distribucion.ColumnStyles.Add(new(SizeType.Percent, 100));
         distribucion.RowStyles.Add(new(SizeType.Absolute, 68));
         distribucion.RowStyles.Add(new(SizeType.Percent, 100));
@@ -197,7 +197,7 @@ internal sealed partial class VentanaComercial : Form
                 continue;
             var enlace = Tema.Boton(configuracion.Nombre);
             enlace.AutoSize = false;
-            enlace.Width = 188;
+            enlace.Width = 219;
             enlace.Height = 37;
             enlace.TextAlign = ContentAlignment.MiddleLeft;
             enlace.Click += async (_, _) => await NavegarAsync(seccion);
