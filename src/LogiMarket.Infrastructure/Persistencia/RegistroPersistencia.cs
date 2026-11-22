@@ -1,3 +1,5 @@
+using LogiMarket.Application.Documentos;
+using LogiMarket.Infrastructure.Documentos;
 using LogiMarket.Application.Reportes;
 using LogiMarket.Application.Comandos;
 using LogiMarket.Infrastructure.Persistencia.Eventos;
@@ -87,6 +89,9 @@ public static class RegistroPersistencia
         servicios.AddScoped<OperacionesPedido>();
         servicios.AddScoped<ILecturaReportePedidos, LecturaReportePedidos>();
         servicios.AddScoped<ConsultarReportePedidos>();
+        servicios.AddScoped<IConsultaDevolucion, ConsultaDevolucion>();
+        servicios.AddScoped<EmitirComprobantes>();
+        servicios.AddSingleton<IFabricaArchivoTxt, FabricaArchivoTxt>();
         return servicios;
     }
 }
