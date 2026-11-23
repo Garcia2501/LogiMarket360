@@ -85,19 +85,27 @@ internal static class Tema
 
 internal sealed class Pantalla : IDisposable
 {
+    private readonly TableLayoutPanel _contenido = Tema.Pilas();
+
     public Pantalla(string titulo, string detalle)
     {
-        Contenedor.Padding = new Padding(25, 20, 25, 14);
-        Contenedor.AutoScroll = true;
-        Tema.Fila(Contenedor, new Label { Text = titulo, AutoSize = true, Font = new Font("Segoe UI", 19, FontStyle.Bold),
+        _contenido.Padding = new Padding(25, 20, 25, 14);
+        _contenido.Dock = DockStyle.Top;
+        _contenido.AutoSize = true;
+        _contenido.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        Cuerpo.AutoSize = true;
+        Cuerpo.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        Tema.Fila(_contenido, new Label { Text = titulo, AutoSize = true, Font = new Font("Segoe UI", 19, FontStyle.Bold),
             ForeColor = Tema.Texto, Margin = new Padding(0, 0, 0, 3), AccessibleName = titulo });
-        Tema.Fila(Contenedor, Tema.TextoPlano(detalle));
+        Tema.Fila(_contenido, Tema.TextoPlano(detalle));
         Estado.Margin = new Padding(0, 3, 0, 8);
-        Tema.Fila(Contenedor, Estado);
-        Tema.Fila(Contenedor, Cuerpo, 100);
+        Tema.Fila(_contenido, Estado);
+        Tema.Fila(_contenido, Cuerpo, 100);
+        Contenedor.Controls.Add(_contenido);
+        Contenedor.ClientSizeChanged += (_, _) => _contenido.MinimumSize = new Size(0, Contenedor.ClientSize.Height);
     }
 
-    public TableLayoutPanel Contenedor { get; } = Tema.Pilas();
+    public Panel Contenedor { get; } = new() { Dock = DockStyle.Fill, AutoScroll = true };
     public TableLayoutPanel Cuerpo { get; } = Tema.Pilas();
     public Label Estado { get; } = Tema.TextoPlano();
     public Func<IServiceProvider, Task>? Cargar { get; set; }
@@ -153,11 +161,13 @@ internal sealed class Cuadricula<T>(string nombre, Func<T, object> identidad) wh
 
     public T? Seleccion => Control.SelectedRows.Count == 0 ? null : Control.SelectedRows[0].DataBoundItem as T;
 
-    public Cuadricula<T> Col(string etiqueta, string propiedad, int peso = 100, string formato = "")
+    public Cuadricula<T> Col(string etiqueta, string propiedad, int peso = 100, string formato = "", int minimo = 5)
     {
+        var anchoEncabezado = TextRenderer.MeasureText(etiqueta, Control.Font).Width + 16;
         Control.Columns.Add(new DataGridViewTextBoxColumn
         {
             HeaderText = etiqueta, DataPropertyName = propiedad, FillWeight = peso,
+            MinimumWidth = Math.Max(minimo, anchoEncabezado),
             DefaultCellStyle = new DataGridViewCellStyle { Format = formato, FormatProvider = CultureInfo.GetCultureInfo("en-US") },
             SortMode = DataGridViewColumnSortMode.NotSortable
         });

@@ -45,9 +45,9 @@ internal sealed partial class VentanaComercial
     private sealed record PedidoFila(Guid Id, string Cliente, string Estado, string Fecha, string Total, string Entrega);
 
     private static Cuadricula<PedidoFila> TablaPedidos(string nombre) => new Cuadricula<PedidoFila>(nombre, x => x.Id)
-        .Col("Pedido", nameof(PedidoFila.Id), 185).Col("Cliente", nameof(PedidoFila.Cliente), 110)
-        .Col("Estado", nameof(PedidoFila.Estado), 80).Col("Creado", nameof(PedidoFila.Fecha), 95)
-        .Col("Cobrado", nameof(PedidoFila.Total), 76).Col("Entrega", nameof(PedidoFila.Entrega), 78);
+        .Col("Pedido", nameof(PedidoFila.Id), 185, minimo: 114).Col("Cliente", nameof(PedidoFila.Cliente), 110, minimo: 110)
+        .Col("Estado", nameof(PedidoFila.Estado), 80, minimo: 90).Col("Creado", nameof(PedidoFila.Fecha), 95, minimo: 125)
+        .Col("Cobrado", nameof(PedidoFila.Total), 76, minimo: 94).Col("Entrega", nameof(PedidoFila.Entrega), 78, minimo: 85);
 
     private static IEnumerable<PedidoFila> FilasPedidos(IEnumerable<LogiMarket.Application.Reportes.PedidoReportado> pedidos) =>
         pedidos.Select(p => new PedidoFila(p.Id, p.Cliente, p.Estado.ToString(), Tema.Fecha(p.FechaCreacionUtc),

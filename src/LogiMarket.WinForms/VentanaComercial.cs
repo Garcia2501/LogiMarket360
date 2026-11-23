@@ -208,6 +208,7 @@ internal sealed partial class VentanaComercial : Form
             _enlaces.Add(seccion, enlace);
             _navegacion.Controls.Add(enlace);
         }
+        _enlaces[Seccion.Panel].Select();
     }
 
     private async Task NavegarAsync(Seccion seccion)
@@ -227,6 +228,7 @@ internal sealed partial class VentanaComercial : Form
 
         if (pagina.Cargar is { } cargar)
             await EjecutarAsync(pagina, async sp => { await cargar(sp); return null; });
+        pagina.Contenedor.AutoScrollPosition = Point.Empty;
     }
 
     private void CerrarSesion()
