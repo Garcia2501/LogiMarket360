@@ -54,14 +54,20 @@ internal static class Tema
 
     public static Button Boton(string texto, bool principal = false)
     {
+        var fondo = principal ? Acento : Papel;
         var boton = new Button
         {
             AutoSize = true, MinimumSize = new Size(86, 33), Text = texto, FlatStyle = FlatStyle.Flat,
-            BackColor = principal ? Acento : Papel, ForeColor = principal ? Color.White : Texto,
+            BackColor = fondo, ForeColor = principal ? Color.White : Texto,
             Margin = new Padding(0, 0, 8, 5), Padding = new Padding(8, 2, 8, 2), Cursor = Cursors.Hand
         };
         boton.FlatAppearance.BorderColor = principal ? Acento : Borde;
         boton.FlatAppearance.MouseOverBackColor = principal ? Color.FromArgb(0, 82, 86) : Suave;
+        boton.EnabledChanged += (_, _) =>
+        {
+            boton.BackColor = boton.Enabled ? fondo : Barra;
+            boton.FlatAppearance.BorderColor = boton.Enabled && principal ? Acento : Borde;
+        };
         return boton;
     }
 
