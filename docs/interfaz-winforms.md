@@ -39,3 +39,40 @@ WinForms se ejecutó en Windows con una base SQLite aislada, usando un host de v
 - Capturas adicionales 09–12 y 16–21. Composición, medición Flyweight, comprobante, edición de borrador, entrega, devolución calculada, maximizado y cierre de sesión. La medición Flyweight comprobó 5 frente a 1.000 objetos y 56.752 frente a 104.024 bytes asignados en esa ejecución.
 
 Para la revisión visual final quedan la entrada manual de credenciales, la navegación TAB completa, el comportamiento con otros escalados DPI y el recorrido con VENTAS, BODEGA y CONSULTA. Se observó el foco inicial y se verificaron el tamaño normal y maximizado. La revisión automática de la herramienta bloqueó la acción de confirmar el reembolso simulado sin autorización específica, por lo que el recorrido visual llegó hasta la validación del importe. Los casos de integración conservan su evidencia de devolución.
+
+## Validación de cierre · 2026-11-22
+
+Se abrió el ejecutable con `--demo` y se verificó el formulario de acceso con una SQLite separada. Un entorno temporal abrió la misma ventana de producción con sesiones autenticadas por `AutenticacionLocal` para contrastar los controles de cada rol. El inicio con el teclado en el formulario de producción queda como verificación manual.
+
+| Vista | Evidencia acumulada y comprobación de cierre |
+| --- | --- |
+| Acceso | Se reprodujo el formulario desplazado a la derecha y se comprobó que queda centrado a 900 × 630. Se observó foco en Usuario y regreso al acceso al cerrar sesiones de prueba. Entrada manual por rol pendiente. |
+| Panel general | Apertura a 900 × 630 y maximizada. Ana, ENTREGADO y USD 59.00 se leen en la tabla. Las capturas 06–07 previas acreditan Singleton tras procesar el evento. |
+| Catálogo y kits | Con VENTAS se observaron cinco productos, precio de P01 USD 20.00, edición inhabilitada y consulta de composición habilitada. Se conserva el árbol anidado, peso y medición Flyweight previos. |
+| Clientes | Ana VIP cargada. Nuevo y Editar habilitados para VENTAS. Se observó el salto de Tab desde Buscar cliente al botón Buscar. |
+| Carrito y borradores | Los controles inferiores seguían alcanzables por desplazamiento a tamaño mínimo. La evidencia previa conserva Prototype y Memento con cantidades 1→2→1→2. |
+| Pedidos e historial | P08 se reejecutó contra SQLite. La evidencia visual anterior conserva el importe, la instantánea y el estado original tras editar el catálogo. |
+| Confirmación y cobro | BODEGA vio el subtotal 60.00, descuento 6.00, envío 5.00 y total 59.00 USD, con confirmación inhabilitada. Las denegaciones de Application y la exclusión de efectos se reejecutaron en la suite. |
+| Despacho y entrega | Con BODEGA se consultaron la guía ESTÁNDAR, el plazo de tres días y la entrega real. El escenario preparó el pedido con una sesión real de VENTAS y registró despacho y entrega con BODEGA por los servicios de Application. |
+| Devoluciones | Se validó visualmente DEFECTO y el importe de USD 54.00 sin flete sobre Ana entregada. La suite confirmó reintegro, auditoría y unicidad después de reabrir SQLite. Pendiente confirmar la devolución desde la ventana y releerla después de un reinicio. La consulta SQLite 22 conserva el pedido entregado y ninguna devolución. |
+| Inventario y movimientos | CONSULTA vio 7/4/19 y los tres movimientos de la venta, con Registrar ajuste inhabilitado. |
+| Reportes y comprobantes | CONSULTA vio el pedido y tuvo acceso a vista previa y TXT. El filtro incompleto `ESTADO =` mostró el error en la columna 9 y el indicador junto al campo. Se conserva la vista previa y exportación verificadas anteriormente. |
+| Auditoría, métricas y demostración | Acceso reservado a ADMIN. Se comprobó que la barra vertical permite alcanzar Aplicar escenario y Reprocesar pendientes. La recuperación y la deduplicación de Outbox se reejecutaron en la suite. |
+
+Los rechazos se comprobaron directamente con `AutorizacionOperaciones.ExigirAsync` usando las cuatro cuentas en SQLite y verificando la auditoría de cada denegación. Las pruebas de servicios también observaron el rechazo de cobro de BODEGA y CONSULTA y el rechazo de devolución de BODEGA. El flujo de P35 conserva pago de USD 59.00, tarifa de USD 5.00, devolución de USD 54.00, tres movimientos de reintegro, stock 8/5/20, una devolución y un evento de devolución al reabrir el archivo temporal.
+
+### Incidencias y evidencia local
+
+- Acceso desplazado. Abrir el programa sin sesión y comparar el centro de la tarjeta con el área completa. Se liberó el ancho de la navegación mientras el usuario está fuera. Capturas 01 y 03.
+- Controles superpuestos y total recortado. Reducir a 900 × 630 y abrir Panel, Carrito y Auditoría. La distribución ahora conserva el alto necesario con desplazamiento vertical y la tabla protege el ancho de las columnas de estado, fecha e importe. Capturas 04–09 y 11–12.
+- Texto de acción principal deshabilitada con poco contraste. Con BODEGA, abrir Confirmación y cobro. El fondo de la acción inactiva se aclaró y mantuvo la acción inhabilitada. Capturas 16 y 21.
+- Teclado y roles. Capturas 13–20. Se verificó el foco visible y una secuencia de Tab en Clientes. El entorno tuvo 96 DPI y se comprobaron el tamaño mínimo y el maximizado.
+- El TRX final `cierre-fase-4-final.trx` registra 118 aprobadas, 0 fallidas y 0 omitidas. `cierre-fase-4-casos.trx` registra 22 pruebas focalizadas aprobadas, incluidas autorización, puertos, referencias y logística. Las ejecuciones visuales anteriores conservan el reinicio y Outbox de P10 y P37.
+
+### Pasos manuales pendientes de cierre
+
+1. Abrir el ejecutable con `--demo`. Introducir una clave incorrecta y comprobar el mensaje. Iniciar y cerrar sesión desde el formulario con ADMIN, VENTAS, BODEGA y CONSULTA. En cada cuenta recorrer los controles habilitados e inhabilitados indicados en la tabla.
+2. Con ADMIN, elegir **Ana QA Cierre** en **Devoluciones**, motivo **DEFECTO**. Comprobar USD 54.00 y confirmar la devolución simulada. En Inventario verificar 8/5/20 con tres movimientos de reintegro. En Auditoría comprobar el comando y en Reportes el comprobante. Volver a Devoluciones y comprobar que ya está registrada y no puede repetirse. Cerrar el proceso, abrir el mismo modo y contrastar referencia, auditoría, devolución y existencias.
+3. Con el escalado de Windows a 125 % y 150 %, volver a abrir y recorrer con Tab y Mayús+Tab el acceso, la barra y los controles de cada vista. Alternar tamaño mínimo y maximizado y revisar los encabezados, la legibilidad y la capacidad de llegar a las acciones mediante desplazamiento.
+
+La herramienta de automatización de Windows no introduce credenciales en el formulario. La confirmación visual del reembolso simulado requiere una acción del usuario o autorización específica en el momento del clic. El estado de integración permanece pendiente de las verificaciones visuales bloqueantes.

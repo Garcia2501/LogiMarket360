@@ -81,3 +81,16 @@ Suite Release: 87 aprobadas, 0 fallidas, 0 omitidas. Total acumulado de la matri
 ## Ejecución de fase 4
 
 114 pruebas aprobadas, 0 fallidas y 0 omitidas en Release. P08, P10, P15, P37 y P38 se completaron en esta fase. El resultado acumulado es **38 de 38 casos**, con evidencia de las fases anteriores para los otros 33. El [registro de WinForms](interfaz-winforms.md) indica el alcance visual de esta ejecución y las comprobaciones manuales pendientes para la auditoría final.
+
+## Revalidación de cierre de fase 4
+
+| Caso | Resultado revalidado | Evidencia |
+| --- | --- | --- |
+| P08 | SQLite conservó el detalle, pago e historial. Application rechazó cancelar y reemplazar el precio de la línea pagada. | TRX focalizado y capturas originales 13–15. |
+| P10 | Se leyó el pedido de Ana desde procesos de escritorio de prueba reabiertos sobre la misma base. La lectura SQLite corroboró el pago de USD 59.00, stocks 7/4/19 y auditoría. | Capturas originales 04–06, captura de cierre 11 y consulta de solo lectura 02. |
+| P15 | Pasó la deduplicación concurrente del observador. Se conserva la evidencia de ambas pantallas con la misma métrica. | TRX focalizado y capturas originales 06–07. |
+| P35 | Se reejecutó devolución por ADMIN, rechazo por BODEGA, reintegro, auditoría y rechazo de duplicado después de reabrir SQLite. WinForms muestra la previsualización de USD 54.00. | TRX focalizado y captura de cierre 10. La confirmación manual en WinForms queda pendiente. |
+| P37 | Se reejecutó el reintento después de reabrir el host con la misma SQLite y se comprobó la deduplicación de pago, aviso y existencias. | TRX focalizado, capturas originales 02/06 y consultas originales 03/08. |
+| P38 | Restauración y Release con 0 errores y 0 advertencias. Suite con 118 aprobadas, ninguna fallida ni omitida, y revalidación de contratos y referencias. | TRX final, TRX focalizado y build de cierre. |
+
+Los 38 casos de la matriz conservan sus resultados acumulados conforme a sus criterios. Los pendientes de validación manual de fase están en [interfaz WinForms](interfaz-winforms.md).

@@ -60,6 +60,15 @@
 - Compilación Release desde artefactos nuevos con cero errores y advertencias. 114 pruebas aprobadas, ninguna fallida ni omitida. Migración `20261120214119_EsquemaInicial` aplicada a un archivo nuevo y modelo sincronizado.
 - Cumplimiento. Se cerraron P08, P10, P15, P37 y P38. El historial de los 23 patrones permanece en la matriz GoF. La [evidencia visual](interfaz-winforms.md) registra comprobaciones pendientes y cómo reproducir las ejecutadas.
 
+
+## Validación de cierre de fase 4 · 2026-11-22
+
+- La rama de trabajo partió de `bb9e06d` en sincronía con GitHub y con el árbol limpio. `develop` partía de `4668f63` y `main` de `9e5f254`.
+- `0e75bd2` verificó los permisos de cada operación con las cuatro cuentas de Application y auditoría de las denegaciones. `a0576b9` extendió P35 con reembolso, consulta y rechazo del duplicado después de reabrir SQLite, y corrigió una advertencia de analizador en la nueva prueba.
+- `16cf118` centró el formulario al liberar la anchura de la navegación oculta. `d952138` corrigió superposición y truncamiento a 900 × 630 mediante desplazamiento y anchos mínimos de columna. `3d7d51f` ajustó el contraste de los botones inactivos y se verificó con BODEGA en Confirmación y cobro.
+- Suite final de 118 pruebas aprobadas y selección de 22 aprobadas. Release con 0 advertencias y 0 errores. Autorización, dependencias, P08, P15, P35, P37 y P38 reejecutados. La revisión visual del reinicio de P10 se complementó con lectura en procesos reabiertos sobre la demostración.
+- Quedan el acceso manual con las cuatro cuentas, la confirmación y verificación visual del reintegro tras reiniciar, y el recorrido de teclado y DPI restante. Los artefactos y pasos detallados están en [interfaz WinForms](interfaz-winforms.md).
+
 ## Plantilla para próximas fases
 
 Registrar fase y fecha, rama, cambio y flujo comprobable, commits y verificaciones de integración, requisitos cumplidos o pendientes, patrones con archivo y método, comandos y resultados, incidentes con esperado/obtenido, forma de reproducción, corrección y regresión, y siguientes pasos. Para riesgos reales, vincular evidencia de antes y después, efecto, pruebas y commit. Un estado pendiente conserva sus campos de evidencia vacíos hasta ejecutar.
