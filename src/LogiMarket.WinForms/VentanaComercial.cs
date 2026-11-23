@@ -7,6 +7,7 @@ namespace LogiMarket.WinForms;
 
 internal sealed partial class VentanaComercial : Form
 {
+    private const int AnchuraNavegacion = 251;
     private enum Seccion { Panel, Catalogo, Clientes, Carrito, Pedidos, Cobro, Despacho, Devoluciones, Inventario, Reportes, Auditoria }
     private readonly IServiceProvider _servicios;
     private readonly SesionLocal _sesion;
@@ -14,6 +15,7 @@ internal sealed partial class VentanaComercial : Form
     private readonly Dictionary<Seccion, (string Nombre, Func<Pantalla> Crear, Operacion Permiso)> _definiciones = [];
     private readonly Dictionary<Seccion, Pantalla> _pantallas = [];
     private readonly Dictionary<Seccion, Button> _enlaces = [];
+    private readonly ColumnStyle _columnaNavegacion = new(SizeType.Absolute, AnchuraNavegacion);
     private readonly Panel _centro = new() { Dock = DockStyle.Fill, BackColor = Tema.Fondo };
     private readonly FlowLayoutPanel _navegacion = new()
     {
@@ -42,7 +44,7 @@ internal sealed partial class VentanaComercial : Form
         StartPosition = FormStartPosition.CenterScreen;
 
         var distribucion = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 2 };
-        distribucion.ColumnStyles.Add(new(SizeType.Absolute, 251));
+        distribucion.ColumnStyles.Add(_columnaNavegacion);
         distribucion.ColumnStyles.Add(new(SizeType.Percent, 100));
         distribucion.RowStyles.Add(new(SizeType.Absolute, 68));
         distribucion.RowStyles.Add(new(SizeType.Percent, 100));
@@ -124,6 +126,7 @@ internal sealed partial class VentanaComercial : Form
     private void MostrarAcceso()
     {
         _navegacion.Visible = false;
+        _columnaNavegacion.Width = 0;
         _salir.Visible = false;
         _rol.Text = EsDemo ? "Base de demostración · sin sesión" : "Sin sesión";
         var tarjeta = Tema.Pilas();
@@ -188,6 +191,7 @@ internal sealed partial class VentanaComercial : Form
     private void MostrarMenu()
     {
         AcceptButton = null;
+        _columnaNavegacion.Width = AnchuraNavegacion;
         _navegacion.Visible = _salir.Visible = true;
         var identidad = _sesion.Actual!;
         _rol.Text = $"{identidad.Nombre} · {identidad.Rol}" + (EsDemo ? " · Demostración" : "");
