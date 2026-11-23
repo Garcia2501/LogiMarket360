@@ -1,8 +1,10 @@
+using LogiMarket.Application.Comandos;
 using LogiMarket.Application.Devoluciones;
 using LogiMarket.Application.Entregas;
 using LogiMarket.Application.Eventos;
 using LogiMarket.Application.Pagos;
 using LogiMarket.Application.Pedidos;
+using LogiMarket.Application.Reportes;
 using LogiMarket.Domain.Clientes;
 using LogiMarket.Domain.Pedidos;
 using LogiMarket.Domain.Seguridad;
@@ -94,26 +96,47 @@ public sealed class LogisticaTests
         await using var entorno = await CrearEntornoAsync(s => s.AddSingleton<TimeProvider>(reloj));
         var orden = await PedidoEntregadoAsync(entorno, "Ana", CategoriaCliente.VIP, [new("KIT_TELETRABAJO", 1)]);
         reloj.Avanzar(20);
+        var comando = new ProcesarDevolucionCommand(orden, MotivoDevolucion.DEFECTO, false);
+        await using (var scope = entorno.Abrir())
+        {
+            var operaciones = scope.ServiceProvider.GetRequiredService<OperacionesPedido>();
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => operaciones.DevolverAsync(comando));
+
+            await entorno.EntrarAsync(Rol.ADMIN);
+            var aprobada = await operaciones.DevolverAsync(comando);
+            Assert.Equal(54m, aprobada.Importe);
+            var outbox = scope.ServiceProvider.GetRequiredService<ReprocesarEventos>();
+            Assert.Equal(new ResumenOutbox(3, 0), await outbox.EjecutarAsync(CanalAviso.SMS));
+            Assert.Equal(new ResumenOutbox(0, 0), await outbox.EjecutarAsync(CanalAviso.EMAIL));
+        }
+
+        await entorno.ReiniciarAsync();
         await entorno.EntrarAsync(Rol.ADMIN);
-        await using var scope = entorno.Abrir();
-        var devoluciones = scope.ServiceProvider.GetRequiredService<AdministrarDevoluciones>();
-        var aprobada = await devoluciones.DevolverAsync(orden, MotivoDevolucion.DEFECTO, false);
-        Assert.Equal(54m, aprobada.Importe);
+        await using var reabierto = entorno.Abrir();
+        var servicios = reabierto.ServiceProvider;
+        var reporte = await servicios.GetRequiredService<ConsultarReportePedidos>().EjecutarAsync("ESTADO = ENTREGADO");
+        var pedido = Assert.Single(reporte);
+        Assert.Equal(orden, pedido.Id);
+        Assert.Equal(54m, pedido.ImporteReembolso);
+        Assert.Equal(59m, pedido.TotalCobrado);
         var duplicada = await Assert.ThrowsAsync<RechazoPedidoException>(() =>
-            devoluciones.DevolverAsync(orden, MotivoDevolucion.DEFECTO, false));
+            servicios.GetRequiredService<OperacionesPedido>().DevolverAsync(comando));
         Assert.Equal("DEVUELTO", duplicada.Codigo);
-        var outbox = scope.ServiceProvider.GetRequiredService<ReprocesarEventos>();
-        Assert.Equal(new ResumenOutbox(3, 0), await outbox.EjecutarAsync(CanalAviso.SMS));
-        Assert.Equal(new ResumenOutbox(0, 0), await outbox.EjecutarAsync(CanalAviso.EMAIL));
 
         await using var db = entorno.AbrirBase();
-        Assert.Equal(59m, (await db.Pagos.SingleAsync()).Importe);
-        Assert.Equal(aprobada.ReferenciaReembolso, (await db.Devoluciones.SingleAsync()).ReferenciaReembolso);
+        Assert.Equal(5m, (await db.Pagos.SingleAsync()).Tarifa);
+        var devolucion = await db.Devoluciones.SingleAsync();
+        Assert.Equal(54m, devolucion.ImporteReembolso);
+        Assert.True(devolucion.ReintegroInventario);
         Assert.Equal(3, await db.Movimientos.CountAsync(m => m.Cantidad > 0));
         Assert.Equal(new[] { 8, 5, 20, 4, 30 }, (await db.Productos.OrderBy(p => p.Sku).ToListAsync()).Select(p => p.Stock));
         Assert.Equal(1, await db.EventosOutbox.CountAsync(e => e.Tipo == EventoComercial.DevolucionAceptada));
         Assert.Equal(new[] { EventoComercial.DespachoRegistrado, EventoComercial.DevolucionAceptada, EventoComercial.PedidoPagado },
             await db.Auditorias.Where(a => a.Categoria == "AVISO_SMS").OrderBy(a => a.Accion).Select(a => a.Accion).ToArrayAsync());
+        var auditoria = await db.Auditorias.Where(a => a.Categoria == "COMANDO"
+            && a.Accion == nameof(ProcesarDevolucionCommand)).ToListAsync();
+        Assert.Single(auditoria, a => a.Resultado == "APROBADO");
+        Assert.Contains(auditoria, a => a.Resultado == "RechazoPedidoException");
         Assert.Equal(9, await db.EntregasEvento.CountAsync());
     }
 

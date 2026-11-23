@@ -95,7 +95,7 @@ public sealed class SeguridadComercialTests
         var auditorias = await db.Auditorias.ToListAsync();
         Assert.Equal(denegadas.Select(op => op.ToString()).Order(),
             auditorias.Where(a => a.UsuarioId == identidad.UsuarioId).Select(a => a.Accion).Order());
-        Assert.Equal(nameof(Operacion.Consultar), Assert.Single(auditorias.Where(a => a.UsuarioId is null)).Accion);
+        Assert.Equal(nameof(Operacion.Consultar), Assert.Single(auditorias, a => a.UsuarioId is null).Accion);
         Assert.All(auditorias, a => Assert.Equal("DENEGADO", a.Resultado));
     }
 }
