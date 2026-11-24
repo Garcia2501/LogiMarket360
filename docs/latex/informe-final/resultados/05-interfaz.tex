@@ -126,14 +126,12 @@ Las doce vistas siguen las operaciones de los wireframes de las páginas 11--16 
 A 96 DPI se verificaron acceso, panel y auditoría, incluida la distribución maximizada y foco representativo. Al 125\,\% se observó \ruta{DeviceDpi=120} en la versión auditada y se abrieron las doce vistas en ventana normal y maximizada. Los dos rótulos largos se leen completos. Se observó el avance por TAB de Buscar cliente a Buscar y el borde de foco. Las vistas largas se alcanzan mediante desplazamiento, aunque algunas celdas largas usan elipsis en ventana normal.
 
 \vistafig{dpi125-foco.jpg}{dpi-foco}{9.1cm}{Foco de teclado visible en Buscar, con la interfaz a 120 DPI.}
-La Figura~\ref{fig:dpi-foco} documenta el control activo. Este recorrido representa la navegación en esa vista. Las recapturas editoriales a 96 DPI no amplían esta comprobación de 120 DPI.
 
 \clearpage
-Los JPEG archivados a 120 DPI muestran las cuatro cifras de Auditoría en ventana normal, maximizada y al volver a la vista. La bitácora de ejecución registró una omisión que no se reproduce al examinar los píxeles de esos archivos. Falta confirmar físicamente si el efecto aparece durante la navegación. El 150\,\% (144 DPI) tras la corrección sigue NO VERIFICADO. Las capturas del error previo muestran el motivo de la corrección, pero se requiere evidencia posterior.
+\plabel{Alcance de RNF03} \textbf{PARCIAL}. Al 125\,\%, las Figuras~\ref{fig:dpi-normal} y \ref{fig:dpi-max} muestran las cuatro cifras de Auditoría. La bitácora consignó una omisión en la transición desde Panel que los JPEG archivados no reproducen. El cotejo de esa transición en el monitor físico sigue pendiente. Al 150\,\% (144 DPI), la compilación corregida permanece \textbf{NO VERIFICADA}. El registro del cotejo se conserva en \ruta{evidencias/cotejo-dpi.md}.
 
 \vistafig{dpi125-reentrada.jpg}{dpi-normal}{10.3cm}{Reentrada en Auditoría a 120 DPI. El JPEG conserva los valores 0, 0, 0 y 3.}
 \clearpage
 \vistafig{dpi125-max.jpg}{dpi-max}{9.62cm}{Auditoría maximizada a 120 DPI, con los cuatro valores visibles.}
-Las Figuras~\ref{fig:dpi-normal} y \ref{fig:dpi-max} documentan las capturas. RNF03 sigue PARCIAL. Véase \ruta{evidencias/cotejo-dpi.md}.
 
 

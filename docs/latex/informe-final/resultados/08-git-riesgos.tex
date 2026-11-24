@@ -1,10 +1,10 @@
 \subsubsection{Gestión de Git, GitHub y trazabilidad}
-El repositorio fue creado y autorizado por el responsable del proyecto. \texttt{main} conserva la versión inicial. El cierre consolida en \texttt{develop} las versiones de interfaz, auditoría y documentación mediante avance rápido. La interfaz vive en \ruta{feature/interfaz-winforms}; \ruta{audit/calidad-integral} contiene la corrección de Mediator, la refactorización de cantidades y pruebas adicionales. Se siguió Conventional Commits con incrementos asociados a código, pruebas o documentación. El corte del informe identifica sus bases reales.
+La interfaz, la auditoría y la documentación se consolidaron en \texttt{develop} mediante avance rápido. El historial sigue Conventional Commits y registra por separado los cambios de código, pruebas y documentación.
 
 \begin{longtable}{@{}L{.36\linewidth}L{.17\linewidth}L{.40\linewidth}@{}}
-\toprule Rama & HEAD & Alcance \\ \midrule\endhead
+\toprule Rama & Referencia & Alcance \\ \midrule\endhead
 \texttt{main} & \texttt{9e5f254} & Base estable. \\
-\texttt{develop} & \texttt{4668f63} & Fase 3, antes de integrar interfaz y auditoría. \\
+\texttt{develop} & \texttt{b0380bc} & Cierre académico y código consolidado. \\
 \ruta{feature/interfaz-winforms} & \texttt{a4e428b} & Interfaz y corrección DPI. \\
 \ruta{audit/calidad-integral} & \texttt{12458bc} & Código y evidencia de auditoría. \\
 \bottomrule
@@ -20,10 +20,10 @@ El repositorio fue creado y autorizado por el responsable del proyecto. \texttt{
 \bottomrule
 \end{longtable}
 
-Los commits conservan separados los cambios de aplicación, auditoría y documentación. La tabla identifica el corte histórico previo a la consolidación. La revisión gráfica parte de \ruta{docs/revision-grafica-latex}, que desciende de la rama auditada. El repositorio se consulta en \url{https://github.com/Garcia2501/LogiMarket360}.
+La rama \ruta{docs/revision-grafica-latex} registra la revisión gráfica desde la versión auditada. El repositorio se consulta en \url{https://github.com/Garcia2501/LogiMarket360}.
 
-\subsubsection{Riesgos, defectos y refactorizaciones}
-El registro identifica 13 riesgos. R01 y R10 tienen refactorizaciones estructurales ejecutadas; R02--R07 y R09 tienen correcciones o mitigaciones, R08 sigue parcial y R11--R13 conservan propuestas. La evidencia diferencial histórica es incompleta. Las referencias relativas de los proyectos \texttt{Domain}, \texttt{Application}, \texttt{Infrastructure} y \texttt{WinForms} parten de \ruta{src/LogiMarket.<Proyecto>}.
+\subsubsection{Riesgos, defectos y refactorizaciones}\label{sec:riesgos}
+El registro identifica 13 riesgos. R01 y R10 corresponden a refactorizaciones ejecutadas. R02--R07 y R09 registran correcciones o mitigaciones, R08 conserva una validación parcial y R11--R13 presentan propuestas sin implementar. \textbf{RNF10 sigue PARCIAL} por falta de evidencia histórica de antes y después para algunas intervenciones. Las rutas de los cuatro proyectos de aplicación parten de \ruta{src/LogiMarket.<Proyecto>}.
 
 \input{resultados/riesgos}
 
@@ -33,11 +33,8 @@ El registro identifica 13 riesgos. R01 y R10 tienen refactorizaciones estructura
 GoF & COMPLETO & 23 colaboraciones funcionales con fuente, pruebas y sus condiciones objetivas. \\
 P01--P38 & COMPLETO & La matriz detallada documenta las condiciones de los 38 escenarios de la guía. \\
 Integridad y seguridad & COMPLETO & Rollback, idempotencia, autorización, concurrencia, unicidad, persistencia y pruebas negativas. \\
-RNF03 & PARCIAL & Ambigüedad visual a 120 DPI y corrección a 144 DPI no verificada. \\
-RNF10 & PARCIAL & Registro de trece riesgos. Evidencias diferenciales incompletas para algunas mitigaciones históricas. \\
-Cierre documental & CERRADO & Portada con datos confirmados. Los resultados técnicos conservan el alcance indicado arriba. \\
+RNF03 & PARCIAL & Cotejo visual en la sección~\ref{sec:dpi}. \\
+RNF10 & PARCIAL & Evidencia por intervención en la sección~\ref{sec:riesgos}. \\
 \bottomrule
 \end{longtable}
-\noindent\textbf{Cierre documental con limitaciones registradas.}
-La suite, las reglas y la arquitectura sustentan el desarrollo técnico. El cotejo físico de DPI y la evidencia diferencial de algunas intervenciones siguen pendientes. El informe preserva riesgos residuales de escalabilidad de reportes, escrituras diagnósticas y capacidad de reproceso Outbox.
 

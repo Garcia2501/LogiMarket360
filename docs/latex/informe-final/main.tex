@@ -111,7 +111,7 @@ Diseñar, implementar, probar y documentar una aplicación empresarial de escrit
 \begin{itemize}
 \item Seguir los requisitos y comprobaciones de la guía APE 04 \cite{ape04}. Ejecutar la aplicación Windows Forms con SQLite, autorización por operación y colaboradores simulados.
 \item Usar los datos oficiales y SQLite independiente para cada escenario que exige stock inicial. Reutilizar la base del propio escenario para las pruebas de reinicio, concurrencia o recuperación.
-\item Vincular los resultados a código, casos de aceptación, artefactos reproducibles e historial Git. Identificar las condiciones pendientes de validación.
+\item Vincular los resultados a código, casos de aceptación, artefactos reproducibles e historial Git. Delimitar el alcance de las comprobaciones.
 \end{itemize}
 
 \subsection{Listado de equipos, materiales y recursos}
@@ -160,17 +160,19 @@ Se analizaron reglas, flujos y wireframes. Se implementaron el dominio y SQLite,
 \item[$\square$] Flexibilidad
 \item[$\square$] La resolución de conflictos
 \item[$\checkmark$] Adaptabilidad, demostrada al revalidar el diseño con cambios de tamaño y DPI.
-\item[$\checkmark$] Responsabilidad, reflejada en el aislamiento de datos y el registro de verificaciones pendientes.
+\item[$\checkmark$] Responsabilidad, reflejada en el aislamiento de datos y la documentación de las limitaciones.
 \item[$\checkmark$] Autogestión, mediante planificación por fases y control incremental de evidencias.
 \end{itemize}
 
 \subsection{Conclusiones}
-La auditoría vinculó los 23 patrones GoF con casos de uso, código y pruebas. La suite archivada aprobó 119 pruebas. Los tres escenarios de compra y la devolución de Ana se ajustaron a las cifras oficiales. La reapertura de SQLite conservó el estado y permitió recuperar un evento sin repetir el cobro.
+Las 119 pruebas automatizadas aprobadas y los casos P01--P38 respaldan los resultados dentro del alcance documentado. Los tres escenarios de compra y la devolución de Ana coincidieron con las cifras de la guía. Los 23 patrones GoF se vincularon con operaciones concretas y con evidencia de su comportamiento.
 
-El expediente reúne P01--P38 y evidencia funcional de las doce vistas. El criterio transversal de presentación sigue parcial hasta comprobar físicamente los valores de Auditoría a 120 DPI y la compilación corregida a 144 DPI. La documentación se refiere al commit auditado y señala ese límite en la evaluación de entrega.
+Las pruebas de concurrencia, reversión y reapertura mostraron que la consistencia depende de las restricciones de SQLite y de confirmar en una misma transacción el registro del cobro, el ajuste de inventario y el evento en Outbox. El reproceso del evento sin un segundo cobro distinguió la recuperación de notificaciones de la operación comercial.
+
+El trabajo mostró cómo aplicar SOLID al sustituir colaboradores y conservar reglas verificables fuera de la interfaz. La evidencia funcional de las doce vistas tiene el alcance del cotejo de accesibilidad (sección~\ref{sec:dpi}). El alcance de la evidencia de refactorización se identifica en la sección~\ref{sec:riesgos}.
 
 \subsection{Recomendaciones}
-Repetir en Windows el salto Panel $\to$ Auditoría a 120 DPI y la matriz normal/maximizada a 144 DPI. Registrar el DPI real, el hash, los rótulos completos, los cuatro valores, el foco y la navegación. Mantener estas comprobaciones identificadas como limitaciones del alcance visual.
+En aplicaciones de escritorio con SQLite, conviene incluir reinicios y fallos de persistencia en la verificación de las operaciones críticas. Para evaluar una refactorización, conviene conservar el mismo escenario de prueba antes y después del cambio, vinculado al commit correspondiente.
 
 \clearpage\subsection{Referencias}
 \begingroup

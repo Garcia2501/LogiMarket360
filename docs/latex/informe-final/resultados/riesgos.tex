@@ -3,7 +3,7 @@
 \plabel{Consecuencia} Cotización y cobro podían divergir al cambiar tarifas o descuentos.
 \plabel{Intervención} Extraer \ruta{ValorarPedido.Calcular}, \ruta{dd57d52}.
 \plabel{Archivos} \ruta{Application/Precios/ValorarPedido.cs}. \ruta{Application/Pedidos/AdministrarPedidos.cs}. \ruta{Application/Pagos/ConfirmacionPedidoFacade.cs}. \ruta{Infrastructure/Persistencia/RegistroPersistencia.cs}
-\plabel{Evidencia previa y posterior} Historial de fase 2 registra la selección posterior. P02–P04 y P32 volvieron a pasar. No se recuperó TRX de la ejecución anterior a la extracción.
+\plabel{Evidencia previa y posterior} El historial de fase 2 registra la extracción. P02–P04 y P32 volvieron a pasar. La ejecución previa carece de TRX archivado.
 \end{minipage}\par
 \par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R02}\quad\textsf{Mitigado}
 \plabel{Observación} Una revocación de sesión entre autorización inicial y Proxy perdía su auditoría al revertir.
@@ -52,7 +52,7 @@
 \plabel{Consecuencia} Rótulos y cifras recortados al 125 \% y al 150 \%.
 \plabel{Intervención} Medir ancho preferido y permitir crecimiento de tarjetas, \ruta{a4e428b}.
 \plabel{Archivos} \ruta{WinForms/Presentacion.cs}. \ruta{WinForms/VentanaComercial.cs}
-\plabel{Evidencia previa y posterior} Capturas aportadas antes de la corrección; después se verificó 96 DPI. Faltan 120/144 DPI. La revalidación a 120 DPI amplió la evidencia; queda una transición ambigua y 144 DPI sin ejecutar tras el arreglo.
+\plabel{Evidencia previa y posterior} Las capturas iniciales motivaron la corrección. El cotejo posterior y su alcance se documentan en la sección~\ref{sec:dpi}.
 \end{minipage}\par
 \par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R09}\quad\textsf{Corregido}
 \plabel{Observación} \ruta{FormularioPrincipalMediator.Destinos} omitía métricas en \ruta{EstadoPedido}.
@@ -71,21 +71,21 @@
 \par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R11}\quad\textsf{Abierto, fuera de escala académica actual}
 \plabel{Observación} \ruta{LecturaReportePedidos.ListarAsync} materializa todos los pedidos antes del árbol de filtros.
 \plabel{Consecuencia} El tiempo y uso de memoria crecen con el historial.
-\plabel{Intervención} Propuesta: proyección por rango y paginación, con traducción tipada que preserve precedencia. Sin commit asociado.
+\plabel{Propuesta sin implementar} Proyección por rango y paginación, con traducción tipada que preserve precedencia.
 \plabel{Archivos} \ruta{Infrastructure/Persistencia/Repositorios/LecturaReportePedidos.cs}. \ruta{Application/Reportes/ConsultarReportePedidos.cs}
 \plabel{Evidencia previa y posterior} P25/P26 prueban semántica actual. Sin medición de rendimiento a gran escala.
 \end{minipage}\par
 \par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R12}\quad\textsf{Riesgo residual, no se reprodujo en el entorno}
 \plabel{Observación} \ruta{InvocadorComandos.EjecutarAsync} espera el registro en el bloque finally. La fachada también espera trazas tras la transacción.
 \plabel{Consecuencia} Un fallo de escritura diagnóstica podría ocultar el resultado comercial confirmado o la causa original.
-\plabel{Intervención} Diseñar persistencia diagnóstica durable o distinguir resultado comercial de estado de auditoría. Sin commit asociado.
+\plabel{Propuesta sin implementar} Registro diagnóstico durable o separación entre resultado comercial y estado de auditoría.
 \plabel{Archivos} \ruta{Application/Comandos/InvocadorComandos.cs}. \ruta{Application/Pagos/ConfirmacionPedidoFacade.cs}
 \plabel{Evidencia previa y posterior} Se verificaron éxito y rechazo normal en P19/P24. Sin inyección de fallo de almacenamiento después del commit.
 \end{minipage}\par
 \par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R13}\quad\textsf{Abierto, capacidad de reproceso manual verificada}
 \plabel{Observación} \ruta{ProcesadorOutboxSqlite.ProcesarAsync} selecciona por fecha un lote máximo de 100 pendientes.
 \plabel{Consecuencia} Un lote bloqueado persistentemente puede retrasar eventos posteriores hasta resolver el fallo.
-\plabel{Intervención} Evaluar planificación de reintentos y equidad mantenida por fecha de próximo intento. Sin commit asociado.
+\plabel{Propuesta sin implementar} Planificación de reintentos según la fecha del próximo intento.
 \plabel{Archivos} \ruta{Infrastructure/Persistencia/Eventos/ProcesadorOutboxSqlite.cs}
 \plabel{Evidencia previa y posterior} P37 recupera un fallo y confirma idempotencia. No se ejecutó un backlog mayor de 100 fallos.
 \end{minipage}\par
