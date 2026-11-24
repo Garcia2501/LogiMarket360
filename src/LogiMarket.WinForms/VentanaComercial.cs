@@ -7,7 +7,7 @@ namespace LogiMarket.WinForms;
 
 internal sealed partial class VentanaComercial : Form
 {
-    private const int AnchuraNavegacion = 251;
+    private const int AnchuraMinimaEnlace = 219;
     private enum Seccion { Panel, Catalogo, Clientes, Carrito, Pedidos, Cobro, Despacho, Devoluciones, Inventario, Reportes, Auditoria }
     private readonly IServiceProvider _servicios;
     private readonly SesionLocal _sesion;
@@ -15,7 +15,7 @@ internal sealed partial class VentanaComercial : Form
     private readonly Dictionary<Seccion, (string Nombre, Func<Pantalla> Crear, Operacion Permiso)> _definiciones = [];
     private readonly Dictionary<Seccion, Pantalla> _pantallas = [];
     private readonly Dictionary<Seccion, Button> _enlaces = [];
-    private readonly ColumnStyle _columnaNavegacion = new(SizeType.Absolute, AnchuraNavegacion);
+    private readonly ColumnStyle _columnaNavegacion = new(SizeType.Absolute, 0);
     private readonly Panel _centro = new() { Dock = DockStyle.Fill, BackColor = Tema.Fondo };
     private readonly FlowLayoutPanel _navegacion = new()
     {
@@ -56,6 +56,7 @@ internal sealed partial class VentanaComercial : Form
         Controls.Add(distribucion);
         _salir.Click += (_, _) => CerrarSesion();
         RegistrarPantallas();
+        DpiChanged += (_, _) => BeginInvoke(AjustarMenu);
 
         _mediador.Conectar(AreaComercial.Catalogo, (_, _) => ActualizarCacheAsync(Seccion.Catalogo));
         _mediador.Conectar(AreaComercial.Carrito, (_, _) => ActualizarCacheAsync(Seccion.Carrito));
@@ -191,7 +192,6 @@ internal sealed partial class VentanaComercial : Form
     private void MostrarMenu()
     {
         AcceptButton = null;
-        _columnaNavegacion.Width = AnchuraNavegacion;
         _navegacion.Visible = _salir.Visible = true;
         var identidad = _sesion.Actual!;
         _rol.Text = $"{identidad.Nombre} · {identidad.Rol}" + (EsDemo ? " · Demostración" : "");
@@ -200,15 +200,38 @@ internal sealed partial class VentanaComercial : Form
             if (!Tiene(configuracion.Permiso))
                 continue;
             var enlace = Tema.Boton(configuracion.Nombre);
-            enlace.AutoSize = false;
-            enlace.Width = 219;
-            enlace.Height = 37;
+            enlace.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             enlace.TextAlign = ContentAlignment.MiddleLeft;
             enlace.Click += async (_, _) => await NavegarAsync(seccion);
             _enlaces.Add(seccion, enlace);
             _navegacion.Controls.Add(enlace);
         }
+        AjustarMenu();
         _enlaces[Seccion.Panel].Select();
+    }
+
+    private void AjustarMenu()
+    {
+        if (_enlaces.Count == 0)
+            return;
+
+        _navegacion.SuspendLayout();
+        try
+        {
+            foreach (var enlace in _enlaces.Values)
+                enlace.MinimumSize = new Size(AnchuraMinimaEnlace, 37);
+
+            var ancho = _enlaces.Values.Max(enlace => enlace.GetPreferredSize(Size.Empty).Width);
+            foreach (var enlace in _enlaces.Values)
+                enlace.MinimumSize = new Size(ancho, 37);
+
+            _columnaNavegacion.Width = ancho + _navegacion.Padding.Horizontal
+                + _enlaces.Values.Max(enlace => enlace.Margin.Horizontal) + SystemInformation.VerticalScrollBarWidth;
+        }
+        finally
+        {
+            _navegacion.ResumeLayout();
+        }
     }
 
     private async Task NavegarAsync(Seccion seccion)

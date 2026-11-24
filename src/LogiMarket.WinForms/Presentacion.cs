@@ -139,7 +139,7 @@ internal sealed class Tarjeta
 
     public FlowLayoutPanel Contenedor { get; } = new()
     {
-        Width = 164, Height = 92, BackColor = Tema.Papel, FlowDirection = FlowDirection.TopDown,
+        AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, MinimumSize = new Size(164, 92), BackColor = Tema.Papel, FlowDirection = FlowDirection.TopDown,
         WrapContents = false, Padding = new Padding(12, 7, 8, 7), Margin = new Padding(0, 0, 9, 9)
     };
 
