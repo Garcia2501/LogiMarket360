@@ -1,4 +1,6 @@
 using LogiMarket.Application.Catalogo;
+using LogiMarket.Application.Comandos;
+using LogiMarket.Application.Escritorio;
 using LogiMarket.Application.Eventos;
 using LogiMarket.Application.Navegacion;
 using LogiMarket.Application.Pagos;
@@ -63,6 +65,37 @@ public sealed class MediadorComercialTests
 
         Assert.Empty(await mediador.NotificarAsync(CambioComercial.VentaConfirmada, id));
         Assert.Equal(Enum.GetValues<AreaComercial>(), refrescadas);
+    }
+
+    [Fact]
+    public async Task DespachoRefrescaIndicadoresYOutboxDeLasVistas()
+    {
+        await using var entorno = await CrearEntornoAsync();
+        var id = await CrearPedidoAsync(entorno, "mediador-despacho", CategoriaCliente.NORMAL, ModalidadEntrega.ESTANDAR,
+            [new("P01", 1)]);
+        await ConfirmarAsync(entorno, id, "mediador-despacho", ProveedorPago.LEGADO);
+        await using var scope = entorno.Abrir();
+        var servicios = scope.ServiceProvider;
+        var escritorio = servicios.GetRequiredService<ConsultarEscritorio>();
+        var anterior = await escritorio.ResumenAsync();
+        Assert.Equal(1, anterior.PorDespachar);
+        Assert.Equal(1, anterior.Sesion.Pendientes);
+
+        var mediador = new FormularioPrincipalMediator();
+        ResumenGeneral? panel = null;
+        IndicadoresSesion? auditoria = null;
+        mediador.Conectar(AreaComercial.Metricas, async (_, ct) =>
+        {
+            panel = await escritorio.ResumenAsync(ct);
+            auditoria = await escritorio.IndicadoresAsync(ct);
+        });
+
+        await entorno.EntrarAsync(Rol.BODEGA);
+        await servicios.GetRequiredService<OperacionesPedido>().DespacharAsync(new DespacharPedidoCommand(id));
+        Assert.Empty(await mediador.NotificarAsync(CambioComercial.EstadoPedido, id));
+
+        Assert.Equal(0, Assert.IsType<ResumenGeneral>(panel).PorDespachar);
+        Assert.Equal(2, Assert.IsType<IndicadoresSesion>(auditoria).Pendientes);
     }
 
     [Fact]

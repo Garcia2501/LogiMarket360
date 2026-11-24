@@ -59,7 +59,8 @@ public sealed class FormularioPrincipalMediator
     {
         CambioComercial.Inicio or CambioComercial.VentaConfirmada or CambioComercial.DevolucionAceptada =>
             [AreaComercial.Catalogo, AreaComercial.Carrito, AreaComercial.Pedidos, AreaComercial.Inventario, AreaComercial.Metricas],
-        CambioComercial.BorradorEditado or CambioComercial.EstadoPedido => [AreaComercial.Carrito, AreaComercial.Pedidos],
+        CambioComercial.BorradorEditado => [AreaComercial.Carrito, AreaComercial.Pedidos],
+        CambioComercial.EstadoPedido => [AreaComercial.Carrito, AreaComercial.Pedidos, AreaComercial.Metricas],
         CambioComercial.CatalogoEditado => [AreaComercial.Catalogo, AreaComercial.Inventario, AreaComercial.Metricas],
         CambioComercial.EventosProcesados => [AreaComercial.Metricas],
         _ => throw new ArgumentOutOfRangeException(nameof(cambio))
