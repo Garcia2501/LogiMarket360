@@ -1,11 +1,13 @@
 using LogiMarket.Application.Catalogo;
 using LogiMarket.Application.Clientes;
 using LogiMarket.Application.Entregas;
+using LogiMarket.Application.Pagos;
 using LogiMarket.Application.Pedidos;
 using LogiMarket.Application.Precios;
 using LogiMarket.Domain.Clientes;
 using LogiMarket.Domain.Pedidos;
 using LogiMarket.Domain.Seguridad;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -109,6 +111,21 @@ public sealed class OperacionesComercialesTests
         error = await Assert.ThrowsAsync<RechazoPedidoException>(() => pedidos.ValidarAsync(orden.Id));
         Assert.Equal("STOCK", error.Codigo);
         Assert.Contains("P02", error.Message);
+
+        await clientes.ActualizarAsync(cliente.Id, "Cliente", CategoriaCliente.NORMAL, null, false);
+        var confirmar = servicios.GetRequiredService<ConfirmacionPedidoFacade>();
+        var primero = await Assert.ThrowsAsync<RechazoPedidoException>(() =>
+            confirmar.ConfirmarAsync(orden.Id, "cadena", ProveedorPago.LEGADO));
+        Assert.Equal("CLIENTE", primero.Codigo);
+        await clientes.ActualizarAsync(cliente.Id, "Cliente", CategoriaCliente.NORMAL, null, true);
+        var segundo = await Assert.ThrowsAsync<RechazoPedidoException>(() =>
+            confirmar.ConfirmarAsync(orden.Id, "cadena", ProveedorPago.LEGADO));
+        Assert.Equal("STOCK", segundo.Codigo);
+        await using var db = entorno.AbrirBase();
+        Assert.Empty(await db.Pagos.ToListAsync());
+        Assert.Empty(await db.Movimientos.ToListAsync());
+        Assert.Empty(await db.EventosOutbox.ToListAsync());
+        Assert.False(await db.Auditorias.AnyAsync(a => a.Categoria == "COBRO"));
     }
 
     private static (string, decimal) Resumen(ValoracionPedido v) => (v.Promocion, v.Descuento);

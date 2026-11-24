@@ -88,15 +88,14 @@ public sealed class OutboxComercialTests
     }
 
     [Fact]
-    public async Task CommandInvocaYRegistraExitoYRechazo()
+    public async Task P24_CommandInvocaYRegistraExitoYRechazo()
     {
         await using var entorno = await CrearEntornoAsync();
-        var id = await CrearPedidoAsync(entorno, "comando", CategoriaCliente.NORMAL,
-            ModalidadEntrega.ESTANDAR, [new("P01", 1)]);
+        var id = await CrearPedidoAsync(entorno, "Ana QA", CategoriaCliente.VIP, ModalidadEntrega.ESTANDAR, [new("KIT_TELETRABAJO", 1)]);
         await using var scope = entorno.Abrir();
         var comandos = scope.ServiceProvider.GetRequiredService<OperacionesPedido>();
         var pago = await comandos.ConfirmarAsync(new ConfirmarPedidoCommand(id, "comando", ProveedorPago.LEGADO));
-        Assert.Equal(25m, pago.Importe);
+        Assert.Equal((60m, 6m, 5m, 59m), (pago.Subtotal, pago.Descuento, pago.Tarifa, pago.Importe));
         await Assert.ThrowsAsync<InvalidOperationException>(() => comandos.CancelarAsync(new CancelarPedidoCommand(id)));
         await using var db = entorno.AbrirBase();
         var registros = await db.Auditorias.Where(a => a.Categoria == "COMANDO").ToListAsync();

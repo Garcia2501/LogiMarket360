@@ -57,9 +57,10 @@ public sealed class MediadorComercialTests
         });
         mediador.Conectar(AreaComercial.Metricas, async (_, ct) =>
         {
-            var filas = await sp.GetRequiredService<ConsultarReportePedidos>().EjecutarAsync(null, ct);
-            Assert.Single(filas, p => p.TotalCobrado is not null);
-            Assert.Equal(0, sp.GetRequiredService<MetricasSesion>().Contar(EventoComercial.PedidoPagado));
+            var panel = await sp.GetRequiredService<ConsultarEscritorio>().ResumenAsync(ct);
+            Assert.Equal(65m, panel.Ventas);
+            Assert.Equal(1, panel.Sesion.Pendientes);
+            Assert.Equal(0, panel.Sesion.Ventas);
             refrescadas.Add(AreaComercial.Metricas);
         });
 
