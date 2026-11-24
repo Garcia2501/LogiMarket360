@@ -1,0 +1,26 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgHeading] at (2.2,0.53) {Rol};
+\node[lgHeading] at (7.25,0.53) {Caso de uso representativo};
+\node[lgHeading] at (12.9,0.53) {Control de aplicación};
+\node[lgBox,text width=3.1cm] (r0) at (2.2,0.0) {\textbf{ADMIN}};
+\node[lgUse] (u0) at (7.25,0.0) {Mantener y auditar};
+\draw[lgAssoc] (r0.east) -- (u0.west);
+\node[lgBox,text width=3.1cm] (r1) at (2.2,-1.05) {\textbf{VENTAS}};
+\node[lgUse] (u1) at (7.25,-1.05) {Gestionar y cobrar pedido};
+\draw[lgAssoc] (r1.east) -- (u1.west);
+\node[lgBox,text width=3.1cm] (r2) at (2.2,-2.1) {\textbf{BODEGA}};
+\node[lgUse] (u2) at (7.25,-2.1) {Despachar y entregar};
+\draw[lgAssoc] (r2.east) -- (u2.west);
+\node[lgBox,text width=3.1cm] (r3) at (2.2,-3.1500000000000004) {\textbf{CONSULTA}};
+\node[lgUse] (u3) at (7.25,-3.1500000000000004) {Consultar reportes};
+\draw[lgAssoc] (r3.east) -- (u3.west);
+\node[lgBox,text width=4.1cm] (auth) at (12.75,-1.55) {{\color{acento}\itshape\footnotesize «servicio»}\\[1pt]\textbf{Autorizacion\allowbreak{}Operaciones}\\[2pt]{\color{lgmuted}\footnotesize ExigirAsync}};
+\node[lgNote] at (7.55,-4.03) {Cada operación protegida comprueba el rol. La figura muestra un uso representativo por rol.};
+\draw[lgAssoc] (10.20,0) -- (10.20,-3.15);
+\draw[lgAssoc] (u0.east) -- (10.20,0);
+\draw[lgAssoc] (u1.east) -- (10.20,-1.05);
+\draw[lgAssoc] (u2.east) -- (10.20,-2.10);
+\draw[lgAssoc] (u3.east) -- (10.20,-3.15);
+\draw[lgDep] (10.20,-1.55) -- (auth.west);
+\end{tikzpicture}
+

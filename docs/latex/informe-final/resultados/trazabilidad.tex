@@ -1,0 +1,34 @@
+\small
+\begin{longtable}{@{}L{.09\linewidth}L{.47\linewidth}L{.35\linewidth}@{}}
+\caption{Trazabilidad de requisitos funcionales y no funcionales.}\\
+\toprule ID & Condición de la guía & Evidencia y estado \\ \midrule\endfirsthead
+\toprule ID & Condición de la guía & Evidencia y estado \\ \midrule\endhead
+RF01 & Identificarse y cerrar sesión localmente con usuarios iniciales, hash y cuatro roles. & P01, P22; login correcto/incorrecto y sesión cerrada. \textbf{COMPLETO} \\[2pt]
+RF02 & Consultar y administrar productos con CRUD, búsqueda e invariantes del catálogo. & P01, P21; duplicado SKU y cantidades inválidas. \textbf{COMPLETO} \\[2pt]
+RF03 & Registrar y editar kits, impedir ciclos y expandir SKU finales. & P05, P18, P27, P34. \textbf{COMPLETO} \\[2pt]
+RF04 & Buscar, registrar y editar clientes con identificación, categoría, contacto y estado activo. & P23; ejercicio CRUD y cliente inactivo. \textbf{COMPLETO} \\[2pt]
+RF05 & Crear/editar borrador con cliente, líneas, cantidades, entrega e instantáneas; rechazar vacío. & P08, P13; modificar catálogo posterior y verificar instantánea. \textbf{COMPLETO} \\[2pt]
+RF06 & Clonar carrito con copia profunda y deshacer/rehacer hasta cinco estados completos, solo en borrador. & P14, P29. \textbf{COMPLETO} \\[2pt]
+RF07 & Calcular subtotal, promoción única, flete, plazo y total con cifras verificables. & P02–P04, P12, P32; umbral 9/10 y redondeo. \textbf{COMPLETO} \\[2pt]
+RF08 & Validar por cadena, cancelar únicamente en estados permitidos y consultar historial. & P08, P23, P24, P31. \textbf{COMPLETO} \\[2pt]
+RF09 & Confirmar con cobro simulado sustituible, registrar trazas y evitar pago doble/sobreventa. & P02–P07, P16, P19–P20, P22, P36. \textbf{COMPLETO} \\[2pt]
+RF10 & Preparar, despachar y entregar en orden, generar guía simulada y consultar seguimiento. & P09, P12, P31; trazabilidad de guía/entrega. \textbf{COMPLETO} \\[2pt]
+RF11 & Devolver totalmente desde ENTREGADO conforme a motivo, plazo y condición; reintegro y reembolso únicos. & P33, P35; límites inclusivos y producto usado. \textbf{COMPLETO} \\[2pt]
+RF12 & Consultar/registrar inventario y movimientos con motivo y referencia, incluido ajuste auditado. & P02–P07, P35–P36; ajuste positivo/negativo. \textbf{COMPLETO} \\[2pt]
+RF13 & Obtener reporte por fechas y filtros por estado, total y cliente con AND/OR y paréntesis. & P25, P26, P34; filtro por rango y resumen. \textbf{COMPLETO} \\[2pt]
+RF14 & Emitir comprobantes internos de venta y devolución a vista previa o TXT. & P17; cuatro combinaciones. \textbf{COMPLETO} \\[2pt]
+RF15 & Generar avisos simulados EMAIL/SMS, auditoría y métricas por pedido, despacho y devolución. & P11, P15, P19, P28, P30, P37. \textbf{COMPLETO} \\[2pt]
+RF16 & Mostrar panel con pedidos, ventas, alertas, stock y métricas; refrescar catálogo, carrito y pedidos mediante mediador. & P15, P21, P28, P30. \textbf{COMPLETO} \\[2pt]
+RF17 & Demostrar cambio de proveedor, fallo de cobro y fallo/reintento Outbox en entorno controlado. & P06, P16, P37. \textbf{COMPLETO} \\[2pt]
+RF18 & Persistir pedido, pago, stock, despacho, devolución y auditoría al reiniciar. & P01, P10, P35, P37; consulta postreinicio. \textbf{COMPLETO} \\[2pt]
+RNF01 & Integridad. Cero efectos de negocio parciales en rechazo. Un pago por pedido, un movimiento por SKU en confirmación, una devolución y stock $\ge$ 0. & P05–P08, P20, P35–P36, índices, estado de DB. \textbf{COMPLETO} \\[2pt]
+RNF02 & Mantenibilidad. Cinco proyectos y cero dependencias prohibidas. Patrones, SOLID, Repository, CQRS básico, transacción real y DI por constructor. & P38, \_build\_ limpio, .csproj, diagramas, código e invocaciones reales. \textbf{COMPLETO} \\[2pt]
+RNF03 & Usabilidad. Doce áreas accesibles desde la ventana principal; TAB, foco, etiquetas, validación próxima al campo, escala, mensajes, confirmación, selección persistente y dos decimales. & Guion visual de las 12 vistas, pruebas válidas e inválidas. Validación física de cifras a 125 \% y corrección a 150 \% pendientes. \textbf{PARCIAL} \\[2pt]
+RNF04 & Rendimiento. P21 ejecutado sobre al menos 1.000 filas, con identidad compartida, instancias y memoria frente a escenario equivalente. La guía no fija latencia ni porcentaje de ahorro. & Medición reproducible, condiciones y resultado bruto obtenido. \textbf{COMPLETO} \\[2pt]
+RNF05 & Seguridad local. Cuatro roles, autorización de operaciones y cero contraseñas en claro; denegación de pago antes de trazas y proveedor. & P01, P22, inspección de BD, revisión del ZIP. \textbf{COMPLETO} \\[2pt]
+RNF06 & Trazabilidad. Registrar cambios de estado, movimientos, correlación, comandos, eventos y evidencias para todos los requisitos/patrones y casos. & Matrices, logs, captura, referencia a archivo/método/commit. \textbf{COMPLETO} \\[2pt]
+RNF07 & Testabilidad. Ejecutar P01–P38 y aprobar al menos 25 pruebas automáticas en dominio, aplicación e integración. & P38, informe TRX, datos repetibles y resultados obtenidos. \textbf{COMPLETO} \\[2pt]
+RNF08 & Recuperabilidad. Base vacía recuperable vía migraciones/seed, persistencia al reiniciar y evento reintentable sin duplicación. & P01, P10, P37, instrucciones reproducibles. \textbf{COMPLETO} \\[2pt]
+RNF09 & Compatibilidad y alcance. Windows, Visual Studio 2022 compatible, C\#/.NET 8, WinForms, EF Core 8, SQLite y \ruta{Microsoft.Extensions.DependencyInjection}. Colaboradores simulados y comprobantes internos. & Compilación, UI, esquema relacional real y demostración sin servicios externos. \textbf{COMPLETO} \\[2pt]
+RNF10 & Calidad y autoría. Registrar al menos diez riesgos reales con refactorizaciones, Git y pruebas antes/después. Aplicar cinco principios SOLID y Clean Code/KISS/DRY/YAGNI. & Historial individual, commits y defensa reproducible. Persisten vacíos de prueba diferencial histórica. \textbf{PARCIAL} \\[2pt]
+\bottomrule\end{longtable}\normalsize

@@ -1,0 +1,7 @@
+﻿Comprobante de devolución
+Comprobante interno de demostración. Sin validez tributaria.
+Pedido: 48fa5ece-d6e2-4669-a0a7-8646c71b2db0
+Motivo: DEFECTO
+Reembolso: DEV-LEG-6249D3D875975BA53210456E7E763B98A050B0BA91CCE27BD60CCBC7569445F5
+Importe reembolsado USD 54.00
+El envío está excluido del reembolso.

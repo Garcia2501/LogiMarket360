@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (cmp) at (3.975,0) {{\color{acento}\itshape\footnotesize «abstracta»}\\[1pt]\textbf{Comprobante}\\[2pt]{\color{lgmuted}\footnotesize EmitirAsync}};
+\node[lgBox,text width=6.5cm] (port) at (11.125000000000002,0) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{ISalida\allowbreak{}Documento}\\[2pt]{\color{lgmuted}\footnotesize EmitirAsync}};
+\node[lgBox,text width=2.955cm] (sales) at (2.1875,-1.55) {\textbf{Comprobante\allowbreak{}Venta}};
+\node[lgBox,text width=2.955cm] (ret) at (5.762500000000001,-1.55) {\textbf{Comprobante\allowbreak{}Devolucion}};
+\node[lgBox,text width=2.955cm] (prev) at (9.3375,-1.55) {\textbf{Vista\allowbreak{}Previa}};
+\node[lgBox,text width=2.955cm] (archive) at (12.912500000000001,-1.55) {\textbf{Archivo\allowbreak{}TXT}};
+\draw[lgAssoc] (cmp.east) -- (port.west);
+\draw[lgInherit] (sales.north) -- (cmp.south west);
+\draw[lgInherit] (ret.north) -- (cmp.south east);
+\draw[lgReal] (prev.north) -- (port.south west);
+\draw[lgReal] (archive.north) -- (port.south east);
+\node[lgNote] at (7.55,-2.55) {La clase de comprobante y el medio de salida se combinan en dos ejes independientes.};
+\end{tikzpicture}

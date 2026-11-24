@@ -1,0 +1,10 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.1466666666666665cm] (s) at (2.783333333333333,0) {\textbf{Administrar\allowbreak{}Catalogo}\\[2pt]{\color{lgmuted}\footnotesize ConsultarExistenciasAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (it) at (7.550000000000001,0) {\textbf{Iterador\allowbreak{}Componentes\allowbreak{}Fisicos}\\[2pt]{\color{lgmuted}\footnotesize Recorrer}};
+\node[lgBox,text width=4.1466666666666665cm] (f) at (12.316666666666666,0) {\textbf{Componente\allowbreak{}Fisico}\\[2pt]{\color{lgmuted}\footnotesize SKU · cantidad}};
+\node[lgBox,text width=6.5cm] (snap) at (7.550000000000001,-1.55) {\textbf{Componente\allowbreak{}Catalogo\allowbreak{}Snapshot}\\[2pt]{\color{lgmuted}\footnotesize Estructura congelada del kit}};
+\draw[lgDep] (s.east) -- (it.west);
+\draw[lgDep] (it.east) -- (f.west);
+\draw[lgDep] (it.south) -- (snap.north);
+\node[lgNote] at (7.55,-2.55) {Recorrido en profundidad con pila interna; produce hojas, con la cantidad acumulada.};
+\end{tikzpicture}

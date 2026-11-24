@@ -1,0 +1,10 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.1466666666666665cm] (ob) at (2.783333333333333,0) {\textbf{Observador\allowbreak{}Metricas}\\[2pt]{\color{lgmuted}\footnotesize RecibirAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (reg) at (7.550000000000001,0) {\textbf{Registro\allowbreak{}Persistencia}\\[2pt]{\color{lgmuted}\footnotesize AddSingleton}};
+\node[lgBox,text width=4.1466666666666665cm] (con) at (12.316666666666666,0) {\textbf{Consultar\allowbreak{}Escritorio}\\[2pt]{\color{lgmuted}\footnotesize Leer panel y métricas}};
+\node[lgBox,text width=6.5cm] (ms) at (7.550000000000001,-1.55) {{\color{acento}\itshape\footnotesize «una instancia por host»}\\[1pt]\textbf{Metricas\allowbreak{}Sesion}\\[2pt]{\color{lgmuted}\footnotesize Registrar · Contar}};
+\draw[lgDep] (ob.south) -- (ms.north west);
+\draw[lgDep] (reg.south) -- (ms.north);
+\draw[lgDep] (con.south) -- (ms.north east);
+\node[lgNote] at (7.55,-2.55) {Panel y Auditoría consultan la misma instancia a través de Application.};
+\end{tikzpicture}

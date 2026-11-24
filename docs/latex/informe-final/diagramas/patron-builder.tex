@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.1466666666666665cm] (use) at (2.783333333333333,0) {\textbf{Administrar\allowbreak{}Pedidos}\\[2pt]{\color{lgmuted}\footnotesize CrearAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (builder) at (7.550000000000001,0) {\textbf{Pedido\allowbreak{}Builder}\\[2pt]{\color{lgmuted}\footnotesize Agregar · Construir}};
+\node[lgBox,text width=4.1466666666666665cm] (p) at (12.316666666666666,0) {\textbf{Pedido}\\[2pt]{\color{lgmuted}\footnotesize AgregarLinea}};
+\node[lgBox,text width=6.5cm] (line) at (3.975,-1.7) {\textbf{Pedido\allowbreak{}Detalle}};
+\node[lgBox,text width=6.5cm] (snap) at (11.125000000000002,-1.7) {\textbf{Componente\allowbreak{}Catalogo\allowbreak{}Snapshot}};
+\draw[lgDep] (use.east) -- (builder.west);
+\draw[lgDep] (builder.east) -- (p.west);
+\draw[lgComp] (p.south) |- (12.25,-1.01) -|  (line.north);
+\draw[lgDep] (line.east) -- (snap.west);
+\node[lgNote] at (7.55,-2.7) {El caso de uso aporta las líneas; Construir entrega el agregado con su instantánea.};
+\end{tikzpicture}

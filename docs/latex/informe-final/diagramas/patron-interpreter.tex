@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.1466666666666665cm] (consulta) at (2.783333333333333,0) {\textbf{Consultar\allowbreak{}Reporte\allowbreak{}Pedidos}\\[2pt]{\color{lgmuted}\footnotesize EjecutarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (par) at (7.550000000000001,0) {\textbf{Parser\allowbreak{}Filtro\allowbreak{}Pedido}\\[2pt]{\color{lgmuted}\footnotesize Parsear}};
+\node[lgBox,text width=4.1466666666666665cm] (f) at (12.316666666666666,0) {{\color{acento}\itshape\footnotesize «abstracta»}\\[1pt]\textbf{Filtro\allowbreak{}Pedidos}\\[2pt]{\color{lgmuted}\footnotesize Cumple}};
+\node[lgBox,text width=6.5cm] (e) at (3.975,-1.55) {\textbf{Filtro\allowbreak{}Estado / Filtro\allowbreak{}Total\\Filtro\allowbreak{}Cliente}};
+\node[lgBox,text width=6.5cm] (g) at (11.125000000000002,-1.55) {\textbf{Filtro\allowbreak{}And / Filtro\allowbreak{}Or}\\[2pt]{\color{lgmuted}\footnotesize Izquierdo · Derecho}};
+\draw[lgDep] (consulta.east) -- (par.west);
+\draw[lgDep] (par.east) -- (f.west);
+\draw[lgInherit] (e.north) -- (f.south west);
+\draw[lgInherit] (g.north) -- (f.south);
+\node[lgNote] at (7.55,-2.55) {Los nodos binarios evalúan ambos operandos mediante el mismo contrato.};
+\end{tikzpicture}

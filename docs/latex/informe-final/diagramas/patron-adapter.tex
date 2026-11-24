@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.1466666666666665cm] (res) at (2.783333333333333,0) {\textbf{Resolutor\allowbreak{}Pasarelas}\\[2pt]{\color{lgmuted}\footnotesize Obtener}};
+\node[lgBox,text width=4.1466666666666665cm] (port) at (7.550000000000001,0) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{IPasarela\allowbreak{}Pago}\\[2pt]{\color{lgmuted}\footnotesize CobrarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (alt) at (12.316666666666666,0) {\textbf{Pasarela\allowbreak{}Alterna\allowbreak{}Simulada}\\[2pt]{\color{lgmuted}\footnotesize CobrarAsync}};
+\node[lgBox,text width=6.5cm] (leg) at (3.975,-1.55) {\textbf{Pasarela\allowbreak{}Legada\allowbreak{}Simulada}\\[2pt]{\color{lgmuted}\footnotesize CobrarCentavos}};
+\node[lgBox,text width=6.5cm] (ad) at (11.125000000000002,-1.55) {\textbf{Pasarela\allowbreak{}Legada\allowbreak{}Adapter}\\[2pt]{\color{lgmuted}\footnotesize CobrarAsync}};
+\draw[lgDep] (res.east) -- (port.west);
+\draw[lgReal] (alt.west) -- (port.east);
+\draw[lgReal] (ad.north) -- (port.south);
+\draw[lgAssoc] (ad.west) -- (leg.east);
+\node[lgNote] at (7.55,-2.55) {El Adapter convierte el importe a centavos y adapta la respuesta legada.};
+\end{tikzpicture}

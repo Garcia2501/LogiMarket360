@@ -1,0 +1,313 @@
+\subsubsection{Aceptación P01--P38}
+Cada caso conserva el procedimiento previsto, el resultado observado y la evidencia del corte auditado. Las ejecuciones históricas se identifican con su fase. Las evidencias visuales y su alcance se describen por separado. P01--P38 sustenta el alcance de aceptación de la guía; la verificación transversal de DPI se evalúa en RNF03.
+\subsection*{Funcionalidad y reglas}
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P01}\quad\textsf{COMPLETO}
+\plabel{Descripción} Migración y seed repetible.
+\plabel{Precondiciones y entrada} Base ausente; ejecutar seed dos veces.
+\plabel{Resultado esperado} Migraciones aplicadas; cinco productos, dos kits y roles; sin duplicados al relanzar seed.
+\plabel{Resultado obtenido} Esquema vigente, 5 productos, 2 kits, 4 roles y sin duplicados.
+\plabel{Método y evidencia} \ruta{InicializacionTests.P01_SeedDesdeArchivoAusenteEsIdempotenteYPersiste}. \ruta{InicializacionTests.P01}; sqlite-arranque-\ruta{limpio.json}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P02}\quad\textsf{COMPLETO}
+\plabel{Descripción} Compra de Ana VIP.
+\plabel{Precondiciones y entrada} Ana VIP, teletrabajo $\times$1 estándar, base nueva.
+\plabel{Resultado esperado} Total 59.00; stock P01=7, P02=4, P03=19; estado PAGADO y un pago.
+\plabel{Resultado obtenido} 59.00, stocks 7/4/19, PAGADO y pago único.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P02_P03_P04_EscenariosOficiales}. \ruta{ConfirmacionTests.P02_P03_P04}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P03}\quad\textsf{COMPLETO}
+\plabel{Descripción} Compra de Luis NORMAL.
+\plabel{Precondiciones y entrada} Luis NORMAL, P04 $\times$2 y P05 $\times$2 exprés, base nueva.
+\plabel{Resultado esperado} Total 102.00; P04=2, P05=28; un pago.
+\plabel{Resultado obtenido} 102.00, stocks P04/P05 2/28, pago único.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P02_P03_P04_EscenariosOficiales}. \ruta{ConfirmacionTests.P02_P03_P04}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P04}\quad\textsf{COMPLETO}
+\plabel{Descripción} Compra mayorista de Carmen.
+\plabel{Precondiciones y entrada} Carmen, P03 $\times$10 estándar, base nueva.
+\plabel{Resultado esperado} Total 90.00; P03=10; descuento 15.00.
+\plabel{Resultado obtenido} 90.00, descuento 15.00, P03=10, pago único.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P02_P03_P04_EscenariosOficiales}. \ruta{ConfirmacionTests.P02_P03_P04}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P05}\quad\textsf{COMPLETO}
+\plabel{Descripción} Stock insuficiente.
+\plabel{Precondiciones y entrada} Teletrabajo $\times$6, stock oficial.
+\plabel{Resultado esperado} Rechazo por P02 insuficiente; sin pago/stock/evento de éxito.
+\plabel{Resultado obtenido} P02 insuficiente; sin pago, movimientos ni Outbox.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P05_KitSinStockNoInvocaProveedor}. \ruta{ConfirmacionTests.P05}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P06}\quad\textsf{COMPLETO}
+\plabel{Descripción} Cobro rechazado.
+\plabel{Precondiciones y entrada} Pedido válido y alterno configurado para rechazar.
+\plabel{Resultado esperado} Se conserva inventario y estado previo; sin pago aprobado ni Outbox de éxito.
+\plabel{Resultado obtenido} VALIDADO y saldos intactos; sin pago ni evento aprobado.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P06_P19_RechazoMantieneValidadoYRegistraTrazaEnOrden}. \ruta{ConfirmacionTests.P06_P19}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P07}\quad\textsf{COMPLETO}
+\plabel{Descripción} Repetición de confirmación.
+\plabel{Precondiciones y entrada} Reintentar misma clave en el mismo pedido.
+\plabel{Resultado esperado} Un pago y un movimiento por SKU; devuelve el resultado original sin cobro doble.
+\plabel{Resultado obtenido} Mismo pago, una llamada y tres movimientos físicos.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P07_P08_IdempotenciaYProteccionDelPedidoPagado}. \ruta{ConfirmacionTests.P07_P08}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P08}\quad\textsf{COMPLETO}
+\plabel{Descripción} Inmutabilidad después del pago.
+\plabel{Precondiciones y entrada} Cambiar precio del catálogo y editar/cancelar pedido pagado.
+\plabel{Resultado esperado} Ambas operaciones denegadas; datos e historial intactos.
+\plabel{Resultado obtenido} Denegación de ambas operaciones y mismo precio, pago e historial.
+\plabel{Método y evidencia} TRX focalizado y capturas originales 13–15. \ruta{EscritorioTests.P08}; capturas fase 4 13–15.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P09}\quad\textsf{COMPLETO}
+\plabel{Descripción} Despacho y entrega por rol.
+\plabel{Precondiciones y entrada} BODEGA: intentar antes del pago; pagar, despachar y entregar.
+\plabel{Resultado esperado} Éxito solo en secuencia permitida; rechazo sin cambios en estado inválido.
+\plabel{Resultado obtenido} Rechazo previo; estado, guía y entrega correctos; VENTAS no despacha.
+\plabel{Método y evidencia} \ruta{LogisticaTests.P09_BodegaDespachaEntregaYConsultaGuiaSoloTrasPago}. \ruta{LogisticaTests.P09}; cierre fase 4, captura 17.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P10}\quad\textsf{COMPLETO}
+\plabel{Descripción} Persistencia después de reiniciar.
+\plabel{Precondiciones y entrada} Cerrar y reabrir sobre misma SQLite.
+\plabel{Resultado esperado} Información persiste en SQLite y coincide con operaciones anteriores.
+\plabel{Resultado obtenido} Pedido, pago, stock y traza preservados; comprobación posterior al reembolso.
+\plabel{Método y evidencia} Capturas originales 04–06, captura de cierre 11 y consulta de solo lectura 02. Fase 4 04–06 y SQLite 03/08; usuario-devolucion-\ruta{reabierta.png}.
+\end{minipage}\par
+\subsection*{Patrones creacionales}
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P11}\quad\textsf{COMPLETO}
+\plabel{Descripción} Factory Method por canal.
+\plabel{Precondiciones y entrada} Procesar evento por EMAIL y SMS en bases separadas.
+\plabel{Resultado esperado} Cada creador retorna notificador concreto y registra el aviso correcto.
+\plabel{Resultado obtenido} Registro del canal, tipo y contenido característico.
+\plabel{Método y evidencia} \ruta{OutboxComercialTests.P11_P30_CanalElegidoYTresObservadoresRecibenUnEvento}. \ruta{OutboxComercialTests.P11_P30}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P12}\quad\textsf{COMPLETO}
+\plabel{Descripción} Abstract Factory de entregas.
+\plabel{Precondiciones y entrada} Resolver estándar y exprés.
+\plabel{Resultado esperado} Tarifas 5/12 y plazos 3/1 días; guías coherentes con la familia.
+\plabel{Resultado obtenido} 5/12, 3/1 y guías de su propia familia.
+\plabel{Método y evidencia} \ruta{OperacionesComercialesTests.P12_FabricaProduceFamiliaCoherente}. \ruta{OperacionesComercialesTests.P12}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P13}\quad\textsf{COMPLETO}
+\plabel{Descripción} Builder de pedido.
+\plabel{Precondiciones y entrada} Crear pedido sin líneas, con cliente inexistente y de varios renglones.
+\plabel{Resultado esperado} Incompleto rechazado; completo crea agregado válido.
+\plabel{Resultado obtenido} Dos rechazos y agregado válido (subtotal 67.00).
+\plabel{Método y evidencia} \ruta{OperacionesComercialesTests.ABMCatalogoClientesYBorradoresPreservaInstantaneas}. \ruta{OperacionesComercialesTests.ABMCatalogoClientesYBorradoresPreservaInstantaneas}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P14}\quad\textsf{COMPLETO}
+\plabel{Descripción} Prototype de borrador.
+\plabel{Precondiciones y entrada} Clonar borrador con kit anidado dos veces, editar una copia.
+\plabel{Resultado esperado} Copia profunda; plantilla/copia previa permanecen intactas.
+\plabel{Resultado obtenido} Identidades nuevas y snapshot aislado de plantilla y otra copia.
+\plabel{Método y evidencia} \ruta{PatronesBorradorTests.P14_ClonaInstantaneaDeKitSinIdentidadesYPermiteEdicionIndependiente}. \ruta{PatronesBorradorTests.P14}; fase 4, captura 16.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P15}\quad\textsf{COMPLETO}
+\plabel{Descripción} Singleton de métricas.
+\plabel{Precondiciones y entrada} Dos ámbitos y dos vistas; duplicar 50 eventos en paralelo.
+\plabel{Resultado esperado} Misma instancia compartida, contadores observables y thread-safe.
+\plabel{Resultado obtenido} Identidad única; total 50; mismo contador visible en Panel y Auditoría.
+\plabel{Método y evidencia} TRX focalizado y capturas originales 06–07. \ruta{MetricasSesionTests.P15}; \ruta{OutboxComercialTests.P37}; fase 4, capturas 06–07.
+\end{minipage}\par
+\subsection*{Patrones estructurales}
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P16}\quad\textsf{COMPLETO}
+\plabel{Descripción} Adapter y sustitución del proveedor.
+\plabel{Precondiciones y entrada} Resolver legado y alterno con el mismo contrato.
+\plabel{Resultado esperado} Cobros desde ambos con mismo contrato; legado intacto.
+\plabel{Resultado obtenido} Ambos aprueban 5.21, repiten resultado y rechazan importes inválidos.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P16_AmbosProveedoresCompartenContrato}. \ruta{ConfirmacionTests.P16}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P17}\quad\textsf{COMPLETO}
+\plabel{Descripción} Bridge de comprobantes.
+\plabel{Precondiciones y entrada} Emitir venta y devolución por VistaPrevia y ArchivoTXT.
+\plabel{Resultado esperado} Cuatro combinaciones; VistaPrevia visible y TXT real.
+\plabel{Resultado obtenido} Cuatro combinaciones; contenido de venta 59.00 y devolución 54.00.
+\plabel{Método y evidencia} \ruta{ComprobantesTests.BridgeEntregaVentaYDevolucionACadaUnoDeLosDosMedios}. \ruta{ComprobantesTests.BridgeEntregaVentaYDevolucionACadaUnoDeLosDosMedios}; TXT y registro visual de fase 3.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P18}\quad\textsf{COMPLETO}
+\plabel{Descripción} Composite de catálogo.
+\plabel{Precondiciones y entrada} Kits oficiales y ciclos directo e indirecto.
+\plabel{Resultado esperado} Precios 50/60; expansión correcta; ciclo rechazado.
+\plabel{Resultado obtenido} 50/60, hojas P01/P02/P03, rechazo de ciclos.
+\plabel{Método y evidencia} \ruta{CatalogoTests}, \ruta{InicializacionTests}, \ruta{RestriccionesSqliteTests}. \ruta{InicializacionTests.P01}; CatalogoTests; RestriccionesSqliteTests.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P19}\quad\textsf{COMPLETO}
+\plabel{Descripción} Decorator y trazas de cobro.
+\plabel{Precondiciones y entrada} Cobro autorizado aprobado, rechazado y argumento inválido.
+\plabel{Resultado esperado} LOG de inicio y fin/error rodea la ejecución, no altera resultado.
+\plabel{Resultado obtenido} Orden INICIO $\to$ PASARELA $\to$ FIN o ERROR; correlación y resultados.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P06_P19_RechazoMantieneValidadoYRegistraTrazaEnOrden; P16_AmbosProveedoresCompartenContrato}. \ruta{ConfirmacionTests.P06_P19} y P16.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P20}\quad\textsf{COMPLETO}
+\plabel{Descripción} Facade y fallo de persistencia.
+\plabel{Precondiciones y entrada} Forzar FK inválida en Outbox antes del commit.
+\plabel{Resultado esperado} Operación consistente; ninguna persistencia parcial indebida.
+\plabel{Resultado obtenido} Pedido VALIDADO; pago, stock, movimientos y evento sin efectos parciales.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P20_FalloDePersistenciaReviertePagoEstadoMovimientosYEvento}. \ruta{ConfirmacionTests.P20}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P21}\quad\textsf{COMPLETO}
+\plabel{Descripción} Flyweight de metadatos.
+\plabel{Precondiciones y entrada} 1.000 filas con cinco SKU, mismo orden y datos extrínsecos.
+\plabel{Resultado esperado} ReferenceEquals true; identidad y memoria documentadas.
+\plabel{Resultado obtenido} ReferenceEquals, 5/1.000 objetos y 56.752/104.024 bytes asignados en medición original.
+\plabel{Método y evidencia} \ruta{FlyweightTests.P21_MilRenglonesCompartenCincoInstanciasYMidenAsignaciones}. \ruta{FlyweightTests.P21}; fase 4, captura 10; protocolo fase 3.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P22}\quad\textsf{COMPLETO}
+\plabel{Descripción} Proxy y roles restringidos.
+\plabel{Precondiciones y entrada} CONSULTA y BODEGA intentan cobrar.
+\plabel{Resultado esperado} Rechazo antes de Decorator/Adapter; sin cobro ni LOG de cobro.
+\plabel{Resultado obtenido} Denegación anterior a log de pago y pasarela; solo auditoría de seguridad.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P22_ProxyDeniegaAntesDelDecoradorYDeLaPasarela}. \ruta{ConfirmacionTests.P22}.
+\end{minipage}\par
+\subsection*{Patrones comportamentales}
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P23}\quad\textsf{COMPLETO}
+\plabel{Descripción} Chain y orden de validación.
+\plabel{Precondiciones y entrada} Kit sin stock con cliente inactivo y, en el cotejo focalizado, cliente ausente al evaluar la cadena. Repetir con un cliente válido.
+\plabel{Resultado esperado} Se informa primera validación y luego la siguiente; sin ejecución de cobro.
+\plabel{Resultado obtenido} CLIENTE seguido de STOCK. La integración confirma ausencia de llamada al proveedor y de persistencia parcial. El cotejo focalizado reprodujo el mismo orden con cliente ausente.
+\plabel{Método y evidencia} \ruta{OperacionesComercialesTests.P23_CadenaDetienePrimeroClienteYLuegoStock}. \ruta{OperacionesComercialesTests.P23}, validación y fachada. \ruta{cotejo-p23.trx} y \ruta{P23CotejoDocumental.cs}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P24}\quad\textsf{COMPLETO}
+\plabel{Descripción} Command con origen intercambiable.
+\plabel{Precondiciones y entrada} Ana VIP, teletrabajo $\times$1 estándar por botón e invocador de prueba.
+\plabel{Resultado esperado} Mismo comando y resultado funcional; historial de invocación.
+\plabel{Resultado obtenido} ConfirmarPedidoCommand / LEGADO; 60$-$6+5=59 y auditoría de éxito.
+\plabel{Método y evidencia} \ruta{OutboxComercialTests.CommandInvocaYRegistraExitoYRechazo}. \ruta{OutboxComercialTests.P24}; recorrido P24 en evidencia de fase 3 y TXT de venta.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P25}\quad\textsf{COMPLETO}
+\plabel{Descripción} Interpreter y coincidencia.
+\plabel{Precondiciones y entrada} ESTADO = PAGADO AND TOTAL >= 50.
+\plabel{Resultado esperado} Devuelve únicamente pedidos que cumplen el filtro.
+\plabel{Resultado obtenido} Solo pedidos coincidentes, con pago persistido.
+\plabel{Método y evidencia} \ruta{FiltroPedidosTests.P25_FiltraSobreEstadosYMontosPersistidos}. \ruta{FiltroPedidosTests.P25}; recorrido de fase 4.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P26}\quad\textsf{COMPLETO}
+\plabel{Descripción} Interpreter y sintaxis.
+\plabel{Precondiciones y entrada} Sintaxis errónea, paréntesis y AND/OR.
+\plabel{Resultado esperado} Error legible sin SQL concatenado; precedencia correcta.
+\plabel{Resultado obtenido} Error con columna y precedencia; árbol tipado; consulta segura.
+\plabel{Método y evidencia} \ruta{FiltroPedidosTests.P26_AndPrecedeAOrYLosParentesisCambianLaSemantica; P26_SyntaxInvalidaDaUnaColumnaYMensaje}. \ruta{FiltroPedidosTests.P26}; cierre fase 4, captura 20.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P27}\quad\textsf{COMPLETO}
+\plabel{Descripción} Iterator de hojas físicas.
+\plabel{Precondiciones y entrada} Iterar teletrabajo y caso con ramas compartidas.
+\plabel{Resultado esperado} P01, P02, P03 una vez por unidad requerida, sin bucle.
+\plabel{Resultado obtenido} Tres SKU en orden determinista y multiplicadores correctos.
+\plabel{Método y evidencia} \ruta{RecorridosCatalogoTests.P27_P34_ConsultaRealDelKitOficial}. \ruta{RecorridosCatalogoTests.P27_P34} e IteratorEsDeterminista.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P28}\quad\textsf{COMPLETO}
+\plabel{Descripción} Mediator y refresco de vistas.
+\plabel{Precondiciones y entrada} Confirmar y revisar catálogo, pedidos y métricas.
+\plabel{Resultado esperado} Catálogo, pedidos y métricas se refrescan sin acoplamiento directo.
+\plabel{Resultado obtenido} Stock 7/4/19, PAGADO y ventas brutas recalculadas; métricas de suscriptores tras reproceso.
+\plabel{Método y evidencia} \ruta{MediadorComercialTests.ConfirmacionRefrescaCincoColaboradoresSobreElEstadoConfirmado}. \ruta{MediadorComercialTests.ConfirmacionRefrescaCincoColaboradoresSobreElEstadoConfirmado}; recorrido de fase 3.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P29}\quad\textsf{COMPLETO}
+\plabel{Descripción} Memento y edición reversible.
+\plabel{Precondiciones y entrada} Tres ediciones, dos deshacer y un rehacer, luego pagar.
+\plabel{Resultado esperado} Se restauran borradores completos; no se deshace un pago.
+\plabel{Resultado obtenido} Snapshots restaurados, límite cinco y pago no reversible.
+\plabel{Método y evidencia} \ruta{PatronesBorradorTests.P29_DeshacerYRehacerRestauraYElPagoCierraElHistorial}. \ruta{PatronesBorradorTests.P29}; fase 4, captura 17.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P30}\quad\textsf{COMPLETO}
+\plabel{Descripción} Observer y deduplicación.
+\plabel{Precondiciones y entrada} Tres suscriptores para compra confirmada; reintentar y provocar rollback.
+\plabel{Resultado esperado} Notificación, auditoría y métrica actualizadas una vez.
+\plabel{Resultado obtenido} Aviso, métrica y auditoría por suscriptor; sin duplicados ni evento exitoso de rollback.
+\plabel{Método y evidencia} \ruta{OutboxComercialTests.P11_P30_CanalElegidoYTresObservadoresRecibenUnEvento; ConfirmacionTests.P20_FalloDePersistenciaReviertePagoEstadoMovimientosYEvento}. \ruta{OutboxComercialTests.P11_P30} y P37; \ruta{ConfirmacionTests.P20}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P31}\quad\textsf{COMPLETO}
+\plabel{Descripción} State y transiciones.
+\plabel{Precondiciones y entrada} Ciclo completo y cancelar pagado.
+\plabel{Resultado esperado} Transiciones con reglas por estado, sin escritura directa.
+\plabel{Resultado obtenido} Transiciones permitidas y rechazo de repetición, retroceso y cancelación pagada.
+\plabel{Método y evidencia} \ruta{PedidoTests.StateRegistraSoloTransicionesAutorizadasPorElEstado}, \ruta{StatePermiteCancelarBorradorOValidado}. \ruta{PedidoTests.StateRegistraSoloTransicionesAutorizadasPorElEstado}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P32}\quad\textsf{COMPLETO}
+\plabel{Descripción} Strategy y prioridad.
+\plabel{Precondiciones y entrada} Promociones normal, VIP, mayorista y extensión registrada.
+\plabel{Resultado esperado} Descuentos 6/15/0; extensión sin editar la calculadora central.
+\plabel{Resultado obtenido} 6/15/0, un descuento, prioridad y redondeo decimal.
+\plabel{Método y evidencia} \ruta{OperacionesComercialesTests.PromocionYUmbralFisico; P32_StrategyAdmiteExtensionYRedondeaMitadHaciaFuera}. \ruta{OperacionesComercialesTests.P32} y PromocionYUmbralFisico.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P33}\quad\textsf{COMPLETO}
+\plabel{Descripción} Template Method y plazos.
+\plabel{Precondiciones y entrada} DEFECTO día 20 y ARREPENTIMIENTO día 10 en pedidos entregados.
+\plabel{Resultado esperado} Defecto aceptado; arrepentimiento rechazado sin reembolso/stock.
+\plabel{Resultado obtenido} Aceptación y rechazo según plazo; rechazo sin reintegro ni reembolso.
+\plabel{Método y evidencia} \ruta{LogisticaTests.P33_PoliticasDePlazoYCondicion}. \ruta{LogisticaTests.P33}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P34}\quad\textsf{COMPLETO}
+\plabel{Descripción} Visitor y peso logístico.
+\plabel{Precondiciones y entrada} Visitar kit teletrabajo.
+\plabel{Resultado esperado} Detalle P01/P02/P03; peso total 1.00 kg.
+\plabel{Resultado obtenido} P01/P02/P03 y 1.00 kg; multiplicidad $\times$3 también cubierta.
+\plabel{Método y evidencia} \ruta{RecorridosCatalogoTests.P27_P34_ConsultaRealDelKitOficial}. \ruta{RecorridosCatalogoTests.P27_P34}; fase 4, captura 09.
+\end{minipage}\par
+\subsection*{Integridad, recuperación y arquitectura}
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P35}\quad\textsf{COMPLETO}
+\plabel{Descripción} Devolución y reintegro únicos.
+\plabel{Precondiciones y entrada} Devolver por defecto y repetir tras reabrir.
+\plabel{Resultado esperado} Para Ana: USD 54.00 de reembolso sin flete; un solo reintegro y devolución única.
+\plabel{Resultado obtenido} 54.00 sin flete, una devolución, tres reintegros, rechazo de duplicado y auditoría.
+\plabel{Método y evidencia} TRX focalizado y capturas de WinForms aportadas por el usuario después de confirmar y reabrir. \ruta{LogisticaTests.P35}; capturas usuario-inventario, usuario-devolucion y usuario-auditoria.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P36}\quad\textsf{COMPLETO}
+\plabel{Descripción} Dos cobros concurrentes.
+\plabel{Precondiciones y entrada} Dos confirmaciones en conexiones distintas, stock inicial ajustado a 1.
+\plabel{Resultado esperado} Máximo un cobro aprobado; stock no negativo; sin sobreventa.
+\plabel{Resultado obtenido} Un pago, un evento, una llamada a pasarela y stock final 0.
+\plabel{Método y evidencia} \ruta{ConfirmacionTests.P36_DosConfirmacionesCompitenPorUnaUnidad}. \ruta{ConfirmacionTests.P36}.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P37}\quad\textsf{COMPLETO}
+\plabel{Descripción} Reinicio y recuperación de Outbox.
+\plabel{Precondiciones y entrada} Fallo de aviso, reiniciar host sobre la misma base, reintentar.
+\plabel{Resultado esperado} Evento pendiente se recupera, se marca procesado una vez y sin duplicar cobro.
+\plabel{Resultado obtenido} Intentos 1$\to$2, pendiente$\to$procesado, sin pago ni aviso duplicado.
+\plabel{Método y evidencia} TRX focalizado, capturas originales 02/06 y consultas originales 03/08. \ruta{OutboxComercialTests.P37}; fase 4, capturas 02/06.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{\large P38}\quad\textsf{COMPLETO}
+\plabel{Descripción} Build limpio y contratos.
+\plabel{Precondiciones y entrada} Compilar desde artefactos nuevos y sustituir puertos y proveedor.
+\plabel{Resultado esperado} Reemplazo de proveedor, contratos segregados, referencias correctas y 25 pruebas automatizadas aprobadas.
+\plabel{Resultado obtenido} 119 pruebas, 0 errores/advertencias; referencias, ISP, DIP y LSP.
+\plabel{Método y evidencia} TRX final, TRX focalizado y build de cierre. ContratosEscritorioTests; ReferenciasTests; \ruta{ConfirmacionTests.P16}; TRX final.
+\end{minipage}\par
+
+

@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.1466666666666665cm] (o) at (2.783333333333333,0) {\textbf{Procesador\allowbreak{}Outbox\allowbreak{}Sqlite}\\[2pt]{\color{lgmuted}\footnotesize ProcesarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (pub) at (7.550000000000001,0) {\textbf{Publicador\allowbreak{}Eventos}\\[2pt]{\color{lgmuted}\footnotesize PublicarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (i) at (12.316666666666666,0) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{IObservador\allowbreak{}Evento}\\[2pt]{\color{lgmuted}\footnotesize RecibirAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (av) at (2.783333333333333,-1.55) {\textbf{Observador\allowbreak{}Avisos}};
+\node[lgBox,text width=4.1466666666666665cm] (met) at (7.550000000000001,-1.55) {\textbf{Observador\allowbreak{}Metricas}};
+\node[lgBox,text width=4.1466666666666665cm] (au) at (12.316666666666666,-1.55) {\textbf{Observador\allowbreak{}Auditoria}};
+\draw[lgCall] (o.east) -- (pub.west);
+\draw[lgAssoc] (pub.east) -- (i.west);
+\draw[lgReal] (av.north) |- (2.78,-.79) -|  (i.south west);
+\draw[lgReal] (met.north) |- (7.55,-1.03) -|  (i.south);
+\draw[lgReal] (au.north) -- (i.south east);
+\node[lgNote] at (7.55,-2.55) {Los tres observadores implementan IObservadorEvento. IEntregaDurable delimita la entrega.};
+\end{tikzpicture}

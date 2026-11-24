@@ -1,0 +1,138 @@
+\clearpage
+\subsubsection{Interfaz Windows Forms y comprobaciones funcionales}
+Las doce vistas siguen las operaciones de los wireframes de las páginas 11--16 de la guía. Los formularios muestran datos de Application y protegen visualmente las acciones. La autorización decisiva se verifica en el caso de uso. Las capturas corresponden a ejecuciones reales y se identifican por recorrido. El manifiesto de evidencias relaciona cada archivo con su origen. Algunas se tomaron en fases previas al último ajuste DPI; se usan para documentar la operación observada.
+
+\paragraph{1. Acceso}
+\plabel{Objetivo} Volver a identificar al operador o finalizar la sesión local.
+\plabel{Controles} Usuario, contraseña enmascarada, acción de acceso y mensaje junto al campo.
+\plabel{Permisos} Antes de autenticar no hay rol operativo. Cada una de las cuatro cuentas se vincula a su rol.
+\plabel{Servicios} \ruta{AutenticacionLocal.IniciarAsync}; \ruta{SesionLocal}.
+\plabel{Patrones y decisiones} Autenticación y autorización por operación.
+\plabel{Comprobación} Se observó el acceso centrado y la vuelta al formulario al cerrar sesión. El usuario confirmó ingreso con las cuatro cuentas. La captura es del formulario de producción, sin credenciales expuestas. Véase la Figura~\ref{fig:acceso}.
+\vistafig{acceso.jpg}{acceso}{10.1cm}{Formulario de acceso a 96 DPI.}
+
+\clearpage
+\paragraph{2. Panel general}
+\plabel{Objetivo} Recuperar el estado de pedidos, ventas, stock bajo y eventos pendientes.
+\plabel{Controles} Tarjetas, tabla de pedidos recientes y acceso al pedido seleccionado.
+\plabel{Permisos} Cualquier sesión habilitada puede consultar.
+\plabel{Servicios} \ruta{ConsultarEscritorio.ResumenAsync}.
+\plabel{Patrones y decisiones} Singleton, Mediator y Observer.
+\plabel{Comprobación} Se observó Ana, el estado y el total de USD 59.00 después de reabrir. La comparación de métricas entre Panel y Auditoría se detalla en P15. Véase la Figura~\ref{fig:panel}.
+\vistafig{panel.jpg}{panel}{10.1cm}{Panel general con datos del escenario comercial de demostración.}
+
+\clearpage
+\paragraph{3. Catálogo y kits}
+\plabel{Objetivo} Buscar SKU y mantener productos, kits y sus componentes.
+\plabel{Controles} Buscador, tablas, edición, desglose del kit y acción para medir 1.000 filas.
+\plabel{Permisos} Consulta para el rol autenticado. Mantenimiento reservado a ADMIN.
+\plabel{Servicios} \ruta{AdministrarCatalogo}; \ruta{ConsultarCatalogoVisual.DemostrarAsync}; \ruta{ConsultarEscritorio.KitsAsync}.
+\plabel{Patrones y decisiones} Composite, Iterator, Visitor y Flyweight.
+\plabel{Comprobación} El kit anidado devolvió P01/P02/P03 y 1.00 kg. Se modificó el precio de P01 y se comparó con el pedido ya pagado. La acción de edición quedó inhabilitada con VENTAS. Véase la Figura~\ref{fig:catalogo}.
+\vistafig{catalogo.jpg}{catalogo}{10.1cm}{Desglose real de KIT\_TELETRABAJO y sus componentes físicos.}
+
+\clearpage
+\paragraph{4. Gestión de clientes}
+\plabel{Objetivo} Buscar, registrar y editar clientes por identificación o nombre.
+\plabel{Controles} Buscador, tabla, ficha de cliente y acciones Nuevo/Editar.
+\plabel{Permisos} ADMIN y VENTAS gestionan clientes. Los otros roles quedan sujetos al permiso de lectura.
+\plabel{Servicios} \ruta{AdministrarClientes.BuscarAsync}; \ruta{AdministrarClientes}.
+\plabel{Patrones y decisiones} Segregación entre consulta y escritura y autorización en Application.
+\plabel{Comprobación} Se observó navegación de Buscar cliente al botón Buscar y ficha de Ana VIP. La prueba de operaciones comerciales cubre la escritura y el uso del cliente en el pedido. Véase la Figura~\ref{fig:clientes}.
+\vistafig{clientes.jpg}{clientes}{10.1cm}{Búsqueda y datos de cliente con sesión VENTAS.}
+
+\clearpage
+\paragraph{5. Carrito y borradores}
+\plabel{Objetivo} Crear pedidos, editar líneas y conservar snapshots.
+\plabel{Controles} Selectores de pedido, cliente, entrega y SKU; cantidad; edición, clonado, deshacer, rehacer y validación.
+\plabel{Permisos} ADMIN y VENTAS pueden editar y validar. El agregado impide los cambios fuera de BORRADOR.
+\plabel{Servicios} \ruta{AdministrarPedidos}; \ruta{AdministrarCatalogo}; \ruta{ConsultarEscritorio.DetalleAsync}.
+\plabel{Patrones y decisiones} Builder, Prototype, Memento, Composite y Mediator.
+\plabel{Comprobación} La copia recibió una identidad nueva. La cantidad cambió 1 a 2 y luego volvió a 1 y a 2 mediante deshacer y rehacer. El cliente y los precios del original se conservaron. Véase la Figura~\ref{fig:carrito}.
+\vistafig{carrito.jpg}{carrito}{10.1cm}{Restauración de líneas en un borrador durante el recorrido de Memento.}
+
+\clearpage
+\paragraph{6. Pedidos e historial}
+\plabel{Objetivo} Consultar pedidos, estados y precio histórico, y cancelar cuando corresponda.
+\plabel{Controles} Filtro por estado, tabla de pedidos, detalle, historial y acción Cancelar.
+\plabel{Permisos} Consulta por roles autenticados. ADMIN y VENTAS cancelan en un estado permitido.
+\plabel{Servicios} \ruta{ConsultarReportePedidos.EjecutarAsync}; \ruta{ConsultarEscritorio.DetalleAsync}; \ruta{OperacionesPedido.CancelarAsync}.
+\plabel{Patrones y decisiones} State, Interpreter, Command y Mediator.
+\plabel{Comprobación} La captura documenta protección del pedido pagado. P08 verifica denegación de edición/cancelación y preservación del importe, pago e historial tras cambiar el precio de catálogo. Véase la Figura~\ref{fig:pedidos}.
+\vistafig{pedidos.jpg}{pedidos}{10.1cm}{Pedido pagado y protección del histórico.}
+
+\clearpage
+\paragraph{7. Confirmación y cobro}
+\plabel{Objetivo} Mostrar cifras, seleccionar un simulador y confirmar el pago de un pedido válido.
+\plabel{Controles} Tabla de órdenes, selector de proveedor, resumen y diálogo de confirmación.
+\plabel{Permisos} ADMIN y VENTAS pueden cobrar. BODEGA y CONSULTA reciben denegación en Application.
+\plabel{Servicios} \ruta{ConsultarEscritorio.DetalleAsync}; \ruta{OperacionesPedido.ConfirmarAsync}.
+\plabel{Patrones y decisiones} Command, Facade, Chain, Proxy, Decorator, Adapter, Strategy y Abstract Factory.
+\plabel{Comprobación} Con Ana se ejecutó el cobro simulado por USD 59.00. Con BODEGA la acción quedó inactiva y legible. P22 comprueba la denegación efectiva y ausencia de llamadas al proveedor. Véase la Figura~\ref{fig:cobro}.
+\vistafig{cobro.jpg}{cobro}{10.1cm}{Resumen de cobro visible con la acción de confirmación inhabilitada para BODEGA.}
+
+\clearpage
+\paragraph{8. Despacho y entrega}
+\plabel{Objetivo} Emitir una guía, registrar entrega y consultar seguimiento.
+\plabel{Controles} Selector de pedido, guía, plazo, historial y botones de despacho/entrega.
+\plabel{Permisos} ADMIN y BODEGA escriben despacho/entrega. VENTAS y CONSULTA solo acceden a las consultas permitidas.
+\plabel{Servicios} \ruta{DespacharPedidos.ConsultarAsync}; \ruta{OperacionesPedido.DespacharAsync}; \ruta{DespacharPedidos.EntregarAsync}.
+\plabel{Patrones y decisiones} State, Abstract Factory, Command y Mediator.
+\plabel{Comprobación} Se registró una guía ESTÁNDAR de tres días y se observó el estado ENTREGADO. P09 prueba rechazo antes del pago y no autorización de VENTAS. Véase la Figura~\ref{fig:despacho}.
+\vistafig{despacho.jpg}{despacho}{10.1cm}{Guía emitida y seguimiento del pedido entregado.}
+
+\clearpage
+\paragraph{9. Devoluciones}
+\plabel{Objetivo} Consultar elegibilidad y registrar el reembolso total sin flete.
+\plabel{Controles} Selector de motivo, casilla de producto sin uso, Validar política, Confirmar devolución y tarjeta de importe.
+\plabel{Permisos} La devolución solo se registra con ADMIN. Application verifica el rol y la política.
+\plabel{Servicios} \ruta{AdministrarDevoluciones.PrevisualizarAsync}; \ruta{OperacionesPedido.DevolverAsync}.
+\plabel{Patrones y decisiones} Template Method, Command, State y Observer vía Outbox.
+\plabel{Comprobación} La captura aportada por el usuario muestra devolución registrada tras reabrir, cobro USD 59.00 y reembolso USD 54.00. Se observaron controles inactivos ante una segunda devolución. P35 comprueba unicidad también en SQLite. Véase la Figura~\ref{fig:devoluciones}.
+\vistafig{devoluciones.png}{devoluciones}{10.1cm}{Devolución de Ana leída tras reiniciar. El importe excluye USD 5.00 de flete.}
+
+\clearpage
+\paragraph{10. Inventario y movimientos}
+\plabel{Objetivo} Consultar stock y trazabilidad de movimientos por SKU.
+\plabel{Controles} Buscador, tabla de stock, tabla de movimientos y registrar ajuste.
+\plabel{Permisos} Roles autenticados consultan. ADMIN registra ajustes.
+\plabel{Servicios} \ruta{AdministrarCatalogo.AjustarAsync}; \ruta{ConsultarEscritorio.MovimientosAsync}.
+\plabel{Patrones y decisiones} Iterator en consultas de kits y Mediator en actualización de la vista.
+\plabel{Comprobación} Los tres SKU de Ana mostraron movimientos de venta −1 y devolución +1. Al finalizar, P01/P02/P03 recuperaron 8/5/20. CONSULTA vio la operación de ajuste inactiva en el cierre de fase. Véase la Figura~\ref{fig:inventario}.
+\vistafig{inventario.png}{inventario}{10.1cm}{Captura del usuario con los saldos reintegrados y los seis movimientos relacionados.}
+
+\clearpage
+\paragraph{11. Reportes y comprobantes}
+\plabel{Objetivo} Consultar pedidos por período o expresión y emitir un documento interno.
+\plabel{Controles} Rango temporal, filtro de expresiones, tabla, tipo, vista previa y Guardar TXT.
+\plabel{Permisos} Consulta y emisión interna sujetas al permiso Consultar.
+\plabel{Servicios} \ruta{ConsultarReportePedidos}; \ruta{EmitirComprobantes.EjecutarAsync}; \ruta{IFabricaArchivoTxt}.
+\plabel{Patrones y decisiones} Interpreter y Bridge.
+\plabel{Comprobación} Un filtro por estado PAGADO y total mínimo recuperó a Ana. Se generó vista previa de USD 59.00 y un TXT real. La prueba P17 cubre venta y devolución en ambos medios. Véase la Figura~\ref{fig:reportes}.
+\vistafig{reportes.jpg}{reportes}{10.1cm}{Vista previa de un comprobante interno de venta.}
+
+\clearpage
+\paragraph{12. Auditoría, métricas y demostración}
+\plabel{Objetivo} Revisar operaciones, indicadores de sesión y eventos pendientes.
+\plabel{Controles} Tarjetas, filtro de categoría, tablas de auditoría y Outbox, selector de canal y controles de simulación/reproceso.
+\plabel{Permisos} Auditoría y demostración reservadas a ADMIN. Los fallos inducidos requieren modo demostración.
+\plabel{Servicios} \ruta{ConsultarEscritorio}; \ruta{ControlDemostracion.AplicarAsync}; \ruta{ReprocesarEventos.EjecutarAsync}.
+\plabel{Patrones y decisiones} Observer, Factory Method, Singleton y Mediator.
+\plabel{Comprobación} La captura del usuario registra confirmación y devolución aprobadas en la misma referencia. P37 y las capturas complementarias documentan un fallo y su recuperación en un segundo intento. Véase la Figura~\ref{fig:auditoria}.
+\vistafig{auditoria.png}{auditoria}{10.1cm}{Auditoría de comandos de pago y devolución de Ana en demostración.}
+
+\clearpage
+\paragraph{Cotejo de DPI, foco y accesibilidad}\label{sec:dpi}
+A 96 DPI se verificaron acceso, panel y auditoría, incluida la distribución maximizada y foco representativo. Al 125\,\% se observó \ruta{DeviceDpi=120} en la versión auditada y se abrieron las doce vistas en ventana normal y maximizada. Los dos rótulos largos se leen completos. Se observó el avance por TAB de Buscar cliente a Buscar y el borde de foco. Las vistas largas se alcanzan mediante desplazamiento, aunque algunas celdas largas usan elipsis en ventana normal.
+
+\vistafig{dpi125-foco.jpg}{dpi-foco}{9.1cm}{Foco de teclado visible en Buscar, con la interfaz a 120 DPI.}
+La Figura~\ref{fig:dpi-foco} documenta el control activo. Este recorrido representa la navegación en esa vista.
+
+\clearpage
+Los JPEG archivados a 120 DPI muestran las cuatro cifras de Auditoría en ventana normal, maximizada y al volver a la vista. La bitácora de ejecución registró una omisión que no se reproduce al examinar los píxeles de esos archivos. Falta confirmar físicamente si el efecto aparece durante la navegación. El 150\,\% (144 DPI) tras la corrección sigue NO VERIFICADO. Las capturas del error previo muestran el motivo de la corrección, pero se requiere evidencia posterior.
+
+\vistafig{dpi125-reentrada.jpg}{dpi-normal}{6.55cm}{Reentrada en Auditoría a 120 DPI. El JPEG conserva los valores 0, 0, 0 y 3.}
+\vistafig{dpi125-max.jpg}{dpi-max}{6.55cm}{Auditoría maximizada a 120 DPI, con los cuatro valores visibles.}
+Las Figuras~\ref{fig:dpi-normal} y \ref{fig:dpi-max} documentan las capturas. RNF03 sigue PARCIAL. Véase \ruta{evidencias/cotejo-dpi.md}.
+
+

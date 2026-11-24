@@ -1,0 +1,31 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgHeading] at (3.7,0.58) {Catálogo y movimientos};
+\node[lgHeading] at (11.15,0.58) {Pedidos y eventos};
+\node[lgBox,text width=2.9cm] (product) at (2,0) {\textbf{Producto}\\[2pt]{\color{lgmuted}\footnotesize SKU único}};
+\node[lgBox,text width=2.85cm] (kit) at (5.55,0) {\textbf{Kit}\\[2pt]{\color{lgmuted}\footnotesize SKU único}};
+\node[lgBox,text width=2.9cm] (inv) at (2,-1.31) {\textbf{Movimiento\allowbreak{}Inventario}\\[2pt]{\color{lgmuted}\footnotesize FK ProductoId}};
+\node[lgBox,text width=2.85cm] (kc) at (5.55,-1.63) {\textbf{Kit\allowbreak{}Componente}\\[2pt]{\color{lgmuted}\footnotesize FK KitId\\ProductoId o KitHijoId}};
+\node[lgBox,text width=2.85cm] (client) at (9.1,0) {\textbf{Cliente}\\[2pt]{\color{lgmuted}\footnotesize Identificación única}};
+\node[lgBox,text width=3.25cm] (order) at (13.03,0) {\textbf{Pedido}\\[2pt]{\color{lgmuted}\footnotesize FK ClienteId}};
+\node[lgBox,text width=3.1cm] (d) at (9.1,-1.3) {\textbf{Pedido\allowbreak{}Detalle}\\[2pt]{\color{lgmuted}\footnotesize FK PedidoId}};
+\node[lgBox,text width=3.25cm] (ops) at (13.03,-1.54) {\textbf{Pago · Despacho\\Devolucion}\\[2pt]{\color{lgmuted}\footnotesize PedidoId único por tabla}};
+\node[lgBox,text width=3.1cm] (dc) at (9.1,-2.85) {\textbf{Pedido\allowbreak{}Detalle\\Componente}\\[2pt]{\color{lgmuted}\footnotesize FK PedidoDetalleId}};
+\node[lgBox,text width=3.25cm] (ev) at (13.03,-3.02) {\textbf{Evento\allowbreak{}Outbox}\\[2pt]{\color{lgmuted}\footnotesize FK PedidoId}};
+\node[lgBox,text width=2.9cm] (u) at (2,-3.21) {\textbf{Usuario}\\[2pt]{\color{lgmuted}\footnotesize Nombre único}};
+\node[lgBox,text width=2.9cm] (audit) at (2,-4.55) {\textbf{Auditoria}\\[2pt]{\color{lgmuted}\footnotesize FK UsuarioId}};
+\node[lgBox,text width=5.18cm] (hist) at (7.22,-4.55) {\textbf{Historial\allowbreak{}Pedido}\\[2pt]{\color{lgmuted}\footnotesize FK PedidoId y UsuarioId}};
+\node[lgBox,text width=3.25cm] (del) at (13.03,-4.55) {\textbf{Entrega\allowbreak{}Evento}\\[2pt]{\color{lgmuted}\footnotesize PK EventoId + Suscriptor}};
+\draw[lgCall] (product.south) -- (inv.north);
+\draw[lgCall] (kit.south) -- (kc.north);
+\draw[lgCall] (product.east) -- (3.87,0) |-  (kc.west);
+\draw[lgCall] (client.east) -- (order.west);
+\draw[lgCall] (order.south west) |- (9.1,-.58)  -- (d.north);
+\draw[lgCall] (order.south) -- (ops.north);
+\draw[lgCall] (d.south) -- (dc.north);
+\draw[lgCall] (order.east) -- (15.35,0) |-  (ev.east);
+\draw[lgCall] (ev.south) -- (del.north);
+\draw[lgCall] (u.south) -- (audit.north);
+\draw[lgCall] (u.east) -- (4.1,-3.21) |-  (hist.west);
+\node[lgNote] at (7.55,-5.55) {Las flechas van de la tabla referenciada a la tabla con FK.\\HistorialPedido también referencia Pedido; KitHijoId vuelve a Kit.};
+\end{tikzpicture}
+

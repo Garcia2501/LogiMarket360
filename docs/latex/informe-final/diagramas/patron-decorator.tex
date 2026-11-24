@@ -1,0 +1,11 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (port) at (7.550000000000001,0) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{IPasarela\allowbreak{}Pago}\\[2pt]{\color{lgmuted}\footnotesize CobrarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (tr) at (2.783333333333333,-1.55) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{ITrazas\allowbreak{}Pago}\\[2pt]{\color{lgmuted}\footnotesize Anotar}};
+\node[lgBox,text width=4.1466666666666665cm] (de) at (7.550000000000001,-1.55) {\textbf{Auditoria\allowbreak{}Pago\allowbreak{}Decorator}\\[2pt]{\color{lgmuted}\footnotesize CobrarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (core) at (12.316666666666666,-1.55) {\textbf{Pasarela\allowbreak{}Legada\allowbreak{}Adapter}\\[2pt]{\color{lgmuted}\footnotesize CobrarAsync}};
+\draw[lgReal] (de.north) -- (port.south);
+\draw[lgReal] (core.north) -- (port.south east);
+\draw[lgAssoc] (de.west) -- (tr.east);
+\draw[lgDep] (de.east) -- (core.west);
+\node[lgNote] at (7.55,-2.55) {CobrarAsync envuelve a una IPasarelaPago: se muestra la selección legada.};
+\end{tikzpicture}

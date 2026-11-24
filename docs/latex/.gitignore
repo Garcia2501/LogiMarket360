@@ -1,0 +1,10 @@
+fontcache/
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.xdv
+main.pdf
+

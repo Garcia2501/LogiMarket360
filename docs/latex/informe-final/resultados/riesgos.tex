@@ -1,0 +1,93 @@
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R01}\quad\textsf{Mitigado}
+\plabel{Observación} Las versiones previas calculaban la valoración en \ruta{AdministrarPedidos} y \ruta{ConfirmacionPedidoFacade}. El diff elimina ambos ensamblajes.
+\plabel{Consecuencia} Cotización y cobro podían divergir al cambiar tarifas o descuentos.
+\plabel{Intervención} Extraer \ruta{ValorarPedido.Calcular}, \ruta{dd57d52}.
+\plabel{Archivos} \ruta{Application/Precios/ValorarPedido.cs}. \ruta{Application/Pedidos/AdministrarPedidos.cs}. \ruta{Application/Pagos/ConfirmacionPedidoFacade.cs}. \ruta{Infrastructure/Persistencia/RegistroPersistencia.cs}
+\plabel{Evidencia previa y posterior} Historial de fase 2 registra la selección posterior. P02–P04 y P32 volvieron a pasar. No se recuperó TRX de la ejecución anterior a la extracción.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R02}\quad\textsf{Mitigado}
+\plabel{Observación} Una revocación de sesión entre autorización inicial y Proxy perdía su auditoría al revertir.
+\plabel{Consecuencia} Denegación sin registro durable.
+\plabel{Intervención} Drenar denegaciones pendientes fuera de la transacción revertida, \ruta{c4eb737}.
+\plabel{Archivos} \ruta{Application/Seguridad/AutorizacionOperaciones.cs}. \ruta{Application/Pagos/ConfirmacionPedidoFacade.cs}. \ruta{Infrastructure/Persistencia/Repositorios/AuditoriaAcceso.cs}
+\plabel{Evidencia previa y posterior} Regresión registrada en \ruta{26df60e}; \ruta{RevocacionCobroTests} vuelve a pasar.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R03}\quad\textsf{Mitigado}
+\plabel{Observación} El formato compartido de moneda mostraba \ruta{USD N2} en vez de un número.
+\plabel{Consecuencia} Total y confirmación ilegibles.
+\plabel{Intervención} Aplicar formato \ruta{N2} al decimal y prefijar USD, \ruta{b326672}.
+\plabel{Archivos} \ruta{WinForms/Presentacion.cs}
+\plabel{Evidencia previa y posterior} Evidencia de fase 4 antes de la corrección; las capturas 04, 14 y las de auditoría actual muestran USD 59.00.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R04}\quad\textsf{Mitigado}
+\plabel{Observación} La barra lateral reservaba una columna invisible en el acceso.
+\plabel{Consecuencia} Formulario descentrado al salir o al abrir sin sesión.
+\plabel{Intervención} Liberar ancho al ocultar menú, \ruta{16cf118}.
+\plabel{Archivos} \ruta{WinForms/VentanaComercial.cs}
+\plabel{Evidencia previa y posterior} Cierre fase 4, capturas 01 $\to$ 03.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R05}\quad\textsf{Mitigado en 96 DPI}
+\plabel{Observación} A tamaño mínimo Carrito y Auditoría superponían elementos y truncaban estado e importe.
+\plabel{Consecuencia} Acciones por debajo del área navegable y filas difíciles de leer.
+\plabel{Intervención} Área desplazable, tamaño mínimo por columna y enfoque, \ruta{d952138}.
+\plabel{Archivos} \ruta{WinForms/Presentacion.cs}. \ruta{WinForms/VentanaComercial.cs}. \ruta{WinForms/VentanaComercial.Panel.cs}
+\plabel{Evidencia previa y posterior} Cierre fase 4, capturas 04–06 $\to$ 07–09 y 11.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R06}\quad\textsf{Mitigado}
+\plabel{Observación} Encabezado seleccionado con contraste insuficiente.
+\plabel{Consecuencia} Difícil identificar el campo activo.
+\plabel{Intervención} Fondo claro para encabezados seleccionados, \ruta{bb9e06d}.
+\plabel{Archivos} \ruta{WinForms/Presentacion.cs}
+\plabel{Evidencia previa y posterior} Imágenes de fase 4 previas $\to$ captura 23.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R07}\quad\textsf{Mitigado}
+\plabel{Observación} Acción principal deshabilitada conservaba fondo oscuro con texto inactivo.
+\plabel{Consecuencia} BODEGA tenía dificultad para leer el control de cobro bloqueado.
+\plabel{Intervención} Actualizar contraste en \ruta{Tema.Boton}, \ruta{3d7d51f}.
+\plabel{Archivos} \ruta{WinForms/Presentacion.cs}
+\plabel{Evidencia previa y posterior} Cierre 16 $\to$ 21. La prueba de autorización también confirma que el backend deniega.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R08}\quad\textsf{Parcial, bloqueante}
+\plabel{Observación} Tamaños fijos de navegación y tarjetas fallaron con texto aumentado.
+\plabel{Consecuencia} Rótulos y cifras recortados al 125 \% y al 150 \%.
+\plabel{Intervención} Medir ancho preferido y permitir crecimiento de tarjetas, \ruta{a4e428b}.
+\plabel{Archivos} \ruta{WinForms/Presentacion.cs}. \ruta{WinForms/VentanaComercial.cs}
+\plabel{Evidencia previa y posterior} Capturas aportadas antes de la corrección; después se verificó 96 DPI. Faltan 120/144 DPI. La revalidación a 120 DPI amplió la evidencia; queda una transición ambigua y 144 DPI sin ejecutar tras el arreglo.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R09}\quad\textsf{Corregido}
+\plabel{Observación} \ruta{FormularioPrincipalMediator.Destinos} omitía métricas en \ruta{EstadoPedido}.
+\plabel{Consecuencia} Panel y contador de pendientes quedaban obsoletos tras despacho.
+\plabel{Intervención} Añadir el destino de métricas a ese cambio, \ruta{66cd254}.
+\plabel{Archivos} \ruta{Application/Navegacion/FormularioPrincipalMediator.cs}. \ruta{tests/Integracion/MediadorComercialTests.cs}
+\plabel{Evidencia previa y posterior} \ruta{mediator-antes.trx} exige callback y recibe null $\to$ \ruta{mediator-despues.trx} 3 aprobadas.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R10}\quad\textsf{Refactorizado}
+\plabel{Observación} Cadena y fachada expandían por separado el snapshot para validar y luego valorar/descontar.
+\plabel{Consecuencia} Trabajo duplicado y riesgo de que las cantidades validadas diverjan de las aplicadas.
+\plabel{Intervención} Compartir producto y cantidad validados, \ruta{ccc6cb3}.
+\plabel{Archivos} \ruta{Application/Pedidos/CadenaValidacionPedido.cs}. \ruta{Application/Pagos/ConfirmacionPedidoFacade.cs}
+\plabel{Evidencia previa y posterior} \ruta{expansion-antes.trx} y \ruta{expansion-despues.trx}, 19/19 ambos; cubre cifras, insuficiencia, rollback y concurrencia.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R11}\quad\textsf{Abierto, fuera de escala académica actual}
+\plabel{Observación} \ruta{LecturaReportePedidos.ListarAsync} materializa todos los pedidos antes del árbol de filtros.
+\plabel{Consecuencia} El tiempo y uso de memoria crecen con el historial.
+\plabel{Intervención} Propuesta: proyección por rango y paginación, con traducción tipada que preserve precedencia. Sin commit asociado.
+\plabel{Archivos} \ruta{Infrastructure/Persistencia/Repositorios/LecturaReportePedidos.cs}. \ruta{Application/Reportes/ConsultarReportePedidos.cs}
+\plabel{Evidencia previa y posterior} P25/P26 prueban semántica actual. Sin medición de rendimiento a gran escala.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R12}\quad\textsf{Riesgo residual, no se reprodujo en el entorno}
+\plabel{Observación} \ruta{InvocadorComandos.EjecutarAsync} espera el registro en el bloque finally. La fachada también espera trazas tras la transacción.
+\plabel{Consecuencia} Un fallo de escritura diagnóstica podría ocultar el resultado comercial confirmado o la causa original.
+\plabel{Intervención} Diseñar persistencia diagnóstica durable o distinguir resultado comercial de estado de auditoría. Sin commit asociado.
+\plabel{Archivos} \ruta{Application/Comandos/InvocadorComandos.cs}. \ruta{Application/Pagos/ConfirmacionPedidoFacade.cs}
+\plabel{Evidencia previa y posterior} Se verificaron éxito y rechazo normal en P19/P24. Sin inyección de fallo de almacenamiento después del commit.
+\end{minipage}\par
+\par\medskip\noindent\begin{minipage}{\linewidth}\noindent\textbf{R13}\quad\textsf{Abierto, capacidad de reproceso manual verificada}
+\plabel{Observación} \ruta{ProcesadorOutboxSqlite.ProcesarAsync} selecciona por fecha un lote máximo de 100 pendientes.
+\plabel{Consecuencia} Un lote bloqueado persistentemente puede retrasar eventos posteriores hasta resolver el fallo.
+\plabel{Intervención} Evaluar planificación de reintentos y equidad mantenida por fecha de próximo intento. Sin commit asociado.
+\plabel{Archivos} \ruta{Infrastructure/Persistencia/Eventos/ProcesadorOutboxSqlite.cs}
+\plabel{Evidencia previa y posterior} P37 recupera un fallo y confirma idempotencia. No se ejecutó un backlog mayor de 100 fallos.
+\end{minipage}\par
+
+

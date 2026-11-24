@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (p) at (3.975,0) {\textbf{Pedido}\\[2pt]{\color{lgmuted}\footnotesize Validar · Despachar · Entregar}};
+\node[lgBox,text width=6.5cm] (e) at (11.125000000000002,0) {{\color{acento}\itshape\footnotesize «abstracta»}\\[1pt]\textbf{Estado\allowbreak{}Del\allowbreak{}Pedido}\\[2pt]{\color{lgmuted}\footnotesize Para(estado)}};
+\node[lgBox,text width=4.1466666666666665cm] (bv) at (2.783333333333333,-1.55) {\textbf{Borrador / Validado}};
+\node[lgBox,text width=4.1466666666666665cm] (pd) at (7.550000000000001,-1.55) {\textbf{Pagado / Despachado}};
+\node[lgBox,text width=4.1466666666666665cm] (c) at (12.316666666666666,-1.55) {\textbf{Cerrado}\\[2pt]{\color{lgmuted}\footnotesize ENTREGADO y CANCELADO}};
+\draw[lgDep] (p.east) -- (e.west);
+\draw[lgInherit] (bv.north) -- (e.south west);
+\draw[lgInherit] (pd.north) -- (e.south);
+\draw[lgInherit] (c.north) -- (e.south east);
+\node[lgNote] at (7.55,-2.55) {Los estados son implementaciones privadas; el agregado conserva EstadoPedido.};
+\end{tikzpicture}

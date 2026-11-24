@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.1466666666666665cm] (res) at (2.783333333333333,0) {\textbf{Familias\allowbreak{}Entrega}\\[2pt]{\color{lgmuted}\footnotesize Obtener}};
+\node[lgBox,text width=4.1466666666666665cm] (f) at (7.550000000000001,0) {{\color{acento}\itshape\footnotesize «abstracta»}\\[1pt]\textbf{Fabrica\allowbreak{}Entrega}\\[2pt]{\color{lgmuted}\footnotesize Crear}};
+\node[lgBox,text width=4.1466666666666665cm] (family) at (12.316666666666666,0) {\textbf{Familia\allowbreak{}Entrega}\\[2pt]{\color{lgmuted}\footnotesize Tarifa · Plazo · Etiqueta}};
+\node[lgBox,text width=4.1466666666666665cm] (std) at (2.783333333333333,-1.55) {\textbf{Fabrica\allowbreak{}Entrega\allowbreak{}Estandar}\\[2pt]{\color{lgmuted}\footnotesize Tarifa · plazo · etiqueta}};
+\node[lgBox,text width=4.1466666666666665cm] (fast) at (7.550000000000001,-1.55) {\textbf{Fabrica\allowbreak{}Entrega\allowbreak{}Expres}\\[2pt]{\color{lgmuted}\footnotesize Tarifa · plazo · etiqueta}};
+\node[lgBox,text width=4.1466666666666665cm] (parts) at (12.316666666666666,-1.55) {\textbf{Tarifa\allowbreak{}Entrega · Plazo\allowbreak{}Entrega\\Etiqueta\allowbreak{}Entrega}};
+\draw[lgDep] (res.east) -- (f.west);
+\draw[lgDep] (f.east) -- (family.west);
+\draw[lgInherit] (std.north) -- (f.south west);
+\draw[lgInherit] (fast.north) -- (f.south);
+\draw[lgAssoc] (family.south) -- (parts.north);
+\node[lgNote] at (7.55,-2.55) {Crear agrupa tres productos de la misma modalidad. FamiliaEntrega protege la coherencia.};
+\end{tikzpicture}

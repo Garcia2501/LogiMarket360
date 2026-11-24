@@ -1,0 +1,186 @@
+\documentclass{article}
+\usepackage[spanish,es-nodecimaldot,es-noquoting]{babel}
+\usepackage[letterpaper,includehead,top=2cm,bottom=3cm,left=3cm,right=3cm,headheight=70pt,headsep=13pt,footskip=20pt]{geometry}
+\usepackage{amsmath,amssymb,graphicx,fancyhdr,multicol}
+\usepackage{booktabs,longtable,tabularx,array,xcolor,listings,tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{xurl}
+\usepackage[colorlinks=true,allcolors=blue!55!black,pdfencoding=auto]{hyperref}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,hypcap=false}
+\hypersetup{pdftitle={LogiMarket 360 — Informe APE 04},pdfsubject={Arquitectura, patrones GoF y evidencias de aceptación}}
+\definecolor{acento}{HTML}{12475B}
+\definecolor{fondo}{HTML}{F2F6F8}
+
+\definecolor{lgmuted}{HTML}{374E58}
+\definecolor{lgline}{HTML}{708998}
+\definecolor{lgerror}{HTML}{8D2926}
+\tikzset{
+  lgBox/.style={draw=lgline,fill=fondo,rounded corners=1.5pt,align=center,
+    minimum height=8.5mm,inner sep=3.0pt,font=\small,text=black!91},
+  lgHeading/.style={font=\small\bfseries,text=acento,align=center},
+  lgUse/.style={lgBox,rounded corners=11pt,text width=4.6cm},
+  lgNote/.style={font=\footnotesize,text=lgmuted,align=center,text width=14.2cm},
+  lgLabel/.style={font=\footnotesize,text=black!87,fill=white,align=center,inner sep=1.2pt},
+  lgParticipant/.style={lgBox,font=\footnotesize\bfseries,draw=acento,minimum height=10mm},
+  lgLife/.style={draw=lgline,densely dotted,line width=.56pt},
+  lgActive/.style={draw=acento,fill=teal!14,line width=.55pt},
+  lgBand/.style={font=\footnotesize\bfseries,draw=lgline,fill=fondo,rounded corners=1pt,
+    inner sep=3pt,text width=12.7cm,align=left,text=acento},
+  lgCall/.style={-{Latex[length=2.1mm]},draw=acento,line width=.64pt,rounded corners=2pt},
+  lgReturn/.style={-{Latex[length=1.8mm]},draw=lgmuted,dashed,line width=.63pt},
+  lgError/.style={-{Latex[length=2mm]},draw=lgerror,dash pattern=on 3pt off 2pt,line width=.85pt,rounded corners=2pt},
+  lgAssoc/.style={draw=acento,line width=.64pt,rounded corners=2pt},
+  lgDep/.style={-{Stealth[open,length=2mm]},draw=acento,dashed,line width=.64pt,rounded corners=2pt},
+  lgInherit/.style={-{Triangle[open,length=2.6mm,width=2.25mm,fill=white]},draw=acento,line width=.65pt,rounded corners=2pt},
+  lgReal/.style={lgInherit,dashed},
+  lgComp/.style={{Diamond[length=2.6mm,width=1.9mm]}-,draw=acento,line width=.65pt,rounded corners=2pt}
+}
+\newsavebox{\lgDiagram}
+\lstset{language={[Sharp]C},basicstyle=\ttfamily\footnotesize,
+  frame=single,rulecolor=\color{black!22},backgroundcolor=\color{fondo},
+  numbers=left,numberstyle=\scriptsize\color{black!65},numbersep=6pt,
+  breaklines=true,breakatwhitespace=true,showstringspaces=false,columns=fullflexible,
+  xleftmargin=1.8em,framexleftmargin=1.25em,keepspaces=true,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1 {Á}{{\'A}}1 {É}{{\'E}}1 {Ó}{{\'O}}1}
+\newcommand{\campo}[1]{\textbf{[POR COMPLETAR: #1]}}
+\newcommand{\plabel}[1]{\par\smallskip\noindent\textbf{#1}\quad\ignorespaces}
+\newcommand{\vistafig}[4]{\par\smallskip\noindent\begin{minipage}{\linewidth}\centering
+  \includegraphics[width=\linewidth,height=#3,keepaspectratio]{capturas/#1}
+  \captionof{figure}{#4}\label{fig:#2}\end{minipage}\par\medskip}
+\newcommand{\wirefig}[4]{\par\smallskip\noindent\begin{minipage}{\linewidth}\centering\includegraphics[width=\linewidth,height=#3,keepaspectratio]{wireframes/#1}\captionof{figure}{#4}\label{fig:#2}\end{minipage}\par\medskip}
+\newcommand{\diagrama}[3]{\par\medskip\noindent\begin{minipage}{\linewidth}\centering
+  \sbox{\lgDiagram}{\input{diagramas/#1}}%
+  \ifdim\wd\lgDiagram>\linewidth\resizebox{\linewidth}{!}{\usebox{\lgDiagram}}\else\usebox{\lgDiagram}\fi
+  \captionof{figure}{#3}\label{diag:#2}
+  \end{minipage}\par\medskip}
+\newcommand{\ruta}[1]{\nolinkurl{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\setlength{\LTpre}{6pt}
+\setlength{\LTpost}{9pt}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{3}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{%
+  \begin{minipage}[c]{2cm}\centering
+      \includegraphics[width=2cm,height=2cm,keepaspectratio]{imagenes/uta.png}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{8cm}\centering
+      \small\textbf{UNIVERSIDAD TÉCNICA DE AMBATO}\\[0.1cm]
+      \scriptsize\textit{FACULTAD DE INGENIERÍA EN SISTEMAS, ELECTRÓNICA E INDUSTRIAL}\\[0.1cm]
+      \scriptsize\textbf{CARRERA SOFTWARE}\\[0.1cm]
+      \scriptsize\textbf{CICLO ACADÉMICO: JULIO--DICIEMBRE 2026}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{2cm}\centering
+      \includegraphics[width=2cm,height=2cm,keepaspectratio]{imagenes/fisei.png}
+  \end{minipage}}
+\fancyfoot[C]{\small\thepage}
+\begin{document}
+\begin{center}
+    {\large\textbf{INFORME DE TAREA}}
+\end{center}
+
+\section{Portada}
+\noindent\begin{tabularx}{\linewidth}{@{}L{.37\linewidth} >{\raggedright\arraybackslash}X@{}}
+\textbf{Tema:} & Desarrollo integral de un aplicativo LogiMarket 360 mediante programación limpia, SOLID y 23 patrones GoF en Clean Architecture.\\[5pt]
+\textbf{Unidad de Organización Curricular:} & PROFESIONAL\\[5pt]
+\textbf{Nivel y Paralelo:} & \campo{nivel y paralelo}\\[5pt]
+\textbf{Alumnos participantes:} & \campo{apellidos y nombres del participante}\\[5pt]
+\textbf{Asignatura:} & \campo{nombre oficial de la asignatura}\\[5pt]
+\textbf{Docente:} & \campo{nombre y título del responsable}\\
+\end{tabularx}
+\par\medskip
+\noindent\textbf{Práctica:} Guía APE 04 \hfill
+\textbf{Modalidad:} Presencial e individual
+
+\section{Informe de la Tarea}
+\subsection{Objetivos}
+\subsubsection{General}
+Diseñar, implementar, probar y documentar una aplicación empresarial de escritorio con persistencia real, trazabilidad operativa y arquitectura limpia. Aplicar Clean Code, KISS, DRY, YAGNI, los principios SOLID y los patrones GoF en operaciones verificables.
+
+\subsubsection{Específicos}
+\begin{itemize}
+\item Modelar ventas y logística a partir de los actores, invariantes, permisos y cifras oficiales de la práctica.
+\item Construir cinco proyectos .NET con dependencias verificables y demostrar los 23 patrones dentro de casos de uso.
+\item Verificar consistencia ante fallos, recuperación de SQLite, idempotencia, seguridad y resultados mediante pruebas y evidencias.
+\end{itemize}
+
+\subsection{Instrucciones}
+\begin{itemize}
+\item Seguir los requisitos y comprobaciones de la guía APE 04 \cite{ape04}. Ejecutar la aplicación Windows Forms con SQLite, autorización por operación y colaboradores simulados.
+\item Usar los datos oficiales y SQLite independiente para cada escenario que exige stock inicial. Reutilizar la base del propio escenario para las pruebas de reinicio, concurrencia o recuperación.
+\item Vincular los resultados a código, casos de aceptación, artefactos reproducibles e historial Git. Identificar las condiciones pendientes de validación.
+\end{itemize}
+
+\subsection{Listado de equipos, materiales y recursos}
+\textbf{Listado de equipos y materiales generales empleados en la tarea:}
+\begin{itemize}
+\item Equipo Windows, .NET SDK 8, C\#, Windows Forms, EF Core 8, SQLite, xUnit y Git.
+\item Guía APE 04, plantilla institucional, repositorio GitHub, registros de pruebas y capturas en una base de demostración aislada.
+\item Tectonic para el informe, BibTeX para las referencias y Poppler para la revisión del PDF.
+\end{itemize}
+\textbf{TAC (Tecnologías para el Aprendizaje y Conocimiento) empleados en la tarea:}
+\begin{itemize}
+\item[$\square$] Plataformas educativas
+\item[$\square$] Simuladores y laboratorios virtuales
+\item[$\square$] Aplicaciones educativas
+\item[$\square$] Recursos audiovisuales
+\item[$\square$] Gamificación
+\item[$\checkmark$] Inteligencia Artificial, como apoyo técnico y editorial con contraste de las evidencias.
+\item Otros (Especifique): \underline{GitHub y documentación técnica oficial}.
+\end{itemize}
+
+\subsection{Desarrollo de la Tarea (Actividades a Desarrollar)}
+Se analizaron reglas, flujos y wireframes. Se implementaron el dominio y SQLite, después el núcleo transaccional y los patrones restantes. Se conectaron las doce vistas con Application y se realizó una auditoría de arquitectura, reglas, pruebas y entrega. La comprobación posterior de DPI amplió la cobertura visual. Su alcance está en los resultados.
+
+\clearpage
+\begingroup\small\setlength{\parskip}{0pt}\tableofcontents\endgroup
+\clearpage
+\subsection{Resultados obtenidos}
+\input{resultados/01-resumen-requisitos}
+\input{resultados/02-modelo-arquitectura}
+\input{resultados/03-flujos-solid}
+\input{resultados/04-patrones}
+\input{resultados/05-interfaz}
+\input{resultados/06-pruebas}
+\input{resultados/07-aceptacion}
+\input{resultados/08-git-riesgos}
+\input{resultados/09-anexos}
+\input{resultados/wireframes}
+
+\clearpage\subsection{Habilidades blandas empleadas en la tarea}
+\begin{itemize}
+\item[$\square$] Liderazgo
+\item[$\square$] Trabajo en equipo
+\item[$\square$] Comunicación asertiva
+\item[$\square$] La empatía
+\item[$\checkmark$] Pensamiento crítico, aplicado a contrastar la guía, el código y los resultados.
+\item[$\square$] Flexibilidad
+\item[$\square$] La resolución de conflictos
+\item[$\checkmark$] Adaptabilidad, demostrada al revalidar el diseño con cambios de tamaño y DPI.
+\item[$\checkmark$] Responsabilidad, reflejada en el aislamiento de datos y el registro de verificaciones pendientes.
+\item[$\checkmark$] Autogestión, mediante planificación por fases y control incremental de evidencias.
+\end{itemize}
+
+\subsection{Conclusiones}
+La auditoría vinculó los 23 patrones GoF con casos de uso, código y pruebas. La suite archivada aprobó 119 pruebas. Los tres escenarios de compra y la devolución de Ana se ajustaron a las cifras oficiales. La reapertura de SQLite conservó el estado y permitió recuperar un evento sin repetir el cobro.
+
+El expediente reúne P01--P38 y evidencia funcional de las doce vistas. El criterio transversal de presentación sigue parcial hasta comprobar físicamente los valores de Auditoría a 120 DPI y la compilación corregida a 144 DPI. La documentación se refiere al commit auditado y señala ese límite en la evaluación de entrega.
+
+\subsection{Recomendaciones}
+Repetir en Windows el salto Panel $\to$ Auditoría a 120 DPI y la matriz normal/maximizada a 144 DPI. Registrar el DPI real, el hash, los rótulos completos, los cuatro valores, el foco y la navegación. Resolver el cierre Git cuando exista evidencia suficiente. Completar los campos oficiales de la portada y renombrar el PDF con los datos del participante.
+
+\clearpage\subsection{Referencias}
+\begingroup
+\makeatletter\renewcommand{\section}[2]{}\makeatother
+\bibliographystyle{ieeetr}
+\bibliography{sample}
+\endgroup
+\appendix\clearpage\section{Anexos}
+\input{resultados/10-indice-artefactos}
+\end{document}
+
+

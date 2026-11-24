@@ -1,0 +1,8 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (svc) at (7.550000000000001,0) {\textbf{Administrar\allowbreak{}Pedidos}\\[2pt]{\color{lgmuted}\footnotesize ClonarBorradorAsync}};
+\node[lgBox,text width=6.5cm] (p) at (3.975,-1.55) {\textbf{Pedido}\\[2pt]{\color{lgmuted}\footnotesize ClonarComoBorrador}};
+\node[lgBox,text width=6.5cm] (m) at (11.125000000000002,-1.55) {\textbf{Pedido\allowbreak{}Detalle}\\[2pt]{\color{lgmuted}\footnotesize Instantánea de línea}};
+\draw[lgDep] (svc.south) -- (p.north);
+\draw[lgComp] (p.east) -- (m.west);
+\node[lgNote] at (7.55,-2.55) {El mismo tipo Pedido crea un borrador con identidad nueva y copia sus líneas.};
+\end{tikzpicture}

@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (ca) at (3.975,0) {\textbf{Calculadora\allowbreak{}Pedido}\\[2pt]{\color{lgmuted}\footnotesize Calcular}};
+\node[lgBox,text width=6.5cm] (ipo) at (11.125000000000002,0) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{IPolitica\allowbreak{}Descuento}\\[2pt]{\color{lgmuted}\footnotesize Aplica · Prioridad · Tasa}};
+\node[lgBox,text width=4.1466666666666665cm] (s) at (2.783333333333333,-1.55) {\textbf{Sin\allowbreak{}Descuento}\\[2pt]{\color{lgmuted}\footnotesize 0 por ciento}};
+\node[lgBox,text width=4.1466666666666665cm] (v) at (7.550000000000001,-1.55) {\textbf{Vip10}\\[2pt]{\color{lgmuted}\footnotesize 10 por ciento}};
+\node[lgBox,text width=4.1466666666666665cm] (m) at (12.316666666666666,-1.55) {\textbf{Mayorista15}\\[2pt]{\color{lgmuted}\footnotesize 15 por ciento}};
+\draw[lgAssoc] (ca.east) -- (ipo.west);
+\draw[lgReal] (s.north) -- (ipo.south west);
+\draw[lgReal] (v.north) -- (ipo.south);
+\draw[lgReal] (m.north) -- (ipo.south east);
+\node[lgNote] at (7.55,-2.55) {La calculadora escoge una política por elegibilidad y prioridad.};
+\end{tikzpicture}

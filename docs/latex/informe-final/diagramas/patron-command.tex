@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.1466666666666665cm] (o) at (2.783333333333333,0) {\textbf{Operaciones\allowbreak{}Pedido}\\[2pt]{\color{lgmuted}\footnotesize ConfirmarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (i) at (7.550000000000001,0) {\textbf{Invocador\allowbreak{}Comandos}\\[2pt]{\color{lgmuted}\footnotesize EjecutarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (f) at (12.316666666666666,0) {\textbf{Confirmacion\allowbreak{}Pedido\allowbreak{}Facade}\\[2pt]{\color{lgmuted}\footnotesize ConfirmarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (c) at (2.783333333333333,-1.55) {\textbf{Confirmar\allowbreak{}Pedido\allowbreak{}Command}\\[2pt]{\color{lgmuted}\footnotesize PedidoId · Clave · Proveedor}};
+\node[lgBox,text width=4.1466666666666665cm] (p) at (7.550000000000001,-1.55) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{IComando\allowbreak{}Pedido}\\[2pt]{\color{lgmuted}\footnotesize PedidoId · Detalle}};
+\node[lgBox,text width=4.1466666666666665cm] (r) at (12.316666666666666,-1.55) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{IRegistro\allowbreak{}Comandos}\\[2pt]{\color{lgmuted}\footnotesize RegistrarAsync}};
+\draw[lgCall] (o.east) -- (i.west);
+\draw[lgCall] (i.east) -- (f.west);
+\draw[lgDep] (o.south) -- (c.north);
+\draw[lgReal] (c.east) -- (p.west);
+\draw[lgDep] (i.south) |- (7.55,-.82) -|  (r.north);
+\node[lgNote] at (7.55,-2.55) {OperacionesPedido proporciona el receptor; el invocador registra el resultado en finally.};
+\end{tikzpicture}

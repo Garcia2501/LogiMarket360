@@ -1,0 +1,56 @@
+\subsubsection{Flujos de negocio y resultados oficiales}
+\paragraph{Acceso, catálogo y clientes.}
+El acceso local recupera al usuario, verifica PBKDF2-HMAC-SHA256 y abre sesión con su rol. El hash usa 600\,000 iteraciones, sal de 16 bytes y derivado de 32 bytes. La comparación emplea tiempo fijo. El cierre elimina el actor de sesión. La autorización se aplica antes de las operaciones protegidas, y los intentos denegados se pueden auditar incluso tras una reversión.
+
+\begin{center}\small
+\begin{tabular}{@{}llrrr@{}}\toprule
+SKU & Producto & USD & Stock inicial & kg\\\midrule
+P01 & Mouse USB & 20.00 & 8 & 0.20\\
+P02 & Teclado & 30.00 & 5 & 0.70\\
+P03 & Memoria USB & 10.00 & 20 & 0.10\\
+P04 & Webcam & 40.00 & 4 & 0.35\\
+P05 & Alfombrilla & 5.00 & 30 & 0.10\\\bottomrule
+\end{tabular}
+\captionof{table}{Catálogo oficial desde una base nueva, cotejado en P01.}\label{tab:catalogo-oficial}
+\end{center}
+KIT\_OFICINA vale USD 50.00. KIT\_TELETRABAJO agrega una P03 a KIT\_OFICINA, vale USD 60.00 y suma 1.00 kg. P18 verifica composiciones y ciclos. P27 y P34 verifican las hojas y el peso.
+
+\paragraph{Pedido, descuentos y entrega.}
+El alta construye un borrador con cliente, modalidad, líneas y snapshots. La cadena revisa cliente activo, líneas, existencias y estado. Dos valores de catálogo en momentos distintos pueden coexistir en pedidos diferentes, porque el pedido pagado conserva sus instantáneas. Cada monto monetario usa decimal. Se elige una promoción por prioridad. A partir de diez unidades físicas MAYORISTA aplica 15\,\%. En los demás casos VIP aplica 10\,\% cuando corresponde, o se aplica NORMAL con 0\,\%. El descuento se redondea a dos decimales con \ruta{MidpointRounding.AwayFromZero}. ESTÁNDAR cuesta USD 5.00 y tiene plazo de tres días; EXPRÉS cuesta USD 12.00 y tiene plazo de un día.
+
+\begin{center}\small
+\begin{tabular}{@{}L{.22\linewidth}L{.42\linewidth}L{.30\linewidth}@{}}\toprule
+Caso & Cálculo en USD & Stock luego del pago\\\midrule
+Ana VIP (P02) & $60.00-6.00+5.00=59.00$ & P01=7, P02=4, P03=19\\
+Luis NORMAL (P03) & $90.00-0.00+12.00=102.00$ & P04=2, P05=28\\
+Carmen MAYORISTA (P04) & $100.00-15.00+5.00=90.00$ & P03=10\\\bottomrule
+\end{tabular}
+\captionof{table}{Escenarios oficiales ensayados en archivos SQLite separados.}
+\end{center}
+P32 añade la superposición de VIP y mayorista y prueba el redondeo. Las estrategias son excluyentes.
+
+\paragraph{Confirmación transaccional.}
+El invocador registra el comando y la fachada coordina la autorización, la validación y el pago. La cadena entrega las cantidades físicas validadas a la valoración y al descuento de existencias. La pasarela es simulada. Proxy exige permiso antes de Decorator y Adapter. La unidad de trabajo confirma pedido, pago, stock, movimientos y Outbox como una unidad. Un duplicado con igual clave recupera la operación anterior. El rechazado conserva el estado VALIDADO y los saldos. Las trazas diagnósticas distinguen ese rechazo de un cobro registrado.
+\diagrama{confirmacion}{confirmacion}{Secuencia aprobada. El procesamiento de Outbox ocurre después de confirmar.}
+\diagrama{rechazo}{rechazo}{Secuencia rechazada por falta de stock o por respuesta de la pasarela.}
+
+\paragraph{Entrega, devolución y reporte.}
+BODEGA puede despachar un pedido pagado y registrar su entrega. La guía y el plazo se obtienen de la familia elegida. La devolución total requiere ENTREGADO. DEFECTO admite hasta 30 días y ARREPENTIMIENTO hasta 7, en este último caso con producto sin uso. El reintegro se realiza según la decisión de la política. El reembolso reusa el valor histórico descontado sin flete. Ana pagó 59.00, de los cuales 5.00 corresponden a envío, y el reembolso fue de USD 54.00. P35 verifica el reintegro de P01, P02 y P03, la persistencia, el rechazo de un duplicado y la auditoría.
+
+Los reportes consumen un árbol de filtros tipado sobre estado, importe y cliente. El comprobante interno se puede generar como vista previa o TXT. El procesador Outbox reintenta notificaciones, métricas y auditoría a partir del evento confirmado, con deduplicación por suscriptor. P37 comprueba persistencia del intento fallido, reapertura y recuperación sin duplicar el cobro.
+
+\subsubsection{SOLID y programación limpia}
+\begin{longtable}{@{}L{.11\linewidth}L{.48\linewidth}L{.35\linewidth}@{}}
+\toprule Principio & Evidencia concreta & Comprobación y límite \\ \midrule\endhead
+SRP & \ruta{ConfirmacionPedidoFacade.ConfirmarAsync} coordina. \ruta{ValorarPedido.Calcular} resuelve la valoración compuesta. & P02--P07 y P20 distinguen reglas, escritura y rollback. La fachada conserva varios colaboradores. \\
+OCP & \ruta{CalculadoraPedido.Calcular} recibe políticas por constructor y elige por prioridad. \ruta{FamiliasEntrega.Obtener} elige la familia registrada. & P32 añade una política y comprueba su resultado. Agregar prioridades iguales requeriría definir el desempate. \\
+LSP & \ruta{IResolutorPasarelas.Obtener} entrega \ruta{IPasarelaPago} con adaptador legado o alterno. & P16 ejecuta la misma solicitud en ambos, aprueba 5.21, repite la respuesta y rechaza importes inválidos. Un proveedor externo requeriría conciliación adicional. \\
+ISP & \ruta{IConsultaCatalogo}, \ruta{IEscrituraCatalogo}, \ruta{IColaEventos} e \ruta{IProcesadorOutbox} separan consumidores. & P38 verifica firmas y composición. \ruta{ILecturaEscritorio} reúne consultas de apoyo y podría segregarse si crecen sus consumidores. \\
+DIP & \ruta{ConfirmacionPedidoFacade} recibe puertos de persistencia, autorización y pasarela; la infraestructura implementa los contratos. & P38 instancia DI y P20 sustituye el puerto de eventos para probar rollback. El registro DI concentra los concretos. \\
+\bottomrule
+\end{longtable}
+
+Clean Code se concreta en métodos que expresan intención, puertos nombrados por su uso, invariantes encapsuladas y comentarios identificables por patrón. KISS se manifiesta en un único archivo SQLite y separación básica de comandos y consultas. DRY evita repetir la valoración y la expansión de cantidades físicas, comprobado por el cambio \texttt{ccc6cb3}. YAGNI limita el alcance a pago, avisos y guías simuladas, y a comprobantes internos. Los efectos de una operación siguen siendo observables mediante el historial y las pruebas.
+
+\paragraph{Convenciones de los diagramas.}
+Un trazo discontinuo con punta abierta indica dependencia; un triángulo hueco, herencia (continuo) o implementación (discontinuo); el rombo lleno marca composición. En secuencias, los retornos y rechazos se distinguen del llamado por trazo discontinuo y, en el rechazo, por color y rótulo.

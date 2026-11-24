@@ -1,0 +1,61 @@
+\clearpage
+\subsubsection{Pruebas automatizadas y evidencia de ejecución}
+El proyecto \ruta{tests/LogiMarket.Tests/LogiMarket.Tests.csproj} usa xUnit 2.9.3 y Microsoft.NET.Test.Sdk 17.8.0. La suite se inicia con \ruta{dotnet test} y recoge los resultados por caso en TRX \cite{xunit}. Las pruebas de integración usan SQLite real con archivos temporales. Cada entorno se construye con dependencias registradas en el proyecto de persistencia y usa la misma base solo cuando el caso requiere repetición, concurrencia o reapertura.
+
+\begin{center}
+\begin{tabular}{@{}lrrrr@{}}\toprule
+Grupo & Ejecutadas & Aprobadas & Fallidas & Omitidas\\\midrule
+Aplicacion & 1 & 1 & 0 & 0 \\
+Arquitectura & 7 & 7 & 0 & 0 \\
+Dominio & 21 & 21 & 0 & 0 \\
+Integracion & 90 & 90 & 0 & 0 \\
+\midrule Total & 119 & 119 & 0 & 0\\\bottomrule
+\end{tabular}
+\captionof{table}{Conteo de definiciones por espacio de nombres y resumen de \texttt{auditoria-final.trx}.}
+\end{center}
+
+\begin{longtable}{@{}L{.22\linewidth}L{.73\linewidth}@{}}
+\toprule Área & Clases y comprobaciones \\ \midrule\endhead
+Dominio & \ruta{CatalogoTests} y \ruta{PedidoTests}. Precios, stock, SKU, snapshots, ciclos y transiciones. \\
+Aplicación & \ruta{MetricasSesionTests}. Identidad y deduplicación concurrente del contador. \\
+Integración SQLite & \ruta{InicializacionTests}, \ruta{RestriccionesSqliteTests} y \ruta{PersistenciaTests}. Migración, semilla repetible, datos recuperados y restricciones efectivas. \\
+Seguridad & \ruta{SeguridadComercialTests} y \ruta{RevocacionCobroTests}. Sesión, permisos efectivos por rol y guardado de la denegación tras rollback. \\
+Transacción & \ruta{ConfirmacionTests}. Escenarios oficiales, proveedor alterno, clave repetida, rollback por FK y competencia por una unidad en dos conexiones. \\
+Logística y eventos & \ruta{LogisticaTests} y \ruta{OutboxComercialTests}. Despacho, devolución, stock, observadores, reintento y reapertura. \\
+Interfaz y regresiones & \ruta{EscritorioTests}, \ruta{MediadorComercialTests}, \ruta{PatronesBorradorTests}, \ruta{FiltroPedidosTests} y \ruta{ComprobantesTests}. Integración de servicios subyacentes a las pantallas. La observación de la interfaz se registra aparte. \\
+Arquitectura & \ruta{ReferenciasTests} y \ruta{ContratosEscritorioTests}. Cinco proyectos, referencias, puertos segregados y composición. \\
+\bottomrule
+\end{longtable}
+
+La auditoría archivó un build Release con cero errores y cero advertencias. El conteo de pruebas procede del TRX, cuyo resumen y huella se pueden comprobar en el expediente. \ruta{auditoria-base.trx} tiene 118 aprobadas. \ruta{mediator-antes.trx} y \ruta{mediator-despues.trx} prueban la corrección de despacho. \ruta{expansion-antes.trx} y \ruta{expansion-despues.trx} conservan 19 aprobadas en la selección afectada por la refactorización. Se trata de ejecuciones históricas; la compilación LaTeX no las sustituye.
+
+Se volvió a ejecutar la solución del commit auditado sobre una copia limpia durante la preparación de este informe. Con SDK 8.0.428 se obtuvieron cinco proyectos restaurados, compilación Release con cero errores y cero advertencias y 119 de 119 pruebas aprobadas. Se conservan \ruta{auditoria-revalidada.trx} y las salidas de restauración, compilación y prueba. La restauración usó paquetes existentes y desactivó NuGet Audit, por lo que ese comando no aporta una revisión de vulnerabilidades de dependencias.
+
+El cotejo adicional de P23 ejecutó la cadena con cliente ausente sobre una base de prueba y luego con el cliente restaurado. Produjo CLIENTE y después STOCK. La única prueba focalizada aprobó y se entrega con su código y \ruta{cotejo-p23.trx}; es una ejecución separada y queda fuera de las 119 de la suite oficial.
+
+\paragraph{Reproducción en Windows.}
+Ejecutar desde la raíz de la solución con .NET 8 y el componente de escritorio:
+\begin{verbatim}
+dotnet restore LogiMarket360.sln
+dotnet build LogiMarket360.sln -c Release --no-restore
+dotnet test LogiMarket360.sln -c Release --no-build
+\end{verbatim}
+Para conservar un TRX, agregar \ruta{--logger} con valor \ruta{trx;LogFileName=logimarket360.trx}. Los artefactos de arranque documentan la migración, los recuentos del seed y la integridad referencial sin adjuntar una base operativa.
+
+\paragraph{Cobertura consolidada de GoF}
+\begin{longtable}{@{}L{.25\linewidth}L{.18\linewidth}L{.50\linewidth}@{}}
+\toprule Familia & Cobertura & Escenarios y evidencia \\ \midrule\endhead
+Creacionales & 5/5 & P11--P15, composición por DI y métricas en dos vistas. \\
+Estructurales & 7/7 & P16--P22, simuladores, comprobantes internos, persistencia y medición Flyweight. \\
+Comportamentales & 11/11 & P23--P34, relojes y bases aisladas, recuperación de eventos y actualización de vistas. \\
+\midrule Total & 23/23 & Participación en casos de uso y comprobaciones individuales documentadas.\\
+\bottomrule
+\end{longtable}
+
+
+
+
+\paragraph{Definición del alcance.}
+El TRX permite comprobar ejecución y resultado sin atribuir a una prueba observable la calidad del foco o la disposición en DPI. Las capturas muestran un estado concreto del proceso, mientras que P36 y P37 demuestran propiedades de concurrencia y recuperación utilizando los datos y distancias temporales de sus propios casos.
+
+

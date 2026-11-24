@@ -1,0 +1,8 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (h) at (3.975,0) {\textbf{Historial\allowbreak{}Borrador}\\[2pt]{\color{lgmuted}\footnotesize Deshacer y rehacer}};
+\node[lgBox,text width=6.5cm] (p) at (11.125000000000002,0) {\textbf{Pedido}\\[2pt]{\color{lgmuted}\footnotesize CapturarBorrador · RestaurarBorrador}};
+\node[lgBox,text width=6.5cm] (m) at (7.550000000000001,-1.55) {\textbf{Pedido.Borrador\allowbreak{}Memento}\\[2pt]{\color{lgmuted}\footnotesize Copia profunda de las líneas}};
+\draw[lgAssoc] (h.south) -- (m.north west);
+\draw[lgDep] (p.south) -- (m.north east);
+\node[lgNote] at (7.55,-2.55) {El historial conserva el memento y Pedido valida su pertenencia al restaurarlo.};
+\end{tikzpicture}

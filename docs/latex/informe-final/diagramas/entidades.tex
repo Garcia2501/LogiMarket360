@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgHeading] at (3.8,0.35) {Catálogo};
+\node[lgHeading] at (11.3,0.35) {Agregado de pedido};
+\node[lgBox,text width=3.0cm] (leaf) at (1.74,-1.76) {\textbf{Producto\allowbreak{}Simple}\\[2pt]{\color{lgmuted}\footnotesize SKU · Precio}};
+\node[lgBox,text width=5cm] (iface) at (3.75,-0.48) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{IElemento\allowbreak{}Catalogo}\\[2pt]{\color{lgmuted}\footnotesize CalcularPrecio · Capturar}};
+\node[lgBox,text width=3.0cm] (kit) at (5.76,-1.76) {\textbf{Kit\allowbreak{}Compuesto}\\[2pt]{\color{lgmuted}\footnotesize Componentes}};
+\node[lgBox,text width=3.45cm] (k) at (5.76,-3.16) {\textbf{Kit\allowbreak{}Componente}\\[2pt]{\color{lgmuted}\footnotesize Cantidad · Elemento}};
+\node[lgBox,text width=6cm] (p) at (11.25,-0.55) {\textbf{Pedido}\\[2pt]{\color{lgmuted}\footnotesize Estado · Lineas}};
+\node[lgBox,text width=6cm] (detail) at (11.25,-1.91) {\textbf{Pedido\allowbreak{}Detalle}\\[2pt]{\color{lgmuted}\footnotesize Sku · Cantidad · Precio histórico}};
+\node[lgBox,text width=6cm] (snap) at (11.25,-3.27) {\textbf{Pedido\allowbreak{}Detalle\allowbreak{}Componente}\\[2pt]{\color{lgmuted}\footnotesize Ruta · SKU · cantidad física}};
+\draw[lgReal] (leaf.north) -- (iface.south west);
+\draw[lgReal] (kit.north) -- (iface.south east);
+\draw[lgComp] (kit.south) -- (k.north);
+\draw[lgAssoc] (k.west) -|  (leaf.south);
+\draw[lgComp] (p.south) -- (detail.north);
+\draw[lgComp] (detail.south) -- (snap.north);
+\node[lgNote] at (7.55,-4.18) {Rombo negro: composición. Triángulo discontinuo: implementación.\\KitComponente apunta a un ProductoSimple o a un KitCompuesto hijo.};
+\end{tikzpicture}

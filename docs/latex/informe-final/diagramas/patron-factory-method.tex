@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.1466666666666665cm] (obs) at (2.783333333333333,0) {\textbf{Observador\allowbreak{}Avisos}\\[2pt]{\color{lgmuted}\footnotesize RecibirAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (crea) at (7.550000000000001,0) {{\color{acento}\itshape\footnotesize «abstracta»}\\[1pt]\textbf{Creador\allowbreak{}Aviso}\\[2pt]{\color{lgmuted}\footnotesize Crear}};
+\node[lgBox,text width=4.1466666666666665cm] (av) at (12.316666666666666,0) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{IAviso\allowbreak{}Simulado}\\[2pt]{\color{lgmuted}\footnotesize Enviar}};
+\node[lgBox,text width=4.1466666666666665cm] (email) at (2.783333333333333,-1.55) {\textbf{Creador\allowbreak{}Email}\\[2pt]{\color{lgmuted}\footnotesize Crear}};
+\node[lgBox,text width=4.1466666666666665cm] (sms) at (7.550000000000001,-1.55) {\textbf{Creador\allowbreak{}Sms}\\[2pt]{\color{lgmuted}\footnotesize Crear}};
+\node[lgBox,text width=4.1466666666666665cm] (prod) at (12.316666666666666,-1.55) {\textbf{Email\allowbreak{}Simulado / Sms\allowbreak{}Simulado}};
+\draw[lgDep] (obs.east) -- (crea.west);
+\draw[lgDep] (crea.east) -- (av.west);
+\draw[lgInherit] (email.north) -- (crea.south west);
+\draw[lgInherit] (sms.north) -- (crea.south);
+\draw[lgReal] (prod.north) -- (av.south);
+\node[lgNote] at (7.55,-2.55) {El observador elige un creador por canal; Crear devuelve el producto del canal.};
+\end{tikzpicture}

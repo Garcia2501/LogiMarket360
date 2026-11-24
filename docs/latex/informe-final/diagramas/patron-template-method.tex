@@ -1,0 +1,10 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (ad) at (3.975,0) {\textbf{Administrar\allowbreak{}Devoluciones}\\[2pt]{\color{lgmuted}\footnotesize DevolverAsync}};
+\node[lgBox,text width=6.5cm] (t) at (11.125000000000002,0) {{\color{acento}\itshape\footnotesize «abstracta»}\\[1pt]\textbf{Procesar\allowbreak{}Devolucion}\\[2pt]{\color{lgmuted}\footnotesize EjecutarAsync}};
+\node[lgBox,text width=6.5cm] (d) at (3.975,-1.55) {\textbf{Devolucion\allowbreak{}Por\allowbreak{}Defecto}\\[2pt]{\color{lgmuted}\footnotesize Hasta 30 días}};
+\node[lgBox,text width=6.5cm] (a) at (11.125000000000002,-1.55) {\textbf{Devolucion\allowbreak{}Por\allowbreak{}Arrepentimiento}\\[2pt]{\color{lgmuted}\footnotesize Hasta 7 días; sin uso}};
+\draw[lgDep] (ad.east) -- (t.west);
+\draw[lgInherit] (d.north) -- (t.south west);
+\draw[lgInherit] (a.north) -- (t.south);
+\node[lgNote] at (7.55,-2.55) {El método plantilla conserva elegibilidad, cálculo, registro, reintegro y evento.};
+\end{tikzpicture}

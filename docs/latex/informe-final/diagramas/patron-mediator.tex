@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (win) at (3.975,0) {\textbf{Ventana\allowbreak{}Comercial}\\[2pt]{\color{lgmuted}\footnotesize NotificarAsync}};
+\node[lgBox,text width=6.5cm] (med) at (11.125000000000002,0) {\textbf{Formulario\allowbreak{}Principal\allowbreak{}Mediator}\\[2pt]{\color{lgmuted}\footnotesize Conectar · NotificarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (aa) at (2.783333333333333,-1.55) {\textbf{Catálogo / Carrito}\\[2pt]{\color{lgmuted}\footnotesize Actualizaciones registradas}};
+\node[lgBox,text width=4.1466666666666665cm] (bb) at (7.550000000000001,-1.55) {\textbf{Pedidos / Inventario}\\[2pt]{\color{lgmuted}\footnotesize Actualizaciones registradas}};
+\node[lgBox,text width=4.1466666666666665cm] (cc) at (12.316666666666666,-1.55) {\textbf{Métricas}\\[2pt]{\color{lgmuted}\footnotesize Actualizaciones registradas}};
+\draw[lgCall] (win.east) -- (med.west);
+\draw[lgCall] (med.south west) -- (aa.north);
+\draw[lgCall] (med.south) -- (bb.north);
+\draw[lgCall] (med.south east) -- (cc.north);
+\node[lgNote] at (7.55,-2.55) {Las áreas son suscripciones, no tipos. La selección se realiza por CambioComercial.};
+\end{tikzpicture}

@@ -1,0 +1,9 @@
+﻿Comprobante de venta
+Comprobante interno de demostración. Sin validez tributaria.
+Pedido: 48fa5ece-d6e2-4669-a0a7-8646c71b2db0
+Pago: LEG-6249D3D875975BA53210456E7E763B98A050B0BA91CCE27BD60CCBC7569445F5
+KIT_TELETRABAJO · Kit teletrabajo · 1 × USD 60.00
+Subtotal USD 60.00
+Descuento USD 6.00
+Envío USD 5.00
+Total cobrado USD 59.00

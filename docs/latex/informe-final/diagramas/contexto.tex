@@ -1,0 +1,12 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=3.7cm] (user) at (2.2,0) {{\color{acento}\itshape\footnotesize «actor»}\\[1pt]\textbf{Operador}\\[2pt]{\color{lgmuted}\footnotesize ADMIN, VENTAS, BODEGA, CONSULTA}};
+\node[lgBox,text width=3.95cm] (app) at (7.55,0) {{\color{acento}\itshape\footnotesize «sistema»}\\[1pt]\textbf{Logi\allowbreak{}Market 360}\\[2pt]{\color{lgmuted}\footnotesize Windows Forms y servicios locales}};
+\node[lgBox,text width=3.65cm] (data) at (12.9,0) {{\color{acento}\itshape\footnotesize «persistencia»}\\[1pt]\textbf{Archivo SQLite}\\[2pt]{\color{lgmuted}\footnotesize Datos operativos y Outbox}};
+\node[lgBox,text width=4.1cm] (sim) at (4.2,-2.15) {{\color{acento}\itshape\footnotesize «infraestructura»}\\[1pt]\textbf{Simuladores locales}\\[2pt]{\color{lgmuted}\footnotesize Cobro y avisos}};
+\node[lgBox,text width=4.1cm] (out) at (10.9,-2.15) {{\color{acento}\itshape\footnotesize «salida»}\\[1pt]\textbf{Comprobantes internos}\\[2pt]{\color{lgmuted}\footnotesize Vista previa o archivo TXT}};
+\draw[lgCall] (user.east) -- (app.west);
+\draw[lgCall] (app.east) -- (data.west);
+\draw[lgCall] (app.south west) |- (4.2,-1.16)  -- (sim.north);
+\draw[lgCall] (app.south east) |- (10.9,-1.16)  -- (out.north);
+\node[lgNote] at (7.55,-3.28) {El operador trabaja en el escritorio; el sistema persiste, simula y emite comprobantes.};
+\end{tikzpicture}

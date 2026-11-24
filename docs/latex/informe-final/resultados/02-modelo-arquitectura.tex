@@ -1,0 +1,33 @@
+\subsubsection{Modelo de dominio y de datos}
+\texttt{ProductoSimple} valida SKU, precio, peso y stock. \texttt{KitCompuesto} trabaja con \texttt{IElementoCatalogo} y controla los ciclos al agregar componentes. El precio suma los elementos directos y el desglose expande el grafo hasta productos físicos, con sus multiplicidades. \texttt{Cliente} conserva identidad y categoría NORMAL o VIP. \texttt{Usuario} contiene identidad, rol y hash. MAYORISTA es una política calculada a partir de unidades, independiente del rol y de la categoría persistida.
+
+El agregado \texttt{Pedido} controla sus cambios de estado y guarda detalles, componentes históricos e historial. Las líneas son propias del pedido y preservan identidad de catálogo, precios y cantidades físicas. Los movimientos de inventario guardan el signo, el saldo resultante, el motivo y la referencia. Una devolución puede existir para un pago único. Despacho y entrega se registran como datos operativos con guía y fechas. La auditoría conserva acciones, resultados y correlaciones.
+
+\diagrama{entidades}{entidades}{Clases del catálogo y del pedido con sus relaciones de composición.}
+\diagrama{relacional}{relacional}{Relaciones persistidas principales. Se muestran las restricciones que afectan el flujo de venta y recuperación.}
+\diagrama{estado}{estado}{Estados y transiciones autorizables del pedido. La devolución registra una operación vinculada tras la entrega.}
+
+\paragraph{Persistencia e integridad.}
+\ruta{LogiMarketDbContext} registra los modelos en \ruta{LogiMarket.Infrastructure/Persistencia/Modelo}. La migración \ruta{20261120214119_EsquemaInicial} crea el esquema. \ruta{DatosIniciales} comprueba datos existentes antes de agregar el catálogo de control y los roles. La auditoría archivó el arranque en un archivo nuevo, una verificación de integridad \texttt{ok} y cero errores de claves foráneas.
+
+Los modelos de catálogo, pedidos y operaciones declaran reglas de integridad y unicidad. En operaciones, las claves únicas cubren pedido, idempotencia y referencia de pago, la devolución única y la entrega de un evento por suscriptor. En catálogo, el SKU es único y las restricciones numéricas protegen precio, peso y stock. EF Core configura la persistencia y las transacciones de SQLite \cite{eftransaction,sqlitefk}. La transacción de escritura se abre antes de leer y actualizar los saldos críticos. El aislamiento del escritor en SQLite se comprueba con dos conexiones en P36 \cite{sqliteisolation}.
+
+\subsubsection{Arquitectura y dependencias}
+La arquitectura coloca invariantes y reglas del agregado en Domain, orquestación y puertos en Application, adaptadores técnicos en Infrastructure y presentación en WinForms. La inversión de dependencias se resuelve en el punto de composición \cite{cleanarch}. El comportamiento de escritorio se apoya en controles nativos Windows Forms \cite{winforms}.
+
+\diagrama{componentes}{componentes}{Referencias directas entre los cinco proyectos inspeccionados.}
+\begin{longtable}{@{}L{.21\linewidth}L{.25\linewidth}L{.47\linewidth}@{}}
+\toprule Proyecto & Referencias directas & Responsabilidad y puntos de comprobación \\ \midrule\endhead
+Domain & Ninguna propia & \ruta{Pedido}, \ruta{EstadoDelPedido}, catálogo, condiciones del stock e instantáneas. Sin UI ni persistencia. \\
+Application & Domain & Casos de uso, puertos y permisos. \ruta{OperacionesPedido} ejecuta comandos. \ruta{ConsultarReportePedidos} y \ruta{ConsultarEscritorio} resuelven consultas. \\
+Infrastructure & Application, Domain & EF Core 8, SQLite, migración, repositorios, PBKDF2, simulación de pago, TXT y Outbox. \\
+WinForms & Application, Infrastructure & \ruta{Program.CrearHost} compone Infrastructure. \ruta{VentanaComercial} recibe servicios, presenta resultados y navega. \\
+Tests & Domain, Application, Infrastructure & xUnit, dobles de puertos, conexiones SQLite reales y pruebas del grafo. \\
+\bottomrule
+\end{longtable}
+
+\plabel{Repository} \ruta{RepositorioPedidos.BuscarAsync} recupera el agregado con sus detalles; Application depende de \ruta{IRepositorioPedidos}. El catálogo separa \ruta{IConsultaCatalogo} e \ruta{IEscrituraCatalogo}. Las consultas de escritorio y reporte usan proyecciones de sus propios puertos.
+\plabel{Unidad de trabajo} \ruta{UnidadDeTrabajoSqlite.EnTransaccionAsync} inicia la transacción, guarda y confirma. Al fallar, el rastreo se limpia y la transacción se dispone sin confirmar. P20 introduce un evento con FK inválida y verifica que pedido, pago, stock y eventos de éxito no queden a medio actualizar.
+\plabel{CQRS básico} Los comandos expresan intención comercial y escriben por permisos. Las consultas entregan proyecciones para renderizar. Ambos caminos usan el mismo archivo SQLite; la separación corresponde a responsabilidades, sin añadir un bus externo.
+\plabel{Inyección} \ruta{RegistroPersistencia.AgregarPersistenciaLogiMarket} conecta los puertos con los concretos. La composición se verifica construyendo el proveedor con validación de ámbitos y comparando el grafo de los cinco \texttt{.csproj}.
+

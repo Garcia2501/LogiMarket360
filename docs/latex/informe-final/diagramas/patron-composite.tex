@@ -1,0 +1,10 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (iface) at (7.550000000000001,0) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{IElemento\allowbreak{}Catalogo}\\[2pt]{\color{lgmuted}\footnotesize CalcularPrecio · Aceptar}};
+\node[lgBox,text width=6.5cm] (prod) at (3.975,-1.55) {\textbf{Producto\allowbreak{}Simple}\\[2pt]{\color{lgmuted}\footnotesize Precio · Capturar}};
+\node[lgBox,text width=6.5cm] (kit) at (11.125000000000002,-1.55) {\textbf{Kit\allowbreak{}Compuesto}\\[2pt]{\color{lgmuted}\footnotesize AgregarComponente · Capturar}};
+\node[lgBox,text width=6.5cm] (k) at (7.550000000000001,-3.1) {\textbf{Kit\allowbreak{}Componente}\\[2pt]{\color{lgmuted}\footnotesize Cantidad · Elemento}};
+\draw[lgReal] (prod.north) -- (iface.south west);
+\draw[lgReal] (kit.north) -- (iface.south east);
+\draw[lgComp] (kit.south) -- (k.north);
+\node[lgNote] at (7.55,-4.1) {Cada KitComponente referencia un ProductoSimple o un KitCompuesto hijo.};
+\end{tikzpicture}

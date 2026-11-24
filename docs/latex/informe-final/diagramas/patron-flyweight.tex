@@ -1,0 +1,11 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (fac) at (3.975,0) {\textbf{Catalogo\allowbreak{}Visual\allowbreak{}Flyweight\allowbreak{}Factory}\\[2pt]{\color{lgmuted}\footnotesize CrearRenglon}};
+\node[lgBox,text width=6.5cm] (meta) at (11.125000000000002,0) {\textbf{Metadatos\allowbreak{}Producto\allowbreak{}Visual}\\[2pt]{\color{lgmuted}\footnotesize SKU · nombre · categoría · descripción}};
+\node[lgBox,text width=6.5cm] (a) at (3.975,-1.55) {\textbf{Renglon\allowbreak{}Catalogo\allowbreak{}Visual}\\[2pt]{\color{lgmuted}\footnotesize stock, cantidad y precio de la fila A}};
+\node[lgBox,text width=6.5cm] (bb) at (11.125000000000002,-1.55) {\textbf{Renglon\allowbreak{}Catalogo\allowbreak{}Visual}\\[2pt]{\color{lgmuted}\footnotesize stock, cantidad y precio de la fila B}};
+\draw[lgAssoc] (fac.east) -- (meta.west);
+\draw[lgDep] (fac.south) -- (a.north);
+\draw[lgAssoc] (a.north east) -- (meta.south west);
+\draw[lgAssoc] (bb.north) -- (meta.south);
+\node[lgNote] at (7.55,-2.55) {Dos filas con igual SKU comparten metadatos; sus valores extrínsecos quedan en cada fila.};
+\end{tikzpicture}

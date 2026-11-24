@@ -1,0 +1,16 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.0cm] (w) at (2.55,0) {{\color{acento}\itshape\footnotesize «proyecto»}\\[1pt]\textbf{Win\allowbreak{}Forms}\\[2pt]{\color{lgmuted}\footnotesize Presentación · Program\\compone DI}};
+\node[lgBox,text width=4.17cm] (i) at (7.55,0) {{\color{acento}\itshape\footnotesize «proyecto»}\\[1pt]\textbf{Infrastructure}\\[2pt]{\color{lgmuted}\footnotesize SQLite y EF Core\\Adaptadores}};
+\node[lgBox,text width=3.8cm] (t) at (12.55,0) {{\color{acento}\itshape\footnotesize «proyecto»}\\[1pt]\textbf{Tests}\\[2pt]{\color{lgmuted}\footnotesize Pruebas por capas}};
+\node[lgBox,text width=5.2cm] (a) at (6.5,-2.35) {{\color{acento}\itshape\footnotesize «proyecto»}\\[1pt]\textbf{Application}\\[2pt]{\color{lgmuted}\footnotesize Casos de uso y puertos}};
+\node[lgBox,text width=5.2cm] (d) at (8.35,-4.5) {{\color{acento}\itshape\footnotesize «proyecto»}\\[1pt]\textbf{Domain}\\[2pt]{\color{lgmuted}\footnotesize Agregados, reglas y estados}};
+\draw[lgDep] (w.east) -- (i.west);
+\draw[lgDep] (w.south) |-  (a.west);
+\draw[lgDep] (i.south) -- (a.north);
+\draw[lgDep] (t.west) -- (i.east);
+\draw[lgDep] (t.south west) |-  (a.east);
+\draw[lgDep] (a.south) -- (d.north west);
+\draw[lgDep] (i.south east) -- (9.82,-.83) -- (9.82,-3.55) -|  (d.north);
+\draw[lgDep] (t.south) |-  (d.east);
+\node[lgNote] at (7.55,-5.66) {Las dependencias apuntan al proyecto referenciado. WinForms usa Infrastructure en la composición.};
+\end{tikzpicture}

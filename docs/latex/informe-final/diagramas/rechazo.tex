@@ -1,0 +1,34 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgParticipant,text width=2.955cm] (p0) at (0.8,0) {Invocador\\Comandos};
+\draw[lgLife] (p0.south) -- (0.8,-13.42);
+\node[lgParticipant,text width=2.955cm] (p1) at (4.175,0) {Confirmacion\\PedidoFacade};
+\draw[lgLife] (p1.south) -- (4.175,-13.42);
+\node[lgParticipant,text width=2.955cm] (p2) at (7.55,0) {UnidadDeTrabajo\\Sqlite};
+\draw[lgLife] (p2.south) -- (7.55,-13.42);
+\node[lgParticipant,text width=2.955cm] (p3) at (10.925,0) {CadenaValidacion\\Pedido};
+\draw[lgLife] (p3.south) -- (10.925,-13.42);
+\node[lgParticipant,text width=2.955cm] (p4) at (14.3,0) {IPasarelaPago\\simulador};
+\draw[lgLife] (p4.south) -- (14.3,-13.42);
+\draw[lgActive] (4.092,-0.78) rectangle (4.258,-12.48);
+\draw[lgActive] (7.467,-1.56) rectangle (7.633,-11.70);
+\draw[lgActive] (10.842,-3.12) rectangle (11.008000000000001,-3.90);
+\draw[lgActive] (14.217,-7.02) rectangle (14.383000000000001,-7.80);
+\draw[lgCall] (0.8,-0.78) -- node[lgLabel,above] {ConfirmarAsync} (4.175,-0.78);
+\draw[lgCall] (4.175,-1.56) -- node[lgLabel,above] {EnTransaccionAsync} (7.55,-1.56);
+\draw[lgCall] (7.55,-2.34) -- node[lgLabel,above] {Ejecutar delegado} (4.175,-2.34);
+\draw[lgCall] (4.175,-3.12) -- node[lgLabel,above] {RevisarAsync} (10.925,-3.12);
+\node[lgBand] at (7.55,-3.90) {Alternativa A · Sin stock};
+\draw[lgError] (10.925,-4.68) -- node[lgLabel,above] {RechazoPedidoException: STOCK} (4.175,-4.68);
+\node[lgBand] at (7.55,-5.46) {Alternativa B · Stock válido y cobro rechazado};
+\draw[lgReturn] (10.925,-6.24) -- node[lgLabel,above] {Validación con cantidades físicas} (4.175,-6.24);
+\draw[lgCall] (4.175,-7.02) -- node[lgLabel,above] {CobrarAsync} (14.3,-7.02);
+\draw[lgReturn] (14.3,-7.80) -- node[lgLabel,above] {Respuesta no aprobada} (4.175,-7.80);
+\draw[lgError] (4.175,-8.58) -- (4.595,-8.58) -- (4.595,-8.84) -- (4.175,-8.84);
+\node[lgLabel,anchor=south west] at (4.194999999999999,-8.58) {RechazoPedidoException: COBRO};
+\node[lgBand] at (7.55,-9.36) {Salida común · No se confirma la transacción};
+\draw[lgError] (4.175,-10.14) -- node[lgLabel,above] {La excepción sale del delegado} (7.55,-10.14);
+\draw[lgCall] (7.55,-10.92) -- (7.97,-10.92) -- (7.97,-11.18) -- (7.55,-11.18);
+\node[lgLabel,anchor=south west] at (7.569999999999999,-10.92) {Limpiar rastreo y disponer transacción};
+\draw[lgError] (7.55,-11.70) -- node[lgLabel,above] {Propagar excepción de rechazo} (4.175,-11.70);
+\draw[lgError] (4.175,-12.48) -- node[lgLabel,above] {Rechazo; trazas y registro según finally} (0.8,-12.48);
+\end{tikzpicture}

@@ -1,0 +1,14 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=4.1466666666666665cm] (p) at (2.783333333333333,0) {\textbf{Producto\allowbreak{}Simple}\\[2pt]{\color{lgmuted}\footnotesize Aceptar}};
+\node[lgBox,text width=4.1466666666666665cm] (k) at (7.550000000000001,0) {\textbf{Kit\allowbreak{}Compuesto}\\[2pt]{\color{lgmuted}\footnotesize Aceptar}};
+\node[lgBox,text width=4.1466666666666665cm] (i) at (12.316666666666666,0) {{\color{acento}\itshape\footnotesize «interfaz»}\\[1pt]\textbf{IVisitante\allowbreak{}Catalogo}\\[2pt]{\color{lgmuted}\footnotesize Visitar(producto) / Visitar(kit)}};
+\node[lgBox,text width=4.1466666666666665cm] (de) at (2.783333333333333,-1.55) {\textbf{Visitante\allowbreak{}Desglose\allowbreak{}Sku}};
+\node[lgBox,text width=4.1466666666666665cm] (pe) at (7.550000000000001,-1.55) {\textbf{Visitante\allowbreak{}Peso\allowbreak{}Logistico}};
+\node[lgBox,text width=4.1466666666666665cm] (ab) at (12.316666666666666,-1.55) {{\color{acento}\itshape\footnotesize «abstracta»}\\[1pt]\textbf{Visitante\allowbreak{}Componentes}\\[2pt]{\color{lgmuted}\footnotesize Visitar(kit)}};
+\draw[lgCall] (p.north) |- (2.78,.82) -|  (i.north west);
+\draw[lgCall] (k.east) -- (i.west);
+\draw[lgReal] (ab.north) -- (i.south);
+\draw[lgInherit] (pe.east) -- (ab.west);
+\draw[lgInherit] (de.south) |- (2.78,-2.44) -|  (ab.south);
+\node[lgNote] at (7.55,-2.98) {Ambos elementos despachan a Visitar; ambos visitantes concretos heredan de VisitanteComponentes.};
+\end{tikzpicture}

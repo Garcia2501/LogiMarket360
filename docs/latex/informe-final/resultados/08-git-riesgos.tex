@@ -1,0 +1,43 @@
+\subsubsection{Gestión de Git, GitHub y trazabilidad}
+El repositorio fue creado y autorizado por el responsable del proyecto. \texttt{main} conserva la versión inicial. \texttt{develop} reúne las fases que habían sido verificadas e integradas. La interfaz vive en \ruta{feature/interfaz-winforms}; \ruta{audit/calidad-integral} contiene la corrección de Mediator, la refactorización de cantidades y pruebas adicionales. Se siguió Conventional Commits con incrementos asociados a código, pruebas o documentación. El corte del informe identifica sus bases reales.
+
+\begin{longtable}{@{}L{.36\linewidth}L{.17\linewidth}L{.40\linewidth}@{}}
+\toprule Rama & HEAD & Alcance \\ \midrule\endhead
+\texttt{main} & \texttt{9e5f254} & Base estable. \\
+\texttt{develop} & \texttt{4668f63} & Fase 3, antes de integrar interfaz y auditoría. \\
+\ruta{feature/interfaz-winforms} & \texttt{a4e428b} & Interfaz y corrección DPI. \\
+\ruta{audit/calidad-integral} & \texttt{12458bc} & Código y evidencia de auditoría. \\
+\bottomrule
+\end{longtable}
+
+\begin{longtable}{@{}L{.16\linewidth}L{.22\linewidth}L{.56\linewidth}@{}}
+\toprule Commit & Tipo y ámbito & Cambio verificable \\ \midrule\endhead
+\texttt{a4e428b} & fix / WinForms & Navegación y tarjetas adaptables para texto ampliado. \\
+\texttt{66cd254} & fix / Mediator & Métricas refrescadas al cambiar el estado del pedido. \\
+\texttt{ccc6cb3} & refactor / pedidos & Reutilizar cantidades físicas validadas. \\
+\texttt{9d89b66} & test / auditoría & Aumentar evidencia de flujos comerciales, entre ellos P23, P24 y P28. \\
+\texttt{12458bc} & docs / auditoría & Registrar cumplimiento, riesgos y evidencias. \\
+\bottomrule
+\end{longtable}
+
+El historial local y la evidencia de publicación mantienen separados estos cambios. No se trató la narrativa del informe como un cambio de código. La creación de \ruta{docs/documentacion-latex} desde \texttt{develop} consolidada queda condicionada a la verificación e integración de la auditoría. La revisión gráfica usa \ruta{docs/revision-grafica-latex}, basada en la auditoría, y mantiene esa base separada de \texttt{develop}. El repositorio se consulta en \url{https://github.com/Garcia2501/LogiMarket360}.
+
+\subsubsection{Riesgos, defectos y refactorizaciones}
+El registro documenta 13 riesgos observados en el código, historial o evidencia visual. Algunas correcciones antiguas conservan una comparación visual o un relato verificable, aunque no se recuperó para todas una ejecución diferencial TRX. Las referencias relativas de los proyectos \texttt{Domain}, \texttt{Application}, \texttt{Infrastructure} y \texttt{WinForms} parten de \ruta{src/LogiMarket.<Proyecto>}.
+
+\input{resultados/riesgos}
+
+\clearpage\subsubsection{Evaluación técnica al corte}
+\begin{longtable}{@{}L{.26\linewidth}L{.18\linewidth}L{.50\linewidth}@{}}
+\toprule Área & Estado & Fundamento \\ \midrule\endhead
+GoF & COMPLETO & 23 colaboraciones funcionales con fuente, pruebas y sus condiciones objetivas. \\
+P01--P38 & COMPLETO & La matriz detallada documenta las condiciones de los 38 escenarios de la guía. \\
+Integridad y seguridad & COMPLETO & Rollback, idempotencia, autorización, concurrencia, unicidad, persistencia y pruebas negativas. \\
+RNF03 & PARCIAL & Ambigüedad visual a 120 DPI y corrección a 144 DPI no verificada. \\
+RNF10 & PARCIAL & Registro de trece riesgos. Evidencias diferenciales incompletas para algunas mitigaciones históricas. \\
+Versión académica & PARCIAL & Portada pendiente de datos oficiales. Validación de DPI impide cerrar el expediente como apto. \\
+\bottomrule
+\end{longtable}
+\noindent\textbf{Estado de preparación al corte: NO LISTO PARA ENTREGA.}
+La suite, las reglas y la arquitectura sustentan el desarrollo técnico. La decisión de liberar sigue sujeta a la comprobación de presentación y a completar la portada. El informe preserva riesgos residuales de escalabilidad de reportes, escrituras diagnósticas y capacidad de reproceso Outbox.
+

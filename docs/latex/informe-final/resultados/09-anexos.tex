@@ -1,0 +1,31 @@
+\clearpage
+\subsubsection{Evidencia complementaria y reproducción}
+\paragraph{Artefactos originales y fuentes.}
+El archivo \ruta{evidencias/capturas.md} conserva origen y SHA-256 de cada captura. Las fuentes TikZ se incluyen bajo \ruta{diagramas/}, los fragmentos exactos con referencia de líneas en \ruta{codigo/} y los resultados TRX en \ruta{evidencias/}. Los comprobantes TXT internos de fase 3 acreditan venta y devolución. La guía APE 04 se cita como material de asignatura. Los diagramas forman parte del texto y se pueden volver a compilar con el proyecto LaTeX.
+
+\paragraph{Inventario, historial y operación de Outbox.}
+La Figura~\ref{fig:inventario-venta} muestra los saldos inmediatamente posteriores a la venta, antes del reintegro que presenta la Figura~\ref{fig:inventario}. La Figura~\ref{fig:cambio-precio} registra la edición del catálogo, cuya preservación histórica se coteja con la Figura~\ref{fig:pedidos}. Ambas comparaciones se corroboran en P08 y P35.
+\par\noindent\begin{minipage}[t]{.487\linewidth}\vistafig{inventario-venta.jpg}{inventario-venta}{7.4cm}{Existencias P01/P02/P03 de 7/4/19 después del cobro y de reabrir SQLite.}
+\end{minipage}\hfill\begin{minipage}[t]{.487\linewidth}\vistafig{cambio-precio.jpg}{cambio-precio}{7.4cm}{Edición del precio vigente de P01 a USD 21.00 en la base de demostración.}\end{minipage}\par
+
+\clearpage
+P21 comparó dos construcciones equivalentes de 1.000 filas con los cinco SKU de control. La Figura~\ref{fig:flyweight} recoge el recuento de objetos, identidad compartida y los bytes asignados en la ejecución. La memoria se mide para la construcción comparada, en el hilo que ejecuta la medición.
+\vistafig{flyweight.jpg}{flyweight}{10.7cm}{Demostración Flyweight sobre 1.000 renglones de catálogo.}
+La fábrica se crea para la proyección y usa el SKU como clave de los metadatos inmutables. Los datos extrínsecos conservan valores independientes por renglón. Este resultado caracteriza esa muestra; no estima consumo total de la aplicación ni del archivo SQLite.
+
+\clearpage
+P37 indujo un fallo del notificador y reapertura del mismo archivo. La Figura~\ref{fig:outbox-fallo} corresponde al primer intento. La Figura~\ref{fig:outbox-recuperado} muestra recuperación en el segundo intento. Los archivos \ruta{03-sqlite-antes-de-reiniciar.json} y \ruta{08-sqlite-recuperado.json} permiten cotejar la referencia de pago y la marca persistida de procesamiento.
+\vistafig{outbox-fallo.jpg}{outbox-fallo}{7.9cm}{Evento pendiente con un intento y un error simulado registrado.}
+\vistafig{outbox-recuperado.jpg}{outbox-recuperado}{7.9cm}{Evento recuperado al reprocesar y métrica de sesión registrada en Auditoría.}
+
+\clearpage
+La Figura~\ref{fig:metricas-panel} completa la comparación visual de P15 junto con la Figura~\ref{fig:outbox-recuperado}. Ambas se documentaron en el recorrido de fase 4. El contador de sesión expresa la actividad observada por el host en ejecución.
+\vistafig{metricas-panel.jpg}{metricas-panel}{10.7cm}{Panel general mostrando el mismo conteo que Auditoría en el recorrido de reproceso.}
+
+\clearpage
+\paragraph{Validación negativa del filtro.}
+En P26, el filtro incompleto \ruta{ESTADO =} devuelve un error con ubicación en la columna 9. La Figura~\ref{fig:interpreter-error} muestra el mensaje en la interfaz ejecutada. La prueba automatizada también confirma precedencia y manejo de paréntesis.
+\vistafig{interpreter-error.jpg}{interpreter-error}{10.9cm}{Error de sintaxis localizado en el monitor de reportes y comprobantes.}
+\paragraph{Repetición del cierre DPI.}
+Abrir la compilación del commit auditado usando la opción \ruta{--demo}. Verificar que el archivo sea el reservado para demostración bajo \ruta{LogiMarket360/Demostracion} en \texttt{\%LOCALAPPDATA\%}. No usar datos operativos. A 125\,\%, ir desde Panel a Auditoría en ventana normal, verificar físicamente las cuatro cifras y repetir maximizado. A 150\,\%, comprobar acceso y las once áreas autenticadas, ambos rótulos largos, tarjetas, solapamiento, contraste, posibilidad de desplazar y foco TAB en los dos tamaños. Registrar versión, DPI y capturas del recorrido.
+

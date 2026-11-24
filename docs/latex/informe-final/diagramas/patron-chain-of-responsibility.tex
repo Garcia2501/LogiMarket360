@@ -1,0 +1,13 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (cad) at (3.975,0) {\textbf{Cadena\allowbreak{}Validacion\allowbreak{}Pedido}\\[2pt]{\color{lgmuted}\footnotesize RevisarAsync}};
+\node[lgBox,text width=6.5cm] (paso) at (11.125000000000002,0) {{\color{acento}\itshape\footnotesize «abstracta»}\\[1pt]\textbf{Paso}\\[2pt]{\color{lgmuted}\footnotesize EjecutarAsync · RevisarAsync}};
+\node[lgBox,text width=2.955cm] (c) at (2.1875,-1.55) {\textbf{Cliente\allowbreak{}Activo}};
+\node[lgBox,text width=2.955cm] (li) at (5.762500000000001,-1.55) {\textbf{Lineas\allowbreak{}Positivas}};
+\node[lgBox,text width=2.955cm] (s) at (9.3375,-1.55) {\textbf{Stock\allowbreak{}Suficiente}};
+\node[lgBox,text width=2.955cm] (e) at (12.912500000000001,-1.55) {\textbf{Estado\allowbreak{}Valido}};
+\draw[lgAssoc] (cad.east) -- (paso.west);
+\draw[lgCall] (c.east) -- (li.west);
+\draw[lgCall] (li.east) -- (s.west);
+\draw[lgCall] (s.east) -- (e.west);
+\node[lgNote] at (7.55,-2.55) {Las cuatro clases de la segunda fila heredan de Paso y aparecen en orden de ejecución.};
+\end{tikzpicture}

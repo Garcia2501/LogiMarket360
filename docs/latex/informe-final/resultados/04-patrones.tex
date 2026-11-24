@@ -1,0 +1,281 @@
+\clearpage\subsubsection{Patrones GoF creacionales}
+Se presenta cada patrón mediante su problema, código real, participantes, prueba y costo. La nomenclatura de las tres familias se toma del catálogo GoF \cite{gof}. Los diagramas muestran las colaboraciones relevantes para el caso de uso.
+\paragraph{Factory Method}
+\plabel{Problema y propósito} Seleccionar EMAIL o SMS para un evento durable sin acoplar el suscriptor a la construcción de cada emisor.
+\plabel{Participantes y colaboración} Application/Eventos/\ruta{AvisosSimulados.cs} \ruta{CreadorEmail.Crear}, \ruta{CreadorSms.Crear} y \ruta{ObservadorAvisos.RecibirAsync}. CreadorEmail y CreadorSms especializan Crear. El observador selecciona por canal, genera el contenido del evento y lo registra mediante el puerto. El aviso se dispara al reprocesar Outbox, después del commit.
+\plabel{Intervención en el caso de uso} Outbox selecciona emisor mediante creadores DI.
+\diagrama{patron-factory-method}{factory-method}{Colaboración Factory Method en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Eventos/AvisosSimulados.cs}, líneas 22--34 del commit auditado.
+\lstinputlisting[firstnumber=22]{codigo/factory-method.cs}
+\plabel{Prueba y resultado} P11 y P30 comprueban tipo, canal y contenido distintivo. El aviso es un registro simulado, sin correo ni SMS reales. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{OutboxComercialTests.P11_P30}.
+\plabel{Beneficio y costo} Canal intercambiable; dos creadores.
+\medskip
+\clearpage
+\paragraph{Abstract Factory}
+\plabel{Problema y propósito} Obtener tarifa, plazo y etiqueta de la misma modalidad y detectar combinaciones inconsistentes.
+\plabel{Participantes y colaboración} Application/Entregas/\ruta{FamiliasEntrega.cs} \ruta{FabricaEntrega.Crear}, variantes, \ruta{FamiliasEntrega.Obtener}. FabricaEntregaEstandar y FabricaEntregaExpres crean TarifaEntrega, PlazoEntrega y EtiquetaEntrega. ValorarPedido y DespacharPedidos usan la familia resuelta para cotizar y elaborar la guía.
+\plabel{Intervención en el caso de uso} Valorar y despachar reciben componentes de la misma familia.
+\diagrama{patron-abstract-factory}{abstract-factory}{Colaboración Abstract Factory en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Entregas/FamiliasEntrega.cs}, líneas 29--37 del commit auditado.
+\lstinputlisting[firstnumber=29]{codigo/abstract-factory.cs}
+\plabel{Prueba y resultado} P12 cotejó USD 5.00 y 3 días para ESTÁNDAR, USD 12.00 y 1 día para EXPRÉS, y guías distinguibles. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{OperacionesComercialesTests.P12}.
+\plabel{Beneficio y costo} Evita mezclar variantes; tres productos por familia.
+\medskip
+\clearpage
+\paragraph{Builder}
+\plabel{Problema y propósito} Construir un pedido con identidad, cliente y varias líneas preservando la coherencia del agregado.
+\plabel{Participantes y colaboración} Application/Pedidos/\ruta{PedidoBuilder.cs} \ruta{Construir}, \ruta{AdministrarPedidos.CrearAsync} y \ruta{Pedido}. AdministrarPedidos prepara instantáneas y usa el builder para componer las líneas. Construir materializa Pedido con el usuario y la fecha, antes de solicitar persistencia.
+\plabel{Intervención en el caso de uso} Construye líneas y snapshots para altas válidas.
+\diagrama{patron-builder}{builder}{Colaboración Builder en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Pedidos/PedidoBuilder.cs}, líneas 19--30 del commit auditado.
+\lstinputlisting[firstnumber=19]{codigo/builder.cs}
+\plabel{Prueba y resultado} P13 rechaza pedido vacío y cliente inexistente. La prueba de alta con varios renglones obtiene subtotal USD 67.00. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{OperacionesComercialesTests.ABMCatalogoClientesYBorradoresPreservaInstantaneas}.
+\plabel{Beneficio y costo} Composición explícita; coordina invariantes.
+\medskip
+\clearpage
+\paragraph{Prototype}
+\plabel{Problema y propósito} Duplicar un borrador comercial sin trasladar su identidad persistente ni compartir líneas mutables.
+\plabel{Participantes y colaboración} Domain/Pedidos/\ruta{Pedido.Borrador.cs} \ruta{ClonarComoBorrador}; Application/Pedidos/\ruta{AdministrarPedidos.cs} \ruta{ClonarBorradorAsync}. ClonarComoBorrador exige edición permitida y crea un pedido nuevo. Las líneas se reconstruyen con copias de sus snapshots. El caso de uso carga y persiste la copia mediante el repositorio.
+\plabel{Intervención en el caso de uso} Pedido y líneas se copian con identidad nueva.
+\diagrama{patron-prototype}{prototype}{Colaboración Prototype en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Domain/Pedidos/Pedido.Borrador.cs}, líneas 8--20 del commit auditado.
+\lstinputlisting[firstnumber=8]{codigo/prototype.cs}
+\plabel{Prueba y resultado} P14 modifica una copia sin cambiar la plantilla ni otra copia. La evidencia visual conserva identificadores distintos. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{PatronesBorradorTests.P14}; fase 4, captura 16.
+\plabel{Beneficio y costo} Reutilización; copia proporcional al grafo.
+\medskip
+\clearpage
+\paragraph{Singleton}
+\plabel{Problema y propósito} Compartir un contador coherente entre los observadores y dos vistas, aunque se resuelvan en distintos ámbitos de DI.
+\plabel{Participantes y colaboración} Application/Eventos/\ruta{MetricasSesion.cs} \ruta{Registrar}, \ruta{Contar}; Infrastructure/Persistencia/\ruta{RegistroPersistencia.cs}. El registro de persistencia instancia MetricasSesion como singleton del host. El acumulador deduplica por evento. ConsultarEscritorio proyecta métricas en Panel y Auditoría.
+\plabel{Intervención en el caso de uso} DI comparte una instancia entre Outbox y consultas de ambas vistas.
+\diagrama{patron-singleton}{singleton}{Colaboración Singleton en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Eventos/MetricasSesion.cs}, líneas 6--18 del commit auditado.
+\lstinputlisting[firstnumber=6]{codigo/singleton.cs}
+\plabel{Prueba y resultado} P15 y P37 verifican identidad, 50 eventos únicos en paralelo y el valor 1 en dos vistas de una misma sesión. Tras cerrar el proceso el contador de sesión empieza de nuevo. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{MetricasSesionTests.P15}; \ruta{OutboxComercialTests.P37}; fase 4, capturas 06–07.
+\plabel{Beneficio y costo} Coherencia por proceso; memoria por evento.
+\medskip
+\clearpage
+\subsubsection{Patrones GoF estructurales}
+\paragraph{Adapter}
+\plabel{Problema y propósito} Aprovechar el simulador legado que recibe centavos y entregar una respuesta uniforme al caso de uso.
+\plabel{Participantes y colaboración} Infrastructure/Pagos/\ruta{PasarelasSimuladas.cs} \ruta{PasarelaLegadaAdapter.CobrarAsync}, \ruta{ResolutorPasarelas.Obtener}. El adaptador convierte decimal a unidades menores, valida precisión a través del conversor y normaliza la respuesta. ResolutorPasarelas también puede seleccionar PasarelaAlternaSimulada con el mismo contrato.
+\plabel{Intervención en el caso de uso} Adapta llamadas de confirmación y admite alterno.
+\diagrama{patron-adapter}{adapter}{Colaboración Adapter en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Infrastructure/Pagos/PasarelasSimuladas.cs}, líneas 25--35 del commit auditado.
+\lstinputlisting[firstnumber=25]{codigo/adapter.cs}
+\plabel{Prueba y resultado} P16 prueba ambos proveedores, valor USD 5.21, repetición y rechazo de importes inválidos. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{ConfirmacionTests.P16}.
+\plabel{Beneficio y costo} Sustitución; valida precisión al convertir.
+\medskip
+\clearpage
+\paragraph{Bridge}
+\plabel{Problema y propósito} Combinar dos tipos de documento interno con dos medios sin duplicar una clase por cada combinación.
+\plabel{Participantes y colaboración} Application/Documentos/\ruta{Comprobante.cs} \ruta{EmitirAsync}; \ruta{EmitirComprobantes.EjecutarAsync}; Infrastructure/Documentos/\ruta{ArchivoTXT.cs}. ComprobanteVenta y ComprobanteDevolucion preparan DocumentoInterno. Comprobante.EmitirAsync delega el contenido al puerto ISalidaDocumento, implementado por VistaPrevia y ArchivoTXT.
+\plabel{Intervención en el caso de uso} Dos tipos de comprobante $\times$ vista y archivo.
+\diagrama{patron-bridge}{bridge}{Colaboración Bridge en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Documentos/Comprobante.cs}, líneas 26--35 del commit auditado.
+\lstinputlisting[firstnumber=26]{codigo/bridge.cs}
+\plabel{Prueba y resultado} P17 cubre cuatro combinaciones. El paquete conserva comprobantes TXT reales de USD 59.00 y USD 54.00. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{ComprobantesTests.BridgeEntregaVentaYDevolucionACadaUnoDeLosDosMedios}; TXT y registro visual de fase 3.
+\plabel{Beneficio y costo} Cambios independientes; contrato de documento común.
+\medskip
+\clearpage
+\paragraph{Composite}
+\plabel{Problema y propósito} Tratar productos y kits como elementos uniformes, incluyendo kits dentro de kits.
+\plabel{Participantes y colaboración} Domain/Catalogo/\ruta{IElementoCatalogo.cs}, \ruta{ProductoSimple}, \ruta{KitCompuesto.CalcularPrecio}, \ruta{AgregarComponente}. ProductoSimple resuelve el precio de una hoja. KitCompuesto suma precios de sus elementos con cantidades, comprueba ciclos al agregar y genera snapshots. La confirmación descuenta SKU físicos.
+\plabel{Intervención en el caso de uso} Seed compone kits y fachada descuenta hojas.
+\diagrama{patron-composite}{composite}{Colaboración Composite en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Domain/Catalogo/KitCompuesto.cs}, líneas 79--89 del commit auditado.
+\lstinputlisting[firstnumber=79]{codigo/composite.cs}
+\plabel{Prueba y resultado} P18 confirma precios 50.00 y 60.00, anidación y rechazo de ciclos. P05 comprueba que el stock del componente P02 gobierna la confirmación. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{InicializacionTests.P01}; CatalogoTests; RestriccionesSqliteTests.
+\plabel{Beneficio y costo} Composición anidada; necesita controlar ciclos.
+\medskip
+\clearpage
+\paragraph{Decorator}
+\plabel{Problema y propósito} Correlacionar el intento de pago, la llamada al proveedor y el desenlace sin cambiar su contrato.
+\plabel{Participantes y colaboración} Application/Pagos/\ruta{AuditoriaPagoDecorator.cs} \ruta{CobrarAsync}, \ruta{ITrazasPago}. AuditoriaPagoDecorator escribe etapas mediante ITrazasPago y delega al proveedor envuelto. La fachada guarda la traza fuera de la transacción comercial concluida o revertida.
+\plabel{Intervención en el caso de uso} Envuelve al proveedor y correlaciona etapas.
+\diagrama{patron-decorator}{decorator}{Colaboración Decorator en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Pagos/AuditoriaPagoDecorator.cs}, líneas 7--20 del commit auditado.
+\lstinputlisting[firstnumber=7]{codigo/decorator.cs}
+\plabel{Prueba y resultado} P19 compara INICIO, PASARELA, FIN o ERROR. ITrazasPago es intercambiable y queda el riesgo residual de persistencia diagnóstica R12. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{ConfirmacionTests.P06_P19} y P16.
+\plabel{Beneficio y costo} Auditoría transversal; persistencia posterior al commit.
+\medskip
+\clearpage
+\paragraph{Facade}
+\plabel{Problema y propósito} Exponer una operación única para confirmar, aunque intervengan permisos, existencias, pago y persistencia.
+\plabel{Participantes y colaboración} Application/Pagos/\ruta{ConfirmacionPedidoFacade.cs} \ruta{ConfirmarAsync} y \ruta{ConfirmarEnTransaccionAsync}. ConfirmarAsync exige permiso y abre unidad de trabajo. ConfirmarEnTransaccionAsync resuelve idempotencia, revisa el pedido y consulta la pasarela. Una aprobación aplica el pago, modifica saldos y encola Outbox.
+\plabel{Intervención en el caso de uso} Valida y valora, registra pago, stock y Outbox.
+\diagrama{patron-facade}{facade}{Colaboración Facade en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Pagos/ConfirmacionPedidoFacade.cs}, líneas 50--65 del commit auditado.
+\lstinputlisting[firstnumber=50]{codigo/facade.cs}
+\plabel{Prueba y resultado} P02–P07 comprueban cálculo, rechazo e idempotencia. P20 prueba reversión cuando falla la persistencia previa al commit. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{ConfirmacionTests.P02_P03_P04}. \ruta{ConfirmacionTests.P05}. \ruta{ConfirmacionTests.P06_P19}. \ruta{ConfirmacionTests.P07_P08}. \ruta{ConfirmacionTests.P20}.
+\plabel{Beneficio y costo} Punto de entrada estable; varios colaboradores.
+\medskip
+\clearpage
+\paragraph{Flyweight}
+\plabel{Problema y propósito} Reducir objetos repetidos de nombre, categoría y descripción cuando un mismo SKU se representa muchas veces.
+\plabel{Participantes y colaboración} Application/Catalogo/\ruta{CatalogoVisualFlyweightFactory.cs} \ruta{CrearRenglon}, \ruta{ConsultarCatalogoVisual.DemostrarAsync}. Cada renglón mantiene precio, cantidad y stock propios. La fábrica interna comparte un objeto inmutable por SKU. La comparación usó la misma cantidad y orden de filas y metadatos equivalentes.
+\plabel{Intervención en el caso de uso} Comparte metadatos e independiza precio, cantidad y saldo.
+\diagrama{patron-flyweight}{flyweight}{Colaboración Flyweight en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Catalogo/CatalogoVisualFlyweightFactory.cs}, líneas 18--31 del commit auditado.
+\lstinputlisting[firstnumber=18]{codigo/flyweight.cs}
+\plabel{Prueba y resultado} P21 verificó identidad de referencia y 5 frente a 1.000 metadatos. La ejecución archivada midió 56.752 frente a 104.024 bytes asignados. El valor corresponde a esa medición, no a todo el proceso. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{FlyweightTests.P21}; fase 4, captura 10; protocolo fase 3.
+\plabel{Beneficio y costo} Menos asignaciones con repetición; diccionario por proyección.
+\medskip
+\clearpage
+\paragraph{Proxy}
+\plabel{Problema y propósito} Evitar que roles de consulta o bodega inicien un cobro o induzcan trazas de la pasarela.
+\plabel{Participantes y colaboración} Application/Pagos/\ruta{PagoAutorizadoProxy.cs} \ruta{CobrarAsync}; Infrastructure/Pagos/\ruta{PasarelasSimuladas.cs} \ruta{Obtener}. El resolutor arma Proxy, Decorator y Adapter/alterno en ese orden. Proxy vuelve a verificar Operacion.Cobrar inmediatamente antes de acceder al decorador.
+\plabel{Intervención en el caso de uso} Exige autorización antes del Decorator y Adapter.
+\diagrama{patron-proxy}{proxy}{Colaboración Proxy en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Pagos/PagoAutorizadoProxy.cs}, líneas 8--13 del commit auditado.
+\lstinputlisting[firstnumber=8]{codigo/proxy.cs}
+\plabel{Prueba y resultado} P22 verifica cero llamadas y cero etapas de cobro para CONSULTA y BODEGA, con auditoría de seguridad. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{ConfirmacionTests.P22}.
+\plabel{Beneficio y costo} Bloquea efectos; requiere orden correcto de DI.
+\medskip
+\clearpage
+\subsubsection{Patrones GoF comportamentales}
+\paragraph{Chain of Responsibility}
+\plabel{Problema y propósito} Detener la confirmación en el primer requisito de negocio aplicable y conservar un código diagnóstico.
+\plabel{Participantes y colaboración} Application/Pedidos/\ruta{CadenaValidacionPedido.cs} \ruta{RevisarAsync}, \ruta{Paso.EjecutarAsync}. La fachada exige el rol. La cadena comprueba cliente, líneas, stock y estado. El resultado incluye las cantidades físicas validadas, que se reutilizan en valoración e inventario.
+\plabel{Intervención en el caso de uso} Cliente $\to$ líneas $\to$ stock $\to$ estado; permiso en fachada.
+\diagrama{patron-chain-of-responsibility}{chain-of-responsibility}{Colaboración Chain of Responsibility en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Pedidos/CadenaValidacionPedido.cs}, líneas 21--33 del commit auditado.
+\lstinputlisting[firstnumber=21]{codigo/chain-of-responsibility.cs}
+\plabel{Prueba y resultado} P23 verifica CLIENTE antes que STOCK y ausencia de efectos de negocio y de pasarela. La prueba examina la fase de precondiciones. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{OperacionesComercialesTests.P23}, validación y fachada. Cotejo del cliente ausente: \ruta{cotejo-p23.trx}.
+\plabel{Beneficio y costo} Reglas aisladas; orden semántico.
+\medskip
+\clearpage
+\paragraph{Command}
+\plabel{Problema y propósito} Representar confirmar, cancelar, despachar o devolver como una acción que la interfaz y las pruebas puedan invocar de la misma forma.
+\plabel{Participantes y colaboración} Application/Comandos/\ruta{ComandosPedido.cs}, \ruta{OperacionesPedido.ConfirmarAsync}, \ruta{InvocadorComandos.EjecutarAsync}. OperacionesPedido liga cada comando con su caso receptor. El invocador ejecuta, conserva correlación y registra el resultado. La interfaz despacha el mismo tipo de comando que las pruebas.
+\plabel{Intervención en el caso de uso} Confirmar, cancelar, despachar y devolver quedan trazables.
+\diagrama{patron-command}{command}{Colaboración Command en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Comandos/InvocadorComandos.cs}, líneas 16--32 del commit auditado.
+\lstinputlisting[firstnumber=16]{codigo/command.cs}
+\plabel{Prueba y resultado} P24 usa a Ana y el proveedor LEGADO. El resultado USD 59.00 se asocia a ConfirmarPedidoCommand y a auditoría de éxito. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{OutboxComercialTests.P24}; recorrido P24 en evidencia de fase 3 y TXT de venta.
+\plabel{Beneficio y costo} Separa invocador de receptor; auditoría posterior.
+\medskip
+\clearpage
+\paragraph{Interpreter}
+\plabel{Problema y propósito} Permitir expresiones del usuario sin convertir su texto en SQL.
+\plabel{Participantes y colaboración} Application/Reportes/\ruta{ParserFiltroPedido.cs} \ruta{Parsear}, \ruta{FiltroPedidos.Cumple}, \ruta{ConsultarReportePedidos.EjecutarAsync}. El parser construye nodos de estado, total y cliente, combina AND antes de OR y respeta paréntesis. ConsultarReportePedidos evalúa el árbol mediante Cumple. Los errores señalan la columna.
+\plabel{Intervención en el caso de uso} Parser produce árbol y reporte lo aplica.
+\diagrama{patron-interpreter}{interpreter}{Colaboración Interpreter en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Reportes/ParserFiltroPedido.cs}, líneas 15--28 del commit auditado.
+\lstinputlisting[firstnumber=15]{codigo/interpreter.cs}
+\plabel{Prueba y resultado} P25 recupera solo el pedido coincidente. P26 verifica sintaxis incorrecta, precedencia, paréntesis y error localizable. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{FiltroPedidosTests.P25}; recorrido de fase 4. \ruta{FiltroPedidosTests.P26}; cierre fase 4, captura 20.
+\plabel{Beneficio y costo} Precedencia verificable; lectura materializada.
+\medskip
+\clearpage
+\paragraph{Iterator}
+\plabel{Problema y propósito} Recorrer los componentes físicos de kits anidados sin ceder la colección mutable ni perder multiplicidades.
+\plabel{Participantes y colaboración} Domain/Catalogo/\ruta{IteradorComponentesFisicos.cs} \ruta{Recorrer}; \ruta{AdministrarCatalogo.ConsultarExistenciasAsync}. Recorrer mantiene el estado de recorrido y entrega hojas en orden determinista, propagando factores de cantidad. La consulta de existencias por kit usa ese resultado.
+\plabel{Intervención en el caso de uso} Enumera hojas con multiplicidad en consulta real.
+\diagrama{patron-iterator}{iterator}{Colaboración Iterator en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Domain/Catalogo/IteradorComponentesFisicos.cs}, líneas 8--23 del commit auditado.
+\lstinputlisting[firstnumber=8]{codigo/iterator.cs}
+\plabel{Prueba y resultado} P27 devuelve P01, P02 y P03 en orden. También se comprobaron ramas compartidas y multiplicidades sin bucles. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{RecorridosCatalogoTests.P27_P34} e IteratorEsDeterminista.
+\plabel{Beneficio y costo} Oculta estado de recorrido; pila e instantánea.
+\medskip
+\clearpage
+\paragraph{Mediator}
+\plabel{Problema y propósito} Actualizar vistas dependientes sin que una pantalla conozca a las demás.
+\plabel{Participantes y colaboración} Application/Navegacion/\ruta{FormularioPrincipalMediator.cs} \ruta{NotificarAsync}/\ruta{Destinos}; WinForms/\ruta{VentanaComercial.cs} \ruta{NotificarAsync}. Destinos decide qué secciones dependen del cambio y NotificarAsync ejecuta las suscripciones. El flujo de confirmación sincroniza catálogo, carrito, pedidos, inventario y métricas.
+\plabel{Intervención en el caso de uso} Panel, auditoría, inventario, carrito y pedidos se refrescan mediante suscripciones.
+\diagrama{patron-mediator}{mediator}{Colaboración Mediator en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Navegacion/FormularioPrincipalMediator.cs}, líneas 36--48 del commit auditado.
+\lstinputlisting[firstnumber=36]{codigo/mediator.cs}
+\plabel{Prueba y resultado} P28 verifica cinco colaboradores. La regresión de despacho probó que el contador bajara de 1 a 0 y que Outbox pasara de 1 a 2 después del arreglo. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{MediadorComercialTests.ConfirmacionRefrescaCincoColaboradoresSobreElEstadoConfirmado}; recorrido de fase 3.
+\plabel{Beneficio y costo} Sin llamadas entre vistas; mantener destinos al añadir eventos.
+\medskip
+\clearpage
+\paragraph{Memento}
+\plabel{Problema y propósito} Deshacer y rehacer borradores sin permitir revertir un pago ni modificar el historial de estados.
+\plabel{Participantes y colaboración} Domain/Pedidos/\ruta{Pedido.Borrador.cs} \ruta{CapturarBorrador}/\ruta{RestaurarBorrador}, Application/Pedidos/\ruta{HistorialBorrador.cs}. Pedido es el originador y copia sus líneas en un memento. HistorialBorrador guarda hasta cinco estados y controla versiones. La restauración se autoriza solo mientras admite edición.
+\plabel{Intervención en el caso de uso} Historial acotado que deshace y rehace con control de versión.
+\diagrama{patron-memento}{memento}{Colaboración Memento en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Domain/Pedidos/Pedido.Borrador.cs}, líneas 22--36 del commit auditado.
+\lstinputlisting[firstnumber=22]{codigo/memento.cs}
+\plabel{Prueba y resultado} P29 comprueba tres ediciones, dos retrocesos, un avance, límite de cinco y bloqueo tras confirmar. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{PatronesBorradorTests.P29}; fase 4, captura 17.
+\plabel{Beneficio y costo} Reversión aislada; memoria por pedido activo.
+\medskip
+\clearpage
+\paragraph{Observer}
+\plabel{Problema y propósito} Notificar distintos efectos de un hecho de negocio confirmado, con recuperación por suscriptor.
+\plabel{Participantes y colaboración} Application/Eventos/\ruta{PublicadorEventos.cs} \ruta{PublicarAsync}; Infrastructure/Persistencia/Eventos/\ruta{EntregaDurableSqlite.cs} \ruta{EntregarAsync}. PublicadorEventos recorre a los observadores de avisos, métricas y auditoría. EntregaDurableSqlite separa la entrega por suscriptor y preserva marcas persistentes según el tipo de efecto.
+\plabel{Intervención en el caso de uso} Outbox despacha a auditoría, avisos y métricas.
+\diagrama{patron-observer}{observer}{Colaboración Observer en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Eventos/PublicadorEventos.cs}, líneas 31--36 del commit auditado.
+\lstinputlisting[firstnumber=31]{codigo/observer.cs}
+\plabel{Prueba y resultado} P30 confirma los tres efectos y ausencia de evento exitoso tras rollback. P37 confirma recuperación y deduplicación. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{OutboxComercialTests.P11_P30} y P37; \ruta{ConfirmacionTests.P20}. \ruta{OutboxComercialTests.P37}; fase 4, capturas 02/06.
+\plabel{Beneficio y costo} Suscriptores ampliables; marcas idempotentes.
+\medskip
+\clearpage
+\paragraph{State}
+\plabel{Problema y propósito} Encapsular qué acciones admite el pedido en cada etapa y registrar solo transiciones autorizadas.
+\plabel{Participantes y colaboración} Domain/Pedidos/\ruta{EstadoDelPedido.cs} \ruta{Para}, Domain/Pedidos/\ruta{Pedido.cs}. EstadoDelPedido.Para resuelve el comportamiento del valor persistible. Borrador admite editar, validar o cancelar. Validado admite pagar o cancelar. Pagado y Despachado avanzan; los estados cerrados deniegan los cambios.
+\plabel{Intervención en el caso de uso} Agregado delega acciones en comportamiento del estado.
+\diagrama{patron-state}{state}{Colaboración State en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Domain/Pedidos/EstadoDelPedido.cs}, líneas 29--45 del commit auditado.
+\lstinputlisting[firstnumber=29]{codigo/state.cs}
+\plabel{Prueba y resultado} P31 recorre el ciclo permitido y rechaza repetición, retroceso y cancelación después de pagar. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{PedidoTests.StateRegistraSoloTransicionesAutorizadasPorElEstado}.
+\plabel{Beneficio y costo} Centraliza transiciones; mapa persistencia/comportamiento.
+\medskip
+\clearpage
+\paragraph{Strategy}
+\plabel{Problema y propósito} Seleccionar una política vigente en función de prioridad, cliente y cantidad física final.
+\plabel{Participantes y colaboración} Application/Precios/\ruta{CalculadoraPedido.cs} \ruta{Calcular}, \ruta{IPoliticaDescuento}. Las estrategias SinDescuento, Vip10 y Mayorista15 reciben el contexto. Calcular filtra aplicables, elige una por prioridad y redondea el descuento con AwayFromZero.
+\plabel{Intervención en el caso de uso} Valorar elige mayorista, VIP o normal sin acumular.
+\diagrama{patron-strategy}{strategy}{Colaboración Strategy en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Precios/CalculadoraPedido.cs}, líneas 46--55 del commit auditado.
+\lstinputlisting[firstnumber=46]{codigo/strategy.cs}
+\plabel{Prueba y resultado} P32 obtiene 0.00, 6.00 y 15.00 en los escenarios correspondientes. Prueba que VIP y MAYORISTA no se acumulan y cubre una política nueva. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{OperacionesComercialesTests.P32} y PromocionYUmbralFisico.
+\plabel{Beneficio y costo} Extensión por DI; mantener prioridades inequívocas.
+\medskip
+\clearpage
+\paragraph{Template Method}
+\plabel{Problema y propósito} Conservar la misma secuencia de devolución para varios motivos, con plazos y condiciones propios.
+\plabel{Participantes y colaboración} Application/Devoluciones/\ruta{ProcesarDevolucion.cs} \ruta{EjecutarAsync} y variantes. El método plantilla ordena elegibilidad, inspección, cálculo histórico, registro, reintegro y evento. Las variantes DevolucionPorDefecto y DevolucionPorArrepentimiento resuelven la condición particular.
+\plabel{Intervención en el caso de uso} Misma secuencia para elegibilidad, reembolso, stock y evento.
+\diagrama{patron-template-method}{template-method}{Colaboración Template Method en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Application/Devoluciones/ProcesarDevolucion.cs}, líneas 44--60 del commit auditado.
+\lstinputlisting[firstnumber=44]{codigo/template-method.cs}
+\plabel{Prueba y resultado} P33 acepta DEFECTO día 20 y rechaza ARREPENTIMIENTO día 10 sin efectos. P35 comprueba USD 54.00 sin flete y devolución única. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{LogisticaTests.P33}. \ruta{LogisticaTests.P35}; capturas usuario-inventario, usuario-devolucion y usuario-auditoria.
+\plabel{Beneficio y costo} Mantiene orden; limitar pasos variables.
+\medskip
+\clearpage
+\paragraph{Visitor}
+\plabel{Problema y propósito} Añadir operaciones de desglose y peso a árboles de catálogo sin integrarlas en las entidades.
+\plabel{Participantes y colaboración} Domain/Catalogo/\ruta{VisitantesCatalogo.cs}, \ruta{ProductoSimple.Aceptar}, \ruta{KitCompuesto.Aceptar}; \ruta{ConsultarLogisticaAsync}. Aceptar distingue hoja y kit. VisitanteComponentes propaga cantidades. VisitanteDesgloseSku acumula unidades y VisitantePesoLogistico suma el peso físico en la consulta logística.
+\plabel{Intervención en el caso de uso} El catálogo aplica visitantes de desglose y peso.
+\diagrama{patron-visitor}{visitor}{Colaboración Visitor en LogiMarket 360.}
+\plabel{Código fuente} \ruta{src/LogiMarket.Domain/Catalogo/VisitantesCatalogo.cs}, líneas 12--26 del commit auditado.
+\lstinputlisting[firstnumber=12]{codigo/visitor.cs}
+\plabel{Prueba y resultado} P34 obtiene P01, P02 y P03 y peso 1.00 kg. La suite comprueba también multiplicidad por tres. \textbf{COMPLETO}.
+\plabel{Evidencia} \ruta{RecorridosCatalogoTests.P27_P34}; fase 4, captura 09.
+\plabel{Beneficio y costo} Reportes extensibles; nuevo nodo afecta el contrato.
+\medskip
+
+

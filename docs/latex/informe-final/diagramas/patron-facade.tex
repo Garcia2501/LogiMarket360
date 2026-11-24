@@ -1,0 +1,13 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=6.5cm] (fac) at (7.550000000000001,0) {\textbf{Confirmacion\allowbreak{}Pedido\allowbreak{}Facade}\\[2pt]{\color{lgmuted}\footnotesize ConfirmarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (u) at (2.783333333333333,-1.4) {\textbf{IUnidad\allowbreak{}De\allowbreak{}Trabajo}\\[2pt]{\color{lgmuted}\footnotesize EnTransaccionAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (v) at (7.550000000000001,-1.4) {\textbf{Cadena\allowbreak{}Validacion\allowbreak{}Pedido}\\[2pt]{\color{lgmuted}\footnotesize RevisarAsync}};
+\node[lgBox,text width=4.1466666666666665cm] (pay) at (12.316666666666666,-1.4) {\textbf{IResolutor\allowbreak{}Pasarelas}\\[2pt]{\color{lgmuted}\footnotesize Obtener}};
+\node[lgBox,text width=4.1466666666666665cm] (stock) at (2.783333333333333,-2.8) {\textbf{IRegistro\allowbreak{}Inventario}\\[2pt]{\color{lgmuted}\footnotesize Agregar}};
+\node[lgBox,text width=4.1466666666666665cm] (rec) at (7.550000000000001,-2.8) {\textbf{IPagos\allowbreak{}Registrados}\\[2pt]{\color{lgmuted}\footnotesize Registrar}};
+\node[lgBox,text width=4.1466666666666665cm] (event) at (12.316666666666666,-2.8) {\textbf{ICola\allowbreak{}Eventos}\\[2pt]{\color{lgmuted}\footnotesize Agregar}};
+\draw[lgDep] (fac.south west) -- (u.north);
+\draw[lgDep] (fac.south) -- (v.north);
+\draw[lgDep] (fac.south east) -- (pay.north);
+\node[lgNote] at (7.55,-3.8) {Colaboradores de escritura de la propia fachada, dentro de la unidad de trabajo.};
+\end{tikzpicture}

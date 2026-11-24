@@ -1,0 +1,17 @@
+\begin{tikzpicture}[x=1cm,y=1cm, transform shape]
+\node[lgBox,text width=2.55cm] (bo) at (2.15,0) {\textbf{BORRADOR}};
+\node[lgBox,text width=2.55cm] (va) at (5.7,0) {\textbf{VALIDADO}};
+\node[lgBox,text width=2.55cm] (pa) at (9.25,0) {\textbf{PAGADO}};
+\node[lgBox,text width=2.7cm] (de) at (12.9,0) {\textbf{DESPACHADO}};
+\node[lgBox,text width=3.0cm] (can) at (3.9,-1.75) {\textbf{CANCELADO}};
+\node[lgBox,text width=2.7cm] (ent) at (12.9,-1.75) {\textbf{ENTREGADO}};
+\node[lgBox,text width=3.1cm] (ret) at (8.64,-1.75) {\textbf{Devolución}\\[2pt]{\color{lgmuted}\footnotesize Operación independiente}};
+\draw[lgCall] (bo.east) -- node[lgLabel,above=.40cm] {validar} (va.west);
+\draw[lgCall] (va.east) -- node[lgLabel,above=.40cm] {pagar} (pa.west);
+\draw[lgCall] (pa.east) -- node[lgLabel,above=.40cm] {despachar} (de.west);
+\draw[lgCall] (bo.south) |- (2.15,-.87) -|  (can.north west);
+\draw[lgCall] (va.south) |- (5.7,-.87) -|  (can.north east);
+\draw[lgCall] (de.south) -- node[lgLabel,right] {entregar} (ent.north);
+\draw[lgDep] (ent.west) -- node[lgLabel,above] {evaluar} (ret.east);
+\node[lgNote] at (7.55,-2.86) {Cancelar es posible desde BORRADOR y VALIDADO; la devolución requiere ENTREGADO.};
+\end{tikzpicture}
