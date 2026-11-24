@@ -18,7 +18,7 @@ public sealed class CadenaValidacionPedido
     public CadenaValidacionPedido(IConsultaCatalogo catalogo) =>
         _primero = new ClienteActivo(new LineasPositivas(new StockSuficiente(catalogo, new EstadoValido())));
 
-    public async Task<IReadOnlyDictionary<Sku, ProductoSimple>> RevisarAsync(Pedido pedido, Cliente? cliente,
+    public async Task<IReadOnlyDictionary<Sku, (ProductoSimple Producto, int Cantidad)>> RevisarAsync(Pedido pedido, Cliente? cliente,
         bool paraConfirmar, CancellationToken ct)
     {
         var contexto = new Contexto(pedido, cliente, paraConfirmar);
@@ -28,7 +28,7 @@ public sealed class CadenaValidacionPedido
 
     private sealed record Contexto(Pedido Pedido, Cliente? Cliente, bool ParaConfirmar)
     {
-        public Dictionary<Sku, ProductoSimple> Productos { get; } = [];
+        public Dictionary<Sku, (ProductoSimple Producto, int Cantidad)> Productos { get; } = [];
     }
 
     private abstract class Paso(Paso? siguiente)
@@ -75,7 +75,7 @@ public sealed class CadenaValidacionPedido
                 var producto = await catalogo.BuscarProductoAsync(unidad.Key, ct);
                 if (producto is not { Activo: true } || producto.Stock < unidad.Value)
                     throw new RechazoPedidoException("STOCK", $"Stock insuficiente o SKU inactivo: {unidad.Key}.");
-                contexto.Productos.Add(unidad.Key, producto);
+                contexto.Productos.Add(unidad.Key, (producto, unidad.Value));
             }
         }
     }
