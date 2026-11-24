@@ -1,6 +1,6 @@
 \clearpage
 \subsubsection{Interfaz Windows Forms y comprobaciones funcionales}
-Las doce vistas siguen las operaciones de los wireframes de las páginas 11--16 de la guía. Los formularios muestran datos de Application y protegen visualmente las acciones. La autorización decisiva se verifica en el caso de uso. Las capturas corresponden a ejecuciones reales y se identifican por recorrido. El manifiesto de evidencias relaciona cada archivo con su origen. Algunas se tomaron en fases previas al último ajuste DPI; se usan para documentar la operación observada.
+Las doce vistas siguen las operaciones de los wireframes de las páginas 11--16 de la guía. Los formularios muestran datos de Application y protegen visualmente las acciones. La autorización decisiva se verifica en el caso de uso. Las capturas corresponden a ejecuciones reales y se identifican por recorrido. La revisión incorporó siete recapturas a 96 DPI sobre copias aisladas de los escenarios. El registro gráfico identifica las tomas históricas que aún conservan el puntero o su halo. El manifiesto de evidencias relaciona cada archivo con su origen. Algunas se tomaron en fases previas al último ajuste DPI; se usan para documentar la operación observada.
 
 \paragraph{1. Acceso}
 \plabel{Objetivo} Volver a identificar al operador o finalizar la sesión local.
@@ -9,7 +9,7 @@ Las doce vistas siguen las operaciones de los wireframes de las páginas 11--16 
 \plabel{Servicios} \ruta{AutenticacionLocal.IniciarAsync}; \ruta{SesionLocal}.
 \plabel{Patrones y decisiones} Autenticación y autorización por operación.
 \plabel{Comprobación} Se observó el acceso centrado y la vuelta al formulario al cerrar sesión. El usuario confirmó ingreso con las cuatro cuentas. La captura es del formulario de producción, sin credenciales expuestas. Véase la Figura~\ref{fig:acceso}.
-\vistafig{acceso.jpg}{acceso}{10.1cm}{Formulario de acceso a 96 DPI.}
+\vistafig{acceso-revision.jpg}{acceso}{10.1cm}{Formulario de acceso a 96 DPI.}
 
 \clearpage
 \paragraph{2. Panel general}
@@ -19,7 +19,7 @@ Las doce vistas siguen las operaciones de los wireframes de las páginas 11--16 
 \plabel{Servicios} \ruta{ConsultarEscritorio.ResumenAsync}.
 \plabel{Patrones y decisiones} Singleton, Mediator y Observer.
 \plabel{Comprobación} Se observó Ana, el estado y el total de USD 59.00 después de reabrir. La comparación de métricas entre Panel y Auditoría se detalla en P15. Véase la Figura~\ref{fig:panel}.
-\vistafig{panel.jpg}{panel}{10.1cm}{Panel general con datos del escenario comercial de demostración.}
+\vistafig{panel-revision.jpg}{panel}{10.1cm}{Panel general con datos del escenario comercial de demostración.}
 
 \clearpage
 \paragraph{3. Catálogo y kits}
@@ -39,7 +39,7 @@ Las doce vistas siguen las operaciones de los wireframes de las páginas 11--16 
 \plabel{Servicios} \ruta{AdministrarClientes.BuscarAsync}; \ruta{AdministrarClientes}.
 \plabel{Patrones y decisiones} Segregación entre consulta y escritura y autorización en Application.
 \plabel{Comprobación} Se observó navegación de Buscar cliente al botón Buscar y ficha de Ana VIP. La prueba de operaciones comerciales cubre la escritura y el uso del cliente en el pedido. Véase la Figura~\ref{fig:clientes}.
-\vistafig{clientes.jpg}{clientes}{10.1cm}{Búsqueda y datos de cliente con sesión VENTAS.}
+\vistafig{clientes-revision.jpg}{clientes}{10.1cm}{Búsqueda y datos de cliente con sesión VENTAS.}
 
 \clearpage
 \paragraph{5. Carrito y borradores}
@@ -69,7 +69,7 @@ Las doce vistas siguen las operaciones de los wireframes de las páginas 11--16 
 \plabel{Servicios} \ruta{ConsultarEscritorio.DetalleAsync}; \ruta{OperacionesPedido.ConfirmarAsync}.
 \plabel{Patrones y decisiones} Command, Facade, Chain, Proxy, Decorator, Adapter, Strategy y Abstract Factory.
 \plabel{Comprobación} Con Ana se ejecutó el cobro simulado por USD 59.00. Con BODEGA la acción quedó inactiva y legible. P22 comprueba la denegación efectiva y ausencia de llamadas al proveedor. Véase la Figura~\ref{fig:cobro}.
-\vistafig{cobro.jpg}{cobro}{10.1cm}{Resumen de cobro visible con la acción de confirmación inhabilitada para BODEGA.}
+\vistafig{cobro-revision.jpg}{cobro}{10.1cm}{Resumen de cobro visible con la acción de confirmación inhabilitada para BODEGA.}
 
 \clearpage
 \paragraph{8. Despacho y entrega}
@@ -79,7 +79,7 @@ Las doce vistas siguen las operaciones de los wireframes de las páginas 11--16 
 \plabel{Servicios} \ruta{DespacharPedidos.ConsultarAsync}; \ruta{OperacionesPedido.DespacharAsync}; \ruta{DespacharPedidos.EntregarAsync}.
 \plabel{Patrones y decisiones} State, Abstract Factory, Command y Mediator.
 \plabel{Comprobación} Se registró una guía ESTÁNDAR de tres días y se observó el estado ENTREGADO. P09 prueba rechazo antes del pago y no autorización de VENTAS. Véase la Figura~\ref{fig:despacho}.
-\vistafig{despacho.jpg}{despacho}{10.1cm}{Guía emitida y seguimiento del pedido entregado.}
+\vistafig{despacho-revision.jpg}{despacho}{10.1cm}{Guía emitida y seguimiento del pedido entregado.}
 
 \clearpage
 \paragraph{9. Devoluciones}
@@ -126,13 +126,14 @@ Las doce vistas siguen las operaciones de los wireframes de las páginas 11--16 
 A 96 DPI se verificaron acceso, panel y auditoría, incluida la distribución maximizada y foco representativo. Al 125\,\% se observó \ruta{DeviceDpi=120} en la versión auditada y se abrieron las doce vistas en ventana normal y maximizada. Los dos rótulos largos se leen completos. Se observó el avance por TAB de Buscar cliente a Buscar y el borde de foco. Las vistas largas se alcanzan mediante desplazamiento, aunque algunas celdas largas usan elipsis en ventana normal.
 
 \vistafig{dpi125-foco.jpg}{dpi-foco}{9.1cm}{Foco de teclado visible en Buscar, con la interfaz a 120 DPI.}
-La Figura~\ref{fig:dpi-foco} documenta el control activo. Este recorrido representa la navegación en esa vista.
+La Figura~\ref{fig:dpi-foco} documenta el control activo. Este recorrido representa la navegación en esa vista. Las recapturas editoriales a 96 DPI no amplían esta comprobación de 120 DPI.
 
 \clearpage
 Los JPEG archivados a 120 DPI muestran las cuatro cifras de Auditoría en ventana normal, maximizada y al volver a la vista. La bitácora de ejecución registró una omisión que no se reproduce al examinar los píxeles de esos archivos. Falta confirmar físicamente si el efecto aparece durante la navegación. El 150\,\% (144 DPI) tras la corrección sigue NO VERIFICADO. Las capturas del error previo muestran el motivo de la corrección, pero se requiere evidencia posterior.
 
-\vistafig{dpi125-reentrada.jpg}{dpi-normal}{6.55cm}{Reentrada en Auditoría a 120 DPI. El JPEG conserva los valores 0, 0, 0 y 3.}
-\vistafig{dpi125-max.jpg}{dpi-max}{6.55cm}{Auditoría maximizada a 120 DPI, con los cuatro valores visibles.}
+\vistafig{dpi125-reentrada.jpg}{dpi-normal}{10.3cm}{Reentrada en Auditoría a 120 DPI. El JPEG conserva los valores 0, 0, 0 y 3.}
+\clearpage
+\vistafig{dpi125-max.jpg}{dpi-max}{9.62cm}{Auditoría maximizada a 120 DPI, con los cuatro valores visibles.}
 Las Figuras~\ref{fig:dpi-normal} y \ref{fig:dpi-max} documentan las capturas. RNF03 sigue PARCIAL. Véase \ruta{evidencias/cotejo-dpi.md}.
 
 

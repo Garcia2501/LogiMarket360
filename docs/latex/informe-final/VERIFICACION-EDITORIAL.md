@@ -1,4 +1,6 @@
-# Registro de verificación editorial
+# Verificación editorial de la versión de respaldo
+
+La revisión posterior se documenta en [Registro de revisión gráfica](evidencias/registro-revision-grafica.md).
 
 **Documento** APE04_Informe_APELLIDOS_NOMBRES.pdf  
 **Fecha** 23 de noviembre de 2026  

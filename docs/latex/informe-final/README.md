@@ -21,3 +21,5 @@ Tectonic usa XeTeX y ejecuta BibTeX con las referencias de `sample.bib`. Los arc
 - `evidencias/` contiene TRX, salidas de compilación, resultados SQLite no operativos y comprobantes de simulación.
 
 Consulta `VERIFICACION-EDITORIAL.md` para el resultado del control PDF y `PENDIENTES.md` para la portada, DPI y estado de integración.
+
+La revisión de diagramas, la paginación comparada y la procedencia de las recapturas constan en [el registro gráfico](evidencias/registro-revision-grafica.md).

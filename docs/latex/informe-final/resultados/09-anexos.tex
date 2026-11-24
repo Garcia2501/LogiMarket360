@@ -5,8 +5,9 @@ El archivo \ruta{evidencias/capturas.md} conserva origen y SHA-256 de cada captu
 
 \paragraph{Inventario, historial y operación de Outbox.}
 La Figura~\ref{fig:inventario-venta} muestra los saldos inmediatamente posteriores a la venta, antes del reintegro que presenta la Figura~\ref{fig:inventario}. La Figura~\ref{fig:cambio-precio} registra la edición del catálogo, cuya preservación histórica se coteja con la Figura~\ref{fig:pedidos}. Ambas comparaciones se corroboran en P08 y P35.
-\par\noindent\begin{minipage}[t]{.487\linewidth}\vistafig{inventario-venta.jpg}{inventario-venta}{7.4cm}{Existencias P01/P02/P03 de 7/4/19 después del cobro y de reabrir SQLite.}
-\end{minipage}\hfill\begin{minipage}[t]{.487\linewidth}\vistafig{cambio-precio.jpg}{cambio-precio}{7.4cm}{Edición del precio vigente de P01 a USD 21.00 en la base de demostración.}\end{minipage}\par
+\vistafig{inventario-venta-revision.jpg}{inventario-venta}{10.55cm}{Existencias P01/P02/P03 de 7/4/19 después del cobro y de reabrir SQLite.}
+\clearpage
+\vistafig{cambio-precio-revision.jpg}{cambio-precio}{10.55cm}{Precio vigente de P01 a USD 21.00 al reabrir la copia del escenario de fase 4.}
 
 \clearpage
 P21 comparó dos construcciones equivalentes de 1.000 filas con los cinco SKU de control. La Figura~\ref{fig:flyweight} recoge el recuento de objetos, identidad compartida y los bytes asignados en la ejecución. La memoria se mide para la construcción comparada, en el hilo que ejecuta la medición.
