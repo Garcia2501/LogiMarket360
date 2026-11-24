@@ -76,11 +76,9 @@ internal static class CatalogoModelo
             b.ToTable("MovimientoInventario", t =>
             {
                 t.HasCheckConstraint("CK_Movimiento_Inventario",
-                    """
-                    typeof(Cantidad) = 'integer' AND Cantidad BETWEEN -2147483648 AND 2147483647
-                    AND Cantidad <> 0 AND StockResultante BETWEEN 0 AND 2147483647
-                    AND (Tipo = 1 OR (Tipo = 2 AND Cantidad < 0) OR (Tipo = 3 AND Cantidad > 0))
-                    """);
+                    "typeof(Cantidad) = 'integer' AND Cantidad BETWEEN -2147483648 AND 2147483647\r\n" +
+                    "AND Cantidad <> 0 AND StockResultante BETWEEN 0 AND 2147483647\r\n" +
+                    "AND (Tipo = 1 OR (Tipo = 2 AND Cantidad < 0) OR (Tipo = 3 AND Cantidad > 0))");
             });
             b.Property(e => e.Id).ValueGeneratedNever();
             b.HasOne<ProductoSimple>().WithMany().HasForeignKey(e => e.ProductoId).OnDelete(DeleteBehavior.Restrict);
