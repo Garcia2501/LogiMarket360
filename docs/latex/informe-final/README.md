@@ -8,7 +8,7 @@ Desde esta carpeta, con Tectonic y su paquete TeX disponible:
 
 ```powershell
 tectonic main.tex --keep-logs --keep-intermediates
-Copy-Item main.pdf APE04_Informe_APELLIDOS_NOMBRES.pdf
+Copy-Item main.pdf APE04_Informe_Garcia_Amores_Manolo_Jose.pdf
 ```
 
 Tectonic usa XeTeX y ejecuta BibTeX con las referencias de `sample.bib`. Los archivos `main.tex` y `imagenes/` de `../plantilla-original/` se preservan a nivel de bytes. `evidencias/plantilla-sha256.txt` registra las huellas de las entradas inspeccionadas en el ZIP institucional.
@@ -20,6 +20,6 @@ Tectonic usa XeTeX y ejecuta BibTeX con las referencias de `sample.bib`. Los arc
 - `wireframes/` contiene los esquemas de referencia de la guía. Sus cifras son ilustrativas.
 - `evidencias/` contiene TRX, salidas de compilación, resultados SQLite no operativos y comprobantes de simulación.
 
-Consulta `VERIFICACION-EDITORIAL.md` para el resultado del control PDF y `PENDIENTES.md` para la portada, DPI y estado de integración.
+Consulta `VERIFICACION-EDITORIAL.md` para el control del respaldo y `PENDIENTES.md` para las limitaciones del cierre documental.
 
 La revisión de diagramas, la paginación comparada y la procedencia de las recapturas constan en [el registro gráfico](evidencias/registro-revision-grafica.md) y [el registro de cierre visual](evidencias/cierre-visual.md).

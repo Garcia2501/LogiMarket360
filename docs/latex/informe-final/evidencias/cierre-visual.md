@@ -12,16 +12,18 @@ Las recapturas se hicieron en Windows con el código auditado, roles ficticios, 
 
 ## Originales conservados con cursor o halo
 
-| Archivo | Condición que hace falta recuperar | Procedimiento de recaptura |
+Por decisión del estudiante se conservan estas siete capturas auténticas en sus archivos originales. El cursor y el halo son indicadores de captura y no modifican los estados, importes, datos o resultados funcionales registrados.
+
+| Archivo original | Figura | Evidencia que conserva |
 | --- | --- | --- |
-| `pedidos.jpg` | Pedido histórico de Ana antes del despacho, cuando aún estaba PAGADO. | Recuperar una copia del punto previo al despacho y reproducir P08 en Carrito y Pedidos. Conserva la captura archivada si solo existe el SQLite posterior, con ENTREGADO. |
-| `dpi125-foco.jpg` | Recorrido de foco a 120 DPI. | Seleccionar escala del 125 % en el monitor físico, reabrir la compilación corregida, navegar con TAB de Buscar cliente a Buscar y capturar el borde de foco. |
-| `dpi125-reentrada.jpg` | Reentrada a Auditoría normal con la secuencia y cifras originales. | A 120 DPI abrir Panel → Auditoría y Reportes → Auditoría en ventana normal. Contrastar en pantalla las cuatro cifras; cotejar 0/0/0/3 antes de sustituir la figura. |
-| `dpi125-max.jpg` | Auditoría maximizada a 120 DPI. | Repetir en ventana maximizada de la misma sesión y cotejar 0/0/0/3. |
-| `outbox-fallo.jpg` | Primer intento con error en el evento histórico. | Usar una copia anterior al primer procesamiento. Con ADMIN en modo demostración, inducir el fallo, reprocesar una vez y verificar Intentos=1, fecha de procesamiento vacía y error. |
-| `outbox-recuperado.jpg` | Segundo intento exitoso del mismo evento y contadores de esa sesión. | Continuar el escenario del primer intento. Desactivar el fallo, reprocesar, verificar Intentos=2 y fecha de procesamiento, y comprobar que cobro y movimientos se conservan únicos. |
-| `metricas-panel.jpg` | Contador de una venta en la misma sesión del recorrido histórico. | Procesar el evento de P15 en la sesión que se va a capturar. Comparar Panel y Auditoría antes de cerrar la aplicación; cotejar los indicadores de la época. |
+| `pedidos.jpg` | 37 | Pedido histórico de Ana en estado PAGADO y seguimiento del pedido. |
+| `dpi125-foco.jpg` | 44 | Foco de teclado en Buscar a 120 DPI. |
+| `dpi125-reentrada.jpg` | 45 | Cifras de Auditoría al volver a la vista en ventana normal, a 120 DPI. |
+| `dpi125-max.jpg` | 46 | Auditoría maximizada con cuatro valores visibles en el JPEG, a 120 DPI. |
+| `outbox-fallo.jpg` | 50 | Primer intento del evento histórico, pendiente y con error. |
+| `outbox-recuperado.jpg` | 51 | Segundo intento exitoso del mismo evento. |
+| `metricas-panel.jpg` | 52 | Contadores del Panel general durante la misma sesión del recorrido histórico. |
 
-Para cada captura coloca el puntero fuera de la ventana y conserva el original cuando alguna cifra, referencia, mensaje o condición esté ausente. Una ejecución nueva con otros identificadores puede servir como comprobación adicional del procedimiento.
+**RNF03 permanece PARCIAL.** Las tres figuras DPI conservan evidencia histórica a 120 DPI. El cotejo físico de las transiciones a 125 % sigue pendiente, y la versión corregida no está verificada al 150 % en ambos tamaños.
 
-**RNF03 permanece PARCIAL.** Las tres figuras DPI conservan evidencia histórica a 120 DPI. Sigue pendiente el cotejo físico de las transiciones a 125 % y el recorrido de la interfaz corregida a 150 % en ambos tamaños. **RNF10 permanece PARCIAL.** Los 13 riesgos registrados incluyen refactorizaciones, correcciones, mitigaciones y propuestas con evidencia de distinto alcance.
+**RNF10 permanece PARCIAL.** Los 13 riesgos registrados incluyen refactorizaciones, correcciones, mitigaciones y propuestas con evidencia de distinto alcance.
